@@ -1,75 +1,39 @@
-package org.bidtime.web.filter.gzip;
+package com.utils.filter.gzip1;
+
+import java.io.IOException;
+import java.io.OutputStream;
 
 import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletResponse;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.zip.GZIPOutputStream;
 
 public class GZIPResponseStream extends ServletOutputStream {
-  protected ByteArrayOutputStream baos = null;
-  protected GZIPOutputStream gzipstream = null;
-  protected boolean closed = false;
-  protected HttpServletResponse response = null;
-  protected ServletOutputStream output = null;
 
-  public GZIPResponseStream(HttpServletResponse response) throws IOException {
-    super();
-    closed = false;
-    this.response = response;
-    this.output = response.getOutputStream();
-    baos = new ByteArrayOutputStream();
-    gzipstream = new GZIPOutputStream(baos);
-  }
+    private final OutputStream stream;
 
-  public void close() throws IOException {
-    if (closed) {
-      throw new IOException("This output stream has already been closed");
+    /**
+     * Creates a FilterServletOutputStream.
+     */
+    public GZIPResponseStream(final OutputStream stream) {
+        this.stream = stream;
     }
-    gzipstream.finish();
 
-    byte[] bytes = baos.toByteArray();
-
-
-    response.addHeader("Content-Length", 
-                       Integer.toString(bytes.length)); 
-    response.addHeader("Content-Encoding", "gzip");
-    output.write(bytes);
-    output.flush();
-    output.close();
-    closed = true;
-  }
-
-  public void flush() throws IOException {
-    if (closed) {
-      throw new IOException("Cannot flush a closed output stream");
+    /**
+     * Writes to the stream.
+     */
+    public void write(final int b) throws IOException {
+        stream.write(b);
     }
-    gzipstream.flush();
-  }
 
-  public void write(int b) throws IOException {
-    if (closed) {
-      throw new IOException("Cannot write to a closed output stream");
+    /**
+     * Writes to the stream.
+     */
+    public void write(final byte[] b) throws IOException {
+        stream.write(b);
     }
-    gzipstream.write((byte)b);
-  }
 
-  public void write(byte b[]) throws IOException {
-    write(b, 0, b.length);
-  }
-
-  public void write(byte b[], int off, int len) throws IOException {
-    if (closed) {
-      throw new IOException("Cannot write to a closed output stream");
+    /**
+     * Writes to the stream.
+     */
+    public void write(final byte[] b, final int off, final int len) throws IOException {
+        stream.write(b, off, len);
     }
-    gzipstream.write(b, off, len);
-  }
-
-  public boolean closed() {
-    return (this.closed);
-  }
-  
-  public void reset() {
-    //noop
-  }
 }
