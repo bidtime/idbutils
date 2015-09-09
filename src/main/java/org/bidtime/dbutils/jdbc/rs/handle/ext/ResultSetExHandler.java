@@ -9,18 +9,20 @@ import org.bidtime.dbutils.jdbc.rs.BeanProcessorEx;
 /**
  * @author jss
  * 
- * 提供对从ResultSet进行预处理的功能,继承自dbutils的ResultSetHandler类
+ *         提供对从ResultSet进行预处理的功能,继承自dbutils的ResultSetHandler类
  *
  */
 public class ResultSetExHandler<T> implements ResultSetHandler<T> {
 
+	protected boolean addHead = false;
+
 	protected Class<T> type;
-	
+
 	protected BeanProcessorEx convert = null;
-    
-	static final BeanProcessorEx ROW_PROCESSOR = new BeanProcessorEx();
-	
-    protected boolean countSql = false;
+
+	protected static final BeanProcessorEx ROW_PROCESSOR = new BeanProcessorEx();
+
+	protected boolean countSql = false;
 
 	public boolean isCountSql() {
 		return countSql;
@@ -30,23 +32,32 @@ public class ResultSetExHandler<T> implements ResultSetHandler<T> {
 		this.countSql = countSql;
 	}
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void setProp(Class type, BeanProcessorEx convert, boolean countSql) {
-        this.type = type;
-        this.convert = convert;
-        this.countSql = countSql;
-    }
-    
-    @SuppressWarnings("rawtypes")
+		this.type = type;
+		this.convert = convert;
+		this.countSql = countSql;
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public void setProp(Class type, BeanProcessorEx convert, boolean countSql,
+			boolean addHead) {
+		this.type = type;
+		this.convert = convert;
+		this.countSql = countSql;
+		this.addHead = addHead;
+	}
+
+	@SuppressWarnings("rawtypes")
 	public void setProp(Class type, boolean countSql) {
-        setProp(type, ROW_PROCESSOR, countSql);
-    }
-    
-    @SuppressWarnings("rawtypes")
-    public void setProp(Class type) {
-        setProp(type, false);
-    }
-	
+		setProp(type, ROW_PROCESSOR, countSql);
+	}
+
+	@SuppressWarnings("rawtypes")
+	public void setProp(Class type) {
+		setProp(type, false);
+	}
+
 	@Override
 	public T handle(ResultSet rs) throws SQLException {
 		return rs.next() ? this.convert.toBean(rs, this.type) : null;

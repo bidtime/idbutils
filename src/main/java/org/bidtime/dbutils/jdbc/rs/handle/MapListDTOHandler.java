@@ -13,8 +13,6 @@ import org.bidtime.dbutils.jdbc.rs.BeanProcessorEx;
  *
  */
 public class MapListDTOHandler extends AbstractListDTOHandler<Map<String, Object>> {
-	
-	final static BeanProcessorEx beanProcess = new BeanProcessorEx();
 
 	public MapListDTOHandler() {
 		setProp(null);

@@ -8,22 +8,32 @@ import org.bidtime.dbutils.jdbc.rs.BeanProcessorEx;
 /**
  * @author jss
  * 
- * 提供对从ResultSet进行预处理的功能,继承AbstractGsonListHandler类
+ *         提供对从ResultSet进行预处理的功能,继承AbstractGsonListHandler类
  *
  */
+
 public class BeanListDTOHandler<T> extends AbstractListDTOHandler<T> {
-	
+
 	public BeanListDTOHandler(Class<T> type) {
-		setProp(type);
+		this(type, false);
 	}
 
 	public BeanListDTOHandler(Class<T> type, boolean countSql) {
-		setProp(type, countSql);
+		this(type, ROW_PROCESSOR, countSql);
 	}
 
 	public BeanListDTOHandler(Class<T> type, BeanProcessorEx convert,
 			boolean countSql) {
-		setProp(type, convert, countSql);
+		this(type, convert, countSql, true);
+	}
+
+	public BeanListDTOHandler(Class<T> type, boolean countSql, boolean addHead) {
+		this(type, ROW_PROCESSOR, countSql, addHead);
+	}
+
+	public BeanListDTOHandler(Class<T> type, BeanProcessorEx convert,
+			boolean countSql, boolean addHead) {
+		super.setProp(type, convert, countSql, addHead);
 	}
 
 	@SuppressWarnings("unchecked")

@@ -899,7 +899,7 @@ public class GsonRows {
 				} else {
 					obj = null;
 				}
-				ar1.put(JSONHelper.objToJsonObj(obj));
+				ar1.put(JSONHelper.objToJsonObj(obj, null));
 			}
 			jsonArray.put(ar1);
 		}

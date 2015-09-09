@@ -8,6 +8,16 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class ResultDTO<T> implements Serializable {
+	
+	String[] head = null;
+
+	public String[] getHead() {
+		return head;
+	}
+
+	public void setHead(String[] head) {
+		this.head = head;
+	}
 
 	/**
 	 * serialVersionUID
@@ -144,11 +154,11 @@ public class ResultDTO<T> implements Serializable {
 				jsonArray = JSONHelper
 						.listMapToJsonArray((List<Map<String, Object>>) data);
 			} else {
-				jsonArray = JSONHelper.clazzToJsonArray((List) data);
+				jsonArray = JSONHelper.clazzToJsonArray((List) data, head);
 			}
 		} else {
 			jsonArray = new JSONArray();
-			JSONObject jsonObject = JSONHelper.clazzToJson(data);
+			JSONObject jsonObject = JSONHelper.clazzToJson(data, head);
 			jsonArray.put(jsonObject);
 		}
 		//} else {

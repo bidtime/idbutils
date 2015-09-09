@@ -97,7 +97,7 @@ public class JSONHelper {
 	 * @param object
 	 * @return jsonObject
 	 */
-	public static Object objToJsonObj(Object objRaw) {
+	public static Object objToJsonObj(Object objRaw, String[] arHeads) {
 		Object objData = null;
 		if (objRaw == null) {		//要转换成json.null
 			objData = JSONObject.NULL;
@@ -108,13 +108,13 @@ public class JSONHelper {
 		} else if (objRaw instanceof java.util.Date) {
 			objData = dateToyyyyMMddHHmmss((Date) objRaw);
 		} else if (objRaw instanceof JsonData) {
-			objData = clazzToJson(objRaw);
+			objData = clazzToJson(objRaw, arHeads);
 		} else if (objRaw instanceof Set || objRaw instanceof Queue ||
 			objRaw instanceof Character ||
 			objRaw instanceof Math || objRaw instanceof Enum) {
 			objData = objRaw;
 		} else {
-			objData = clazzToJson(objRaw);
+			objData = clazzToJson(objRaw, arHeads);
 		}
 		return objData;
 	}
@@ -130,11 +130,11 @@ public class JSONHelper {
 	}
 	
 	@SuppressWarnings("rawtypes")
-	public static JSONArray listToJson(List list) {
+	public static JSONArray listToJson(List list, String[] arHeads) {
 		JSONArray jsonObject1 = new JSONArray();
 		for (int i=0; i<list.size(); i++) {
 			Object obj = list.get(i);
-			jsonObject1.put(JSONHelper.objToJsonObj(obj));
+			jsonObject1.put(JSONHelper.objToJsonObj(obj, arHeads));
 		}
 		return jsonObject1;
 	}
@@ -386,17 +386,17 @@ public class JSONHelper {
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private static JSONArray listToJsonArray(List list) {
+	private static JSONArray listToJsonArray(List list, String[] arHeads) {
 		JSONArray jsonArray = new JSONArray();
 		if (list != null && list.size()>0) {
 			for (int i = 0; i < list.size(); i++) {
 				Object objData = list.get(i);
 				if (objData instanceof List) {
-					jsonArray.put(listToJsonArray((List)objData));
+					jsonArray.put(listToJsonArray((List)objData, arHeads));
 				} else if (objData instanceof Map) {
 					jsonArray.put(mapToJson((Map)objData));
 				} else {
-					jsonArray.put(JSONHelper.objToJsonObj(objData));
+					jsonArray.put(JSONHelper.objToJsonObj(objData, arHeads));
 				}
 			}
 		}
@@ -409,29 +409,33 @@ public class JSONHelper {
 		for (Entry<String, Object> entry: map.entrySet()) {
 			Object objData = entry.getValue();
 			if (objData instanceof List) {
-				jsonObject.put(entry.getKey(), listToJsonArray((List)objData));
+				jsonObject.put(entry.getKey(), listToJsonArray((List)objData, null));
 			} else if (objData instanceof Map) {
 				jsonObject.put(entry.getKey(), mapToJson((Map)objData));
 			} else {
 				jsonObject.put(entry.getKey(),
-						JSONHelper.objToJsonObj(objData));
+						JSONHelper.objToJsonObj(objData, null));
 			}
 		}
 		return jsonObject;
 	}
 	
 	@SuppressWarnings("rawtypes")
-	public static JSONArray clazzToJsonArray(List list) {
+	public static JSONArray clazzToJsonArray(List list, String[] head) {
 		List<Map<String, Object>> listResult = new ArrayList<>();
 		for (Object o:list) {
-			Map<String, Object> map = clazzToMap(o);
+			Map<String, Object> map = clazzToMap(o, head);
 			listResult.add(map);
 		}
 		return listMapToJsonArray(listResult);
 	}
 	
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static JSONObject clazzToJson(Object object) {
+		return clazzToJson(object, null);
+	}
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public static JSONObject clazzToJson(Object object, String[] arHeads) {
 		JSONObject jsonObject = new JSONObject();
 		PropertyDescriptor[] propDescripts = null;
 		try {
@@ -440,15 +444,29 @@ public class JSONHelper {
 		} catch (IntrospectionException e) {
 			logger.error("class to map error", e);
 		}
+		Map<String, Object> mapHead = null;
+		
+		if (arHeads != null) {
+			mapHead = new CaseInsensitiveHashMap();
+			for (int n = 0; n < arHeads.length; n ++) {
+				mapHead.put(arHeads[n], true);
+			}
+		}
+
 		for (int i=0; i<propDescripts.length; i++) {
 			PropertyDescriptor pro = propDescripts[i];
 			//Method setter = pd.getWriteMethod();
-			String head = pro.getName();
+			String key = pro.getName();
 			Method setter = pro.getReadMethod();
 
 			if (setter == null || setter.getName().equals("getClass")) {
 				continue;
 			}
+
+			if (mapHead != null && !mapHead.containsKey(key)) {
+				continue;
+			}
+
 			Object retVal = null;	//通过反射把该类对象传递给invoke方法来调用对应的方法  
 			try {
 				retVal = setter.invoke(object);
@@ -456,17 +474,21 @@ public class JSONHelper {
 				logger.error("clazzToJson", e);
 			}
 			if (retVal instanceof List) {
-				jsonObject.put(head, listToJsonArray((List)retVal));
+				jsonObject.put(key, listToJsonArray((List)retVal, arHeads));
 			} else if (retVal instanceof Map) {
-				jsonObject.put(head, mapToJson((Map)retVal));
+				jsonObject.put(key, mapToJson((Map)retVal));
 			} else {
-				jsonObject.put(head, JSONHelper.objToJsonObj(retVal));
+				jsonObject.put(key, JSONHelper.objToJsonObj(retVal, arHeads));
 			}
 		}
 		return jsonObject;
 	}
 	
 	public static Map<String, Object> clazzToMap(Object object) {
+		return clazzToMap(object,  null);
+	}
+	
+	public static Map<String, Object> clazzToMap(Object object, String[] arHeads) {
 		Map<String, Object> map = new HashMap<String, Object>();
 		PropertyDescriptor[] propDescripts = null;
 		try {
@@ -475,12 +497,25 @@ public class JSONHelper {
 		} catch (IntrospectionException e) {
 			logger.error("class to map error", e);
 		}
+		
+		Map<String, Object> mapHead = null;
+		
+		if (arHeads != null) {
+			mapHead = new CaseInsensitiveHashMap();
+			for (int i = 0; i < arHeads.length; i ++) {
+				mapHead.put(arHeads[i], true);
+			}
+		}
+		
 		for (int i=0; i<propDescripts.length; i++) {
 			PropertyDescriptor pd = propDescripts[i];
 			//Method setter = pd.getWriteMethod();
-			String head = pd.getName();
+			String key = pd.getName();
 			Method setter = pd.getReadMethod();
 			if (setter == null || setter.getName().equals("getClass")) {
+				continue;
+			}
+			if (mapHead != null && !mapHead.containsKey(key)) {
 				continue;
 			}
 			Object retVal = null;	//通过反射把该类对象传递给invoke方法来调用对应的方法  
@@ -489,44 +524,10 @@ public class JSONHelper {
 			} catch (Exception e) {
 				logger.error("class to map", e);
 			}
-			map.put(head, retVal);
+			map.put(key, retVal);
 		}
 		return map;
 	}
-	
-	/*
-	public static void mapToClazz(Object object, Map<String, Object> map) {
-		//Map<String, Object> map = new HashMap<String, Object>();
-		PropertyDescriptor[] propDescripts = null;
-		try {
-			propDescripts = Introspector.getBeanInfo(object.getClass()).
-					getPropertyDescriptors();
-		} catch (IntrospectionException e) {
-			logger.error("mapToClazz", e);
-		}
-		for (int i=0; i<propDescripts.length; i++) {
-			PropertyDescriptor pd = propDescripts[i];
-			Method setter = pd.getWriteMethod();
-			String head = pd.getName();
-			//Method setter = pro.getReadMethod();
-
-			if (setter == null) {
-				continue;
-			}
-			if (setter.getName().equals("getClass")) {
-				continue;
-			}
-			Object retVal = null;	//通过反射把该类对象传递给invoke方法来调用对应的方法  
-			try {
-				setter.invoke(object, );
-			} catch (Exception e) {
-				logger.error("mapToClazz", e);
-			}
-			map.put(head, retVal);
-		}
-		//return map;
-	}
-	*/
 
 	// public static void main(String[] args) {
 	// String head[] = new String[]{"http://www.baidu.com?id=01"};

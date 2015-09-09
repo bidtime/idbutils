@@ -88,7 +88,7 @@ public class GsonRow {
 			} else {
 				obj = null;
 			}
-			ar1.put(JSONHelper.objToJsonObj(obj));
+			ar1.put(JSONHelper.objToJsonObj(obj, null));
 		}
 		return ar1;
 	}

@@ -195,13 +195,13 @@ public class ParserDataSet {
 	protected JSONObject toJson() {
 		JSONObject jsonObject = new JSONObject();
 		if (this.isExistsInsertRows()) {
-			jsonObject.put("add", JSONHelper.listToJson(this.add));
+			jsonObject.put("add", JSONHelper.listToJson(this.add, null));
 		}
 		if (this.isExistsUpdateRows()) {
-			jsonObject.put("edit", JSONHelper.listToJson(this.edit));
+			jsonObject.put("edit", JSONHelper.listToJson(this.edit, null));
 		}
 		if (this.isExistsDelRows()) {
-			jsonObject.put("del", JSONHelper.listToJson(this.del));
+			jsonObject.put("del", JSONHelper.listToJson(this.del, null));
 		}
 		return jsonObject;
 	}

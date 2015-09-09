@@ -27,7 +27,7 @@ public class MapDTOHandler extends ResultSetDTOHandler<Map<String, Object>> {
 			boolean countSql) {
 		setProp(null, convert, countSql);
 	}
-     
+   
     @Override
     public Map<String, Object> doDTO(ResultSet rs) throws SQLException {
        return rs.next() ? this.convert.toMap(rs) : null;
