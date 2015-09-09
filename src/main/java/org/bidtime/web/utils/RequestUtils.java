@@ -12,10 +12,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
 import org.bidtime.dbutils.gson.JSONHelper;
-import org.bidtime.dbutils.gson.dataset.ParserDataSet;
 import org.bidtime.utils.basic.CArrayComm;
 import org.bidtime.utils.spring.SpringMessageUtils;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -98,34 +96,35 @@ public class RequestUtils {
 		return getIntegerSplit(request, sParam, COMMA);
 	}
 	
-	public static ParserDataSet getPaserDataSetOfRequest(HttpServletRequest request, String sParam) throws Exception {
-		String data = request.getParameter(sParam);
-		ParserDataSet g = ParserDataSet.jsonStrToObject(data);
-		if (g == null) {
-			throw new Exception("json data is null");
-		} else {
-			return g;
-		}
-	}
+//	public static ParserDataSet getPaserDataSetOfRequest(HttpServletRequest request, String sParam) throws Exception {
+//		String data = request.getParameter(sParam);
+//		ParserDataSet g = ParserDataSet.jsonStrToObject(data);
+//		if (g == null) {
+//			throw new Exception("json data is null");
+//		} else {
+//			return g;
+//		}
+//	}
 	
-	public static Object getPaserJsonOfRequest(HttpServletRequest request, String sParam) throws Exception {
-		String data = request.getParameter(sParam);
-		JSONObject jsonObject = new JSONObject(data);
-		Object o = JSONHelper.jsonObjToObj(jsonObject);
-		if (o == null) {
-			throw new Exception("json data is null");
-		} else {
-			return o;
-		}
-	}
-	
+//	public static Object getPaserJsonOfRequest(HttpServletRequest request, String sParam) throws Exception {
+//		String data = request.getParameter(sParam);
+//		JSONObject jsonObject = new JSONObject(data);
+//		Object o = JSONHelper.jsonToMap(jsonObject);
+//		if (o == null) {
+//			throw new Exception("json data is null");
+//		} else {
+//			return o;
+//		}
+//	}
+//	
 	public static Map<String, Object> getPaserJsonMapOfRequest(HttpServletRequest request, String sParam) throws Exception {
-		JSONObject jsonObject = (JSONObject)getPaserJsonOfRequest(request, sParam);
-		if (jsonObject != null) {
-			return JSONHelper.jsonToMap(jsonObject);
-		} else {
-			return null;
-		}
+		String jsonObject = RequestUtils.getString(request, sParam);
+		return JSONHelper.jsonStrToMap(jsonObject);
+	}
+
+	public static <T> T getPaserJsonMapOfRequest(HttpServletRequest request, String sParam, Class<T> type) throws Exception {
+		String json = RequestUtils.getString(request, sParam);
+		return JSONHelper.jsonStrToClazz(json, type);
 	}
 
 	public static Object[] getSplit(HttpServletRequest request, String sParam,

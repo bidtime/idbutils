@@ -4,6 +4,7 @@ import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -16,6 +17,7 @@ import java.util.Queue;
 import java.util.Set;
 
 import org.bidtime.dbutils.gson.dataset.JsonData;
+import org.bidtime.utils.comm.CaseInsensitiveHashMap;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -33,11 +35,26 @@ public class JSONHelper {
 		return df.format(date);
 	}
 	
-	public static List<Map<String, Object>> parserToListMap(String json) {
-		return parserToListMap(json, false);
+	private static Date yyyyMMddHHmmssToDate(String sDate) {
+		return StringToDate(sDate, "yyyy-MM-dd HH:mm:ss");
+	}
+
+	private static Date StringToDate(String sDate, String fmt) {
+		java.text.DateFormat df2 = new java.text.SimpleDateFormat(fmt);
+		try {
+			Date date2 = df2.parse(sDate);
+			return date2;
+		} catch (ParseException e) {
+			logger.error("StringToDate", e);
+			return null;
+		}
 	}
 	
-	public static List<Map<String, Object>> parserToListMap(String json, boolean bNew) {
+	public static List<Map<String, Object>> jsonStrToListMap(String json) {
+		return jsonStrToListMap(json, false);
+	}
+	
+	public static List<Map<String, Object>> jsonStrToListMap(String json, boolean bNew) {
 		JSONArray jsonobj = new JSONArray(json);
 		if (jsonobj.length() > 0 || bNew) {
 			return jsonArrayToListMap(jsonobj);
@@ -77,46 +94,35 @@ public class JSONHelper {
 	}
 
 	/**
-	 * @param jsonObject
-	 * @return
+	 * @param object
+	 * @return jsonObject
 	 */
 	public static Object objToJsonObj(Object objRaw) {
 		Object objData = null;
 		if (objRaw == null) {		//要转换成json.null
 			objData = JSONObject.NULL;
-		} else if (objRaw instanceof String) {
-			objData = String.valueOf(objRaw);
+		} else if (objRaw instanceof String || objRaw instanceof Number ||
+			objRaw instanceof StringBuilder || objRaw instanceof StringBuffer ||
+			objRaw instanceof Boolean || objRaw instanceof Appendable) {
+			objData = objRaw;
 		} else if (objRaw instanceof java.util.Date) {
 			objData = dateToyyyyMMddHHmmss((Date) objRaw);
-		} else if (objRaw instanceof java.sql.Date) {
-			java.sql.Date dt = (java.sql.Date)objRaw;
-			objData = dateToyyyyMMddHHmmss(new java.util.Date(dt.getTime()));
-		} else if (objRaw instanceof java.sql.Timestamp) {
-			java.sql.Timestamp dt = (java.sql.Timestamp)objRaw;
-			objData = dateToyyyyMMddHHmmss(new java.util.Date(dt.getTime()));
-		} else if (objRaw instanceof java.sql.Time) {
-			java.sql.Time dt = (java.sql.Time)objRaw;
-			objData = dateToyyyyMMddHHmmss(new java.util.Date(dt.getTime()));
-//		} else if (objRaw instanceof GsonRows) {
-//			objData = ((GsonRows)objRaw).toJson();
 		} else if (objRaw instanceof JsonData) {
 			objData = clazzToJson(objRaw);
-		} else if (objRaw instanceof Set) {
-			objData = objRaw;
-		} else if (objRaw instanceof Queue) {
+		} else if (objRaw instanceof Set || objRaw instanceof Queue ||
+			objRaw instanceof Character ||
+			objRaw instanceof Math || objRaw instanceof Enum) {
 			objData = objRaw;
 		} else {
-			objData = objRaw;
+			objData = clazzToJson(objRaw);
 		}
 		return objData;
 	}
 	
-	public static Object jsonObjToObj(Object jsonObject) {
+	private static Object jsonObjToObj(Object jsonObject) {
 		Object objData = null;
 		if (jsonObject == JSONObject.NULL) {	//如果是json.null, 要转换成 (object)null
 			objData = (Object)null;
-//		} else if (jsonObject instanceof GsonRows) {
-//			objData = new GsonRows((JSONObject)jsonObject);
 		} else {
 			objData = jsonObject;
 		}
@@ -159,14 +165,14 @@ public class JSONHelper {
 	 * @param map
 	 * @return
 	 */
-	public static List<String> jsonMapKeysList(Map<?, ?> map) {
-		List<String> jsonjsonList = new ArrayList<String>();
-		String columnStr = "column";
-		for (int i = 0; i < map.keySet().size(); i++) {
-			jsonjsonList.add(columnStr + (i + 1));
-		}
-		return jsonjsonList;
-	}
+//	private static List<String> jsonMapKeysList(Map<?, ?> map) {
+//		List<String> jsonjsonList = new ArrayList<String>();
+//		String columnStr = "column";
+//		for (int i = 0; i < map.keySet().size(); i++) {
+//			jsonjsonList.add(columnStr + (i + 1));
+//		}
+//		return jsonjsonList;
+//	}
 
 //	public void visitMap(Map<String, Object> map) {
 //		for (Entry<String, Object> entry: map.entrySet()) {
@@ -182,8 +188,9 @@ public class JSONHelper {
 	 * @return
 	 * @throws JSONException
 	 */
-	public static List<?> jsonToList(JSONArray jsonArr) throws JSONException {
-		List<Object> jsonToMapList = new ArrayList<Object>();
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private static List<?> jsonToList(JSONArray jsonArr) throws JSONException {
+		List jsonToMapList = new ArrayList();
 		for (int i = 0; i < jsonArr.length(); i++) {
 			Object object = jsonArr.get(i);
 			if (object instanceof JSONArray) {
@@ -197,17 +204,158 @@ public class JSONHelper {
 		return jsonToMapList;
 	}
 	
-	public static Map<String, Object> parserToMap(String json) {
-		return parserToMap(json, false);
+	public static Map<String, Object> jsonStrToMap(String json) {
+		return jsonStrToMap(json, false);
 	}
 	
-	public static Map<String, Object> parserToMap(String json, boolean bNew) {
+	public static Map<String, Object> jsonStrToMap(String json, boolean bNew) {
 		JSONObject jsonobj = new JSONObject(json);
 		if (jsonobj.length() > 0 || bNew) {
 			return jsonToMap(jsonobj);
 		} else {
 			return null;
 		}
+	}
+	
+    @SuppressWarnings("unchecked")
+	private static void callSetter(Object target, PropertyDescriptor prop, Object value)
+            throws Exception {
+        Method setter = prop.getWriteMethod();
+        if (setter == null) {
+            return;
+        }
+        Class<?>[] params = setter.getParameterTypes();
+        try {
+            // convert types for some popular ones
+            if (value instanceof String && params[0].isEnum()) {
+                value = Enum.valueOf(params[0].asSubclass(Enum.class), (String) value);
+            }
+            // Don't call setter if the value object isn't the right type
+            setter.invoke(target, new Object[]{value});
+        } catch (Exception e) {
+            throw new Exception(
+                "Cannot set " + prop.getName() + ": " + e.getMessage());
+        }
+    }
+    
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private static List<?> jsonToListClazz(JSONArray jsonArr) throws JSONException {
+		List jsonToMapList = new ArrayList();
+		for (int i = 0; i < jsonArr.length(); i++) {
+			Object object = jsonArr.get(i);
+			if (object instanceof JSONArray) {
+				jsonToMapList.add(JSONHelper.jsonToList((JSONArray) object));
+			} else if (object instanceof JSONObject) {
+				jsonToMapList.add(JSONHelper.jsonToMap((JSONObject) object));
+			} else {
+				jsonToMapList.add(object);
+			}
+		}
+		return jsonToMapList;
+	}
+	
+	protected static Object processColumn(JSONObject rs, String key, Class<?> propType)
+			throws Exception {	
+		if ( !propType.isPrimitive() && rs.isNull(key) ) {
+			return (Object)null;
+		}
+
+		if (propType.equals(String.class)) {
+			return rs.getString(key);
+		} else if (propType.equals(Integer.TYPE) || propType.equals(Integer.class)) {
+			return Integer.valueOf(rs.getInt(key));
+		} else if (propType.equals(Boolean.TYPE) || propType.equals(Boolean.class)) {
+			return Boolean.valueOf(rs.getBoolean(key));
+		} else if (propType.equals(Long.TYPE) || propType.equals(Long.class)) {
+			return Long.valueOf(rs.getLong(key));
+		} else if (propType.equals(Double.TYPE) || propType.equals(Double.class)) {
+			return Double.valueOf(rs.getDouble(key));
+		} else if (propType.equals(Float.TYPE) || propType.equals(Float.class)) {
+			return ((Double) rs.getDouble(key)).floatValue();
+		} else if (propType.equals(Short.TYPE) || propType.equals(Short.class)) {
+			return ((Integer) rs.getInt(key)).shortValue();
+		} else if (propType.equals(Byte.TYPE) || propType.equals(Byte.class)) {
+			return ((Integer) rs.getInt(key)).byteValue();
+		} else if (propType.equals(Date.class)) {
+			String s = rs.getString(key);
+			return yyyyMMddHHmmssToDate(s);
+		} else if (propType.equals(List.class) || propType.equals(Map.class) ) {
+			Object oo = (Object)rs;
+			return jsonToListClazz((JSONArray)oo);
+		} else {
+			return rs.get(key);
+		}
+	}
+
+	public static <T> T jsonStrToClazz(String json, Class<T> type)
+			throws Exception {
+		return jsonStrToClazz(json, type, false);
+	}
+
+	public static <T> T jsonStrToClazz(String json, Class<T> type, boolean bNew)
+			throws Exception {
+		JSONObject jsonobj = new JSONObject(json);
+		if (jsonobj.length() > 0 || bNew) {
+			return jsonToClazz(jsonobj, type);
+		} else {
+			return null;
+		}
+	}
+	
+	public static <T> T jsonToClazz(JSONObject jsonObj, Class<T> type)
+			throws Exception {
+        T bean = type.newInstance();
+		PropertyDescriptor[] props = null;
+		try {
+			props = Introspector.getBeanInfo(type).
+					getPropertyDescriptors();
+		} catch (IntrospectionException e) {
+			logger.error("class to map error", e);
+		}
+		
+        Map<String, Object> mColumns = new CaseInsensitiveHashMap();
+        try {
+			for (int i=0; i<props.length; i++) {
+				PropertyDescriptor pro = props[i];
+				Method setter = pro.getWriteMethod();
+				String head = pro.getName();
+				//Method setter = pro.getReadMethod();
+				if (setter == null || setter.getName().equals("getClass")) {
+					continue;
+				}
+				mColumns.put(head, i);
+			}
+			Iterator<String> jsonKeys = jsonObj.keys();
+			while (jsonKeys.hasNext()) {
+				String jsonKey = jsonKeys.next();
+				if ( !mColumns.containsKey(jsonKey) ) {
+					continue;
+				}
+				int nIdx = (Integer)mColumns.get(jsonKey);
+				PropertyDescriptor pd = props[nIdx];
+				Class<?> propType = pd.getPropertyType();
+				//Object jsonValObj = jsonObj.get(jsonKey);
+//				if (jsonValObj == JSONObject.NULL) {	//如果是json.null, 要转换成 (object)null
+//					objReturn = (Object)null;
+//				} else if (jsonValObj instanceof JSONArray) {
+//					//objReturn = JSONHelper.jsonToList((JSONArray) jsonValObj);
+//				} else if (jsonValObj instanceof JSONObject) {
+//					//objReturn = JSONHelper.jsonToMap((JSONObject) jsonValObj);
+//				} else {
+//					//objReturn = JSONHelper.jsonObjToObj(jsonValObj);
+//					objReturn = jsonValObj;
+//				}
+				
+	            Object objValue = null;
+	            if(propType != null) {
+	            	objValue = processColumn(jsonObj, jsonKey, propType);
+	            }
+				callSetter(bean, pd, objValue);
+			}
+        } finally {
+        	mColumns = null;
+        }
+		return bean;
 	}
 
 	/**
@@ -217,7 +365,7 @@ public class JSONHelper {
 	 * @return
 	 * @throws JSONException
 	 */
-	public static Map<String, Object> jsonToMap(JSONObject jsonObj)
+	private static Map<String, Object> jsonToMap(JSONObject jsonObj)
 			throws JSONException {
 		Map<String, Object> jsonMap = new LinkedHashMap<String, Object>();
 		Iterator<String> jsonKeys = jsonObj.keys();
@@ -238,7 +386,7 @@ public class JSONHelper {
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public static JSONArray listToJsonArray(List list) {
+	private static JSONArray listToJsonArray(List list) {
 		JSONArray jsonArray = new JSONArray();
 		if (list != null && list.size()>0) {
 			for (int i = 0; i < list.size(); i++) {
@@ -256,7 +404,7 @@ public class JSONHelper {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public static JSONObject mapToJson(Map<String, Object> map) {
+	private static JSONObject mapToJson(Map<String, Object> map) {
 		JSONObject jsonObject = new JSONObject();
 		for (Entry<String, Object> entry: map.entrySet()) {
 			Object objData = entry.getValue();
@@ -282,9 +430,40 @@ public class JSONHelper {
 		return listMapToJsonArray(listResult);
 	}
 	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static JSONObject clazzToJson(Object object) {
-		Map<String, Object> map = clazzToMap(object);
-		return mapToJson(map);
+		JSONObject jsonObject = new JSONObject();
+		PropertyDescriptor[] propDescripts = null;
+		try {
+			propDescripts = Introspector.getBeanInfo(object.getClass()).
+					getPropertyDescriptors();
+		} catch (IntrospectionException e) {
+			logger.error("class to map error", e);
+		}
+		for (int i=0; i<propDescripts.length; i++) {
+			PropertyDescriptor pro = propDescripts[i];
+			//Method setter = pd.getWriteMethod();
+			String head = pro.getName();
+			Method setter = pro.getReadMethod();
+
+			if (setter == null || setter.getName().equals("getClass")) {
+				continue;
+			}
+			Object retVal = null;	//通过反射把该类对象传递给invoke方法来调用对应的方法  
+			try {
+				retVal = setter.invoke(object);
+			} catch (Exception e) {
+				logger.error("clazzToJson", e);
+			}
+			if (retVal instanceof List) {
+				jsonObject.put(head, listToJsonArray((List)retVal));
+			} else if (retVal instanceof Map) {
+				jsonObject.put(head, mapToJson((Map)retVal));
+			} else {
+				jsonObject.put(head, JSONHelper.objToJsonObj(retVal));
+			}
+		}
+		return jsonObject;
 	}
 	
 	public static Map<String, Object> clazzToMap(Object object) {
@@ -294,18 +473,14 @@ public class JSONHelper {
 			propDescripts = Introspector.getBeanInfo(object.getClass()).
 					getPropertyDescriptors();
 		} catch (IntrospectionException e) {
-			logger.error("class to map error", e.getMessage());
+			logger.error("class to map error", e);
 		}
 		for (int i=0; i<propDescripts.length; i++) {
-			PropertyDescriptor pro = propDescripts[i];
+			PropertyDescriptor pd = propDescripts[i];
 			//Method setter = pd.getWriteMethod();
-			String head = pro.getName();
-			Method setter = pro.getReadMethod();
-
-			if (setter == null) {
-				continue;
-			}
-			if (setter.getName().equals("getClass")) {
+			String head = pd.getName();
+			Method setter = pd.getReadMethod();
+			if (setter == null || setter.getName().equals("getClass")) {
 				continue;
 			}
 			Object retVal = null;	//通过反射把该类对象传递给invoke方法来调用对应的方法  
@@ -318,6 +493,40 @@ public class JSONHelper {
 		}
 		return map;
 	}
+	
+	/*
+	public static void mapToClazz(Object object, Map<String, Object> map) {
+		//Map<String, Object> map = new HashMap<String, Object>();
+		PropertyDescriptor[] propDescripts = null;
+		try {
+			propDescripts = Introspector.getBeanInfo(object.getClass()).
+					getPropertyDescriptors();
+		} catch (IntrospectionException e) {
+			logger.error("mapToClazz", e);
+		}
+		for (int i=0; i<propDescripts.length; i++) {
+			PropertyDescriptor pd = propDescripts[i];
+			Method setter = pd.getWriteMethod();
+			String head = pd.getName();
+			//Method setter = pro.getReadMethod();
+
+			if (setter == null) {
+				continue;
+			}
+			if (setter.getName().equals("getClass")) {
+				continue;
+			}
+			Object retVal = null;	//通过反射把该类对象传递给invoke方法来调用对应的方法  
+			try {
+				setter.invoke(object, );
+			} catch (Exception e) {
+				logger.error("mapToClazz", e);
+			}
+			map.put(head, retVal);
+		}
+		//return map;
+	}
+	*/
 
 	// public static void main(String[] args) {
 	// String head[] = new String[]{"http://www.baidu.com?id=01"};

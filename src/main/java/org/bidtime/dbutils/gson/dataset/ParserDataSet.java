@@ -6,9 +6,7 @@ package org.bidtime.dbutils.gson.dataset;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
 import org.bidtime.dbutils.gson.JSONHelper;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 /**
@@ -113,58 +111,58 @@ public class ParserDataSet {
 		this.del = del;
 	}
 	
-	public ParserDataSet(String json) {
-		fromString(json);
-	}
+//	public ParserDataSet(String json) {
+//		fromString(json);
+//	}
 
-	protected void fromString(String json) {
-		JSONObject jsonobj = new JSONObject(json);
-		fromJson(jsonobj);
-	}
-		
-	public ParserDataSet(JSONObject jsonObject) {
-		fromJson(jsonObject);
-	}
+//	protected void fromString(String json) {
+//		JSONObject jsonobj = new JSONObject(json);
+//		fromJson(jsonobj);
+//	}
+//		
+//	public ParserDataSet(JSONObject jsonObject) {
+//		fromJson(jsonObject);
+//	}
+//	
+//	private List<GsonRow> jsonObjectKeyToList(JSONObject jsonObject, String prop) {
+//		List<GsonRow> list = null;
+//		if (jsonObject.has(prop)) {
+//			JSONArray jsonAttr = jsonObject.getJSONArray(prop);
+//			if (jsonAttr != null && jsonAttr.length() > 0) {
+//				list = new ArrayList<GsonRow>();
+//				for (int i = 0; i < jsonAttr.length(); i++) {
+//					Object object = jsonAttr.get(i);
+//					list.add(new GsonRow((JSONObject)object));
+//				}
+//			}
+//		}
+//		return list;
+//	}
 	
-	private List<GsonRow> jsonObjectKeyToList(JSONObject jsonObject, String prop) {
-		List<GsonRow> list = null;
-		if (jsonObject.has(prop)) {
-			JSONArray jsonAttr = jsonObject.getJSONArray(prop);
-			if (jsonAttr != null && jsonAttr.length() > 0) {
-				list = new ArrayList<GsonRow>();
-				for (int i = 0; i < jsonAttr.length(); i++) {
-					Object object = jsonAttr.get(i);
-					list.add(new GsonRow((JSONObject)object));
-				}
-			}
-		}
-		return list;
-	}
+//	public void fromJson(JSONObject jsonObject) {
+//		add = jsonObjectKeyToList(jsonObject, "add");
+//		edit = jsonObjectKeyToList(jsonObject, "edit");
+//		del = jsonObjectKeyToList(jsonObject, "del");
+//	}
 	
-	public void fromJson(JSONObject jsonObject) {
-		add = jsonObjectKeyToList(jsonObject, "add");
-		edit = jsonObjectKeyToList(jsonObject, "edit");
-		del = jsonObjectKeyToList(jsonObject, "del");
-	}
-	
-	public static ParserDataSet parserString(String json) {
-		return parserString(json, false);
-	}
+//	public static ParserDataSet parserString(String json) {
+//		return parserString(json, false);
+//	}
 
-	public static ParserDataSet parserString(String json, boolean bNew) {
-		if (StringUtils.isNotEmpty(json)) {
-			JSONObject jsonobj = new JSONObject(json);
-			if (jsonobj.length() > 0 || bNew) {
-				ParserDataSet row = new ParserDataSet();
-				row.fromJson(jsonobj);
-				return row;
-			} else {
-				return null;
-			}
-		} else {
-			return null;
-		}
-	}
+//	public static ParserDataSet parserString(String json, boolean bNew) {
+//		if (StringUtils.isNotEmpty(json)) {
+//			JSONObject jsonobj = new JSONObject(json);
+//			if (jsonobj.length() > 0 || bNew) {
+//				ParserDataSet row = new ParserDataSet();
+//				row.fromJson(jsonobj);
+//				return row;
+//			} else {
+//				return null;
+//			}
+//		} else {
+//			return null;
+//		}
+//	}
 
 	public boolean isExistsInsertRows() {
 		return ( add != null && !add.isEmpty() ) ? true : false;
@@ -190,9 +188,9 @@ public class ParserDataSet {
 		return toString();	//GsonComm.toJson(this, ParserDataSetJson.class, true);
 	}
 
-	public static ParserDataSet jsonStrToObject(String json) {
-		return parserString(json);	//GsonComm.fromJson(s, ParserDataSetJson.class);
-	}
+//	public static ParserDataSet jsonStrToObject(String json) {
+//		return parserString(json);	//GsonComm.fromJson(s, ParserDataSetJson.class);
+//	}
 
 	protected JSONObject toJson() {
 		JSONObject jsonObject = new JSONObject();

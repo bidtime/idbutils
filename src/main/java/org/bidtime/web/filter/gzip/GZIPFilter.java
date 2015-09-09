@@ -2,7 +2,7 @@
  * GZipFilter
  * 过滤压缩流功能
  */
-package com.utils.filter.gzip1;
+package org.bidtime.web.filter.gzip;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

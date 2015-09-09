@@ -9,7 +9,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
 import org.bidtime.dbutils.gson.JSONHelper;
 import org.bidtime.utils.basic.CArrayComm;
 import org.bidtime.utils.basic.ObjectComm;
@@ -887,14 +886,6 @@ public class GsonRows {
 		}
 		return bReturn;
 	}
-
-	public String objectToJsonStr() {
-		return toString();
-	}
-
-	public static GsonRows jsonStrToObject(String json) {
-		return GsonRows.parserString(json);
-	}
 	
 	private JSONArray dataToJson() {
 		JSONArray jsonArray = new JSONArray();
@@ -934,67 +925,67 @@ public class GsonRows {
 		return jsonObject1.toString();
 	}
 	
-	public GsonRows(String json) {
-		fromString(json);
-	}
+//	public GsonRows(String json) {
+//		fromString(json);
+//	}
+//	
+//	public GsonRows(JSONObject jsonObject) {
+//		fromJson(jsonObject);
+//	}
+//
+//	public static GsonRows parserString(String json) {
+//		return parserString(json, false);
+//	}
+//
+//	public static GsonRows parserString(String json, boolean bNew) {
+//		if (StringUtils.isNotEmpty(json)) {
+//			JSONObject jsonobj = new JSONObject(json);
+//			if (jsonobj.length() > 0 || bNew) {
+//				GsonRows rows = new GsonRows();
+//				rows.fromJson(jsonobj);
+//				return rows;
+//			} else {
+//				return null;
+//			}
+//		} else {
+//			return null;
+//		}
+//	}
 	
-	public GsonRows(JSONObject jsonObject) {
-		fromJson(jsonObject);
-	}
-
-	public static GsonRows parserString(String json) {
-		return parserString(json, false);
-	}
-
-	public static GsonRows parserString(String json, boolean bNew) {
-		if (StringUtils.isNotEmpty(json)) {
-			JSONObject jsonobj = new JSONObject(json);
-			if (jsonobj.length() > 0 || bNew) {
-				GsonRows rows = new GsonRows();
-				rows.fromJson(jsonobj);
-				return rows;
-			} else {
-				return null;
-			}
-		} else {
-			return null;
-		}
-	}
-	
-	public void fromString(String json) {
-		JSONObject jsonobj = new JSONObject(json);
-		fromJson(jsonobj);
-	}
-	
-	public void fromJson(JSONObject jsonObject) {
-		JSONArray headArray = jsonObject.optJSONArray("head");
-		if (headArray != null && headArray.length()>0) {
-			head = new String[headArray.length()];
-			for (int i = 0; i < headArray.length(); i++) {
-				Object object = headArray.get(i);
-				head[i] = (String)object;
-			}
-		}
-		//data
-		if (jsonObject.has("data") && !jsonObject.isNull("data")) {
-			JSONArray dataArray = jsonObject.getJSONArray("data");
-			if (dataArray != null) {
-				this.data = new Object[dataArray.length()][];
-				for (int i = 0; i < dataArray.length(); i++) {
-					JSONArray arrayPerRow = (JSONArray)dataArray.get(i);
-					Object[] objRow = new Object[arrayPerRow.length()];
-					for (int j = 0; j < arrayPerRow.length(); j++) {
-						objRow[j] = JSONHelper.jsonObjToObj(arrayPerRow.get(j));
-					}
-					data[i] = objRow;
-				}
-			} else {
-				CArrayComm.clearArray(data);
-			}
-		} else {
-			CArrayComm.clearArray(data);
-		}
-	}
+//	public void fromString(String json) {
+//		JSONObject jsonobj = new JSONObject(json);
+//		fromJson(jsonobj);
+//	}
+//	
+//	public void fromJson(JSONObject jsonObject) {
+//		JSONArray headArray = jsonObject.optJSONArray("head");
+//		if (headArray != null && headArray.length()>0) {
+//			head = new String[headArray.length()];
+//			for (int i = 0; i < headArray.length(); i++) {
+//				Object object = headArray.get(i);
+//				head[i] = (String)object;
+//			}
+//		}
+//		//data
+//		if (jsonObject.has("data") && !jsonObject.isNull("data")) {
+//			JSONArray dataArray = jsonObject.getJSONArray("data");
+//			if (dataArray != null) {
+//				this.data = new Object[dataArray.length()][];
+//				for (int i = 0; i < dataArray.length(); i++) {
+//					JSONArray arrayPerRow = (JSONArray)dataArray.get(i);
+//					Object[] objRow = new Object[arrayPerRow.length()];
+//					for (int j = 0; j < arrayPerRow.length(); j++) {
+//						objRow[j] = JSONHelper.jsonObjToObj(arrayPerRow.get(j));
+//					}
+//					data[i] = objRow;
+//				}
+//			} else {
+//				CArrayComm.clearArray(data);
+//			}
+//		} else {
+//			CArrayComm.clearArray(data);
+//		}
+//	}
 	
 //	private static String getJson() {
 //		return "{\"head\":[\"code\",\"name\",\"id\"],\"data\":[[\"1\",\"1\",2],[\"1\",\"1\",3]]}";
