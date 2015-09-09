@@ -1,4 +1,4 @@
-package com.utils.filter.gzip1;
+package org.bidtime.web.filter.gzip;
 
 import java.io.IOException;
 import java.io.OutputStream;
