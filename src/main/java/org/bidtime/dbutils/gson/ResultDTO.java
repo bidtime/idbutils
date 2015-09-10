@@ -9,14 +9,27 @@ import org.json.JSONObject;
 
 public class ResultDTO<T> implements Serializable {
 	
-	String[] head = null;
+	@SuppressWarnings("rawtypes")
+	Map mapColPros = null;
+	
+//	String[] head = null;
+//
+//	public String[] getHead() {
+//		return head;
+//	}
+//
+//	public void setHead(String[] head) {
+//		this.head = head;
+//	}
 
-	public String[] getHead() {
-		return head;
+	@SuppressWarnings("rawtypes")
+	public Map getMapColPros() {
+		return mapColPros;
 	}
 
-	public void setHead(String[] head) {
-		this.head = head;
+	@SuppressWarnings("rawtypes")
+	public void setMapColPros(Map mapColPros) {
+		this.mapColPros = mapColPros;
 	}
 
 	/**
@@ -154,11 +167,11 @@ public class ResultDTO<T> implements Serializable {
 				jsonArray = JSONHelper
 						.listMapToJsonArray((List<Map<String, Object>>) data);
 			} else {
-				jsonArray = JSONHelper.clazzToJsonArray((List) data, head);
+				jsonArray = JSONHelper.clazzToJsonArray((List) data, mapColPros);
 			}
 		} else {
 			jsonArray = new JSONArray();
-			JSONObject jsonObject = JSONHelper.clazzToJson(data, head);
+			JSONObject jsonObject = JSONHelper.clazzToJson(data, mapColPros);
 			jsonArray.put(jsonObject);
 		}
 		//} else {

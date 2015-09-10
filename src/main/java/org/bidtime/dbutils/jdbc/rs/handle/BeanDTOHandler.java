@@ -19,11 +19,11 @@ public class BeanDTOHandler<T> extends ResultSetDTOHandler<T> {
     }
 
     public BeanDTOHandler(Class<T> type, boolean countSql) {
-    	this(type, ROW_PROCESSOR, countSql);
+    	this(type, countSql, true);
     }
 
-    public BeanDTOHandler(Class<T> type, boolean countSql, boolean addHead) {
-    	this(type, ROW_PROCESSOR, countSql, addHead);
+    public BeanDTOHandler(Class<T> type, boolean countSql, boolean thumbsHead) {
+    	this(type, new BeanProcessorEx(), countSql, thumbsHead);
     }
     
     public BeanDTOHandler(Class<T> type, BeanProcessorEx convert, boolean countSql) {
@@ -31,8 +31,8 @@ public class BeanDTOHandler<T> extends ResultSetDTOHandler<T> {
     }
     
     public BeanDTOHandler(Class<T> type, BeanProcessorEx convert, boolean countSql,
-    		boolean addhead) {
-        setProp(type, convert, countSql, addHead);
+    		boolean thumbsHead) {
+        setProp(type, convert, countSql, thumbsHead);
     }
     
 	@Override

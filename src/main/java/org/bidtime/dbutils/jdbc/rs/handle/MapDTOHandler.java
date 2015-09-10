@@ -16,21 +16,30 @@ import org.bidtime.dbutils.jdbc.rs.handle.ext.ResultSetDTOHandler;
 public class MapDTOHandler extends ResultSetDTOHandler<Map<String, Object>> {
 	
 	public MapDTOHandler() {
-		setProp(null);
+		this(false);
 	}
 
 	public MapDTOHandler(boolean countSql) {
-		setProp(null, countSql);
+		this(countSql, false);
+	}
+
+	public MapDTOHandler(boolean countSql, boolean thumbsHead) {
+		this(new BeanProcessorEx(), countSql, thumbsHead);
 	}
 
 	public MapDTOHandler(BeanProcessorEx convert,
 			boolean countSql) {
-		setProp(null, convert, countSql);
+		this(convert, countSql, false);
 	}
-   
+	
+	public MapDTOHandler(BeanProcessorEx convert,
+			boolean countSql, boolean thumbsHead) {
+		super.setProp(Map.class, convert, countSql, thumbsHead);
+	}
+ 
     @Override
     public Map<String, Object> doDTO(ResultSet rs) throws SQLException {
-       return rs.next() ? this.convert.toMap(rs) : null;
+       return rs.next() ? this.convert.toMap(rs, this.mapBeanPropColumns) : null;
     }
 
 }

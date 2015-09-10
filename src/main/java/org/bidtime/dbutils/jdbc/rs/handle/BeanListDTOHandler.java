@@ -19,7 +19,7 @@ public class BeanListDTOHandler<T> extends AbstractListDTOHandler<T> {
 	}
 
 	public BeanListDTOHandler(Class<T> type, boolean countSql) {
-		this(type, ROW_PROCESSOR, countSql);
+		this(type, new BeanProcessorEx(), countSql);
 	}
 
 	public BeanListDTOHandler(Class<T> type, BeanProcessorEx convert,
@@ -27,19 +27,19 @@ public class BeanListDTOHandler<T> extends AbstractListDTOHandler<T> {
 		this(type, convert, countSql, true);
 	}
 
-	public BeanListDTOHandler(Class<T> type, boolean countSql, boolean addHead) {
-		this(type, ROW_PROCESSOR, countSql, addHead);
+	public BeanListDTOHandler(Class<T> type, boolean countSql, boolean thumbsHead) {
+		this(type, new BeanProcessorEx(), countSql, thumbsHead);
 	}
 
 	public BeanListDTOHandler(Class<T> type, BeanProcessorEx convert,
-			boolean countSql, boolean addHead) {
-		super.setProp(type, convert, countSql, addHead);
+			boolean countSql, boolean thumbsHead) {
+		super.setProp(type, convert, countSql, thumbsHead);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	protected T handleRow(ResultSet rs) throws SQLException {
-		return (T) this.convert.toBean(rs, this.type);
+		return (T) this.convert.toBean(rs, this.type, this.mapBeanPropColumns, mapColumns);
 	}
 
 }

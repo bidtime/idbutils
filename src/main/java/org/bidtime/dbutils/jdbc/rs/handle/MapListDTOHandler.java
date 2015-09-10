@@ -15,21 +15,30 @@ import org.bidtime.dbutils.jdbc.rs.BeanProcessorEx;
 public class MapListDTOHandler extends AbstractListDTOHandler<Map<String, Object>> {
 
 	public MapListDTOHandler() {
-		setProp(null);
+		this(false);
 	}
 
 	public MapListDTOHandler(boolean countSql) {
-		setProp(null, countSql);
+		this(countSql, false);
+	}
+
+	public MapListDTOHandler(boolean countSql, boolean thumbsHead) {
+		this(new BeanProcessorEx(), countSql, thumbsHead);
 	}
 
 	public MapListDTOHandler(BeanProcessorEx convert,
 			boolean countSql) {
-		setProp(null, convert, countSql);
+		this(convert, countSql, false);
+	}
+
+	public MapListDTOHandler(BeanProcessorEx convert,
+			boolean countSql, boolean thumbsHead) {
+		super.setProp(Map.class, convert, countSql, thumbsHead);
 	}
   
     @Override
     protected Map<String, Object> handleRow(ResultSet rs) throws SQLException {
-        return this.convert.toMap(rs);
+        return this.convert.toMap(rs, this.mapBeanPropColumns);
     }
 
 }

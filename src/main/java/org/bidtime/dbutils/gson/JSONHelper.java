@@ -97,7 +97,8 @@ public class JSONHelper {
 	 * @param object
 	 * @return jsonObject
 	 */
-	public static Object objToJsonObj(Object objRaw, String[] arHeads) {
+	@SuppressWarnings("rawtypes")
+	public static Object objToJsonObj(Object objRaw, Map mapColPros) {
 		Object objData = null;
 		if (objRaw == null) {		//要转换成json.null
 			objData = JSONObject.NULL;
@@ -108,13 +109,13 @@ public class JSONHelper {
 		} else if (objRaw instanceof java.util.Date) {
 			objData = dateToyyyyMMddHHmmss((Date) objRaw);
 		} else if (objRaw instanceof JsonData) {
-			objData = clazzToJson(objRaw, arHeads);
+			objData = clazzToJson(objRaw, mapColPros);
 		} else if (objRaw instanceof Set || objRaw instanceof Queue ||
 			objRaw instanceof Character ||
 			objRaw instanceof Math || objRaw instanceof Enum) {
 			objData = objRaw;
 		} else {
-			objData = clazzToJson(objRaw, arHeads);
+			objData = clazzToJson(objRaw, mapColPros);
 		}
 		return objData;
 	}
@@ -130,11 +131,11 @@ public class JSONHelper {
 	}
 	
 	@SuppressWarnings("rawtypes")
-	public static JSONArray listToJson(List list, String[] arHeads) {
+	public static JSONArray listToJson(List list, Map mapColPros) {
 		JSONArray jsonObject1 = new JSONArray();
 		for (int i=0; i<list.size(); i++) {
 			Object obj = list.get(i);
-			jsonObject1.put(JSONHelper.objToJsonObj(obj, arHeads));
+			jsonObject1.put(JSONHelper.objToJsonObj(obj, mapColPros));
 		}
 		return jsonObject1;
 	}
@@ -386,17 +387,17 @@ public class JSONHelper {
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private static JSONArray listToJsonArray(List list, String[] arHeads) {
+	private static JSONArray listToJsonArray(List list, Map mapColPros) {
 		JSONArray jsonArray = new JSONArray();
 		if (list != null && list.size()>0) {
 			for (int i = 0; i < list.size(); i++) {
 				Object objData = list.get(i);
 				if (objData instanceof List) {
-					jsonArray.put(listToJsonArray((List)objData, arHeads));
+					jsonArray.put(listToJsonArray((List)objData, mapColPros));
 				} else if (objData instanceof Map) {
 					jsonArray.put(mapToJson((Map)objData));
 				} else {
-					jsonArray.put(JSONHelper.objToJsonObj(objData, arHeads));
+					jsonArray.put(JSONHelper.objToJsonObj(objData, mapColPros));
 				}
 			}
 		}
@@ -421,10 +422,10 @@ public class JSONHelper {
 	}
 	
 	@SuppressWarnings("rawtypes")
-	public static JSONArray clazzToJsonArray(List list, String[] head) {
+	public static JSONArray clazzToJsonArray(List list, Map mapColPros) {
 		List<Map<String, Object>> listResult = new ArrayList<>();
 		for (Object o:list) {
-			Map<String, Object> map = clazzToMap(o, head);
+			Map<String, Object> map = clazzToMap(o, mapColPros);
 			listResult.add(map);
 		}
 		return listMapToJsonArray(listResult);
@@ -435,7 +436,7 @@ public class JSONHelper {
 	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public static JSONObject clazzToJson(Object object, String[] arHeads) {
+	public static JSONObject clazzToJson(Object object, Map mapHead) {
 		JSONObject jsonObject = new JSONObject();
 		PropertyDescriptor[] propDescripts = null;
 		try {
@@ -443,14 +444,6 @@ public class JSONHelper {
 					getPropertyDescriptors();
 		} catch (IntrospectionException e) {
 			logger.error("class to map error", e);
-		}
-		Map<String, Object> mapHead = null;
-		
-		if (arHeads != null) {
-			mapHead = new CaseInsensitiveHashMap();
-			for (int n = 0; n < arHeads.length; n ++) {
-				mapHead.put(arHeads[n], true);
-			}
 		}
 
 		for (int i=0; i<propDescripts.length; i++) {
@@ -474,11 +467,11 @@ public class JSONHelper {
 				logger.error("clazzToJson", e);
 			}
 			if (retVal instanceof List) {
-				jsonObject.put(key, listToJsonArray((List)retVal, arHeads));
+				jsonObject.put(key, listToJsonArray((List)retVal, mapHead));
 			} else if (retVal instanceof Map) {
 				jsonObject.put(key, mapToJson((Map)retVal));
 			} else {
-				jsonObject.put(key, JSONHelper.objToJsonObj(retVal, arHeads));
+				jsonObject.put(key, JSONHelper.objToJsonObj(retVal, mapHead));
 			}
 		}
 		return jsonObject;
@@ -488,7 +481,8 @@ public class JSONHelper {
 		return clazzToMap(object,  null);
 	}
 	
-	public static Map<String, Object> clazzToMap(Object object, String[] arHeads) {
+	@SuppressWarnings("rawtypes")
+	public static Map<String, Object> clazzToMap(Object object, Map mapHead) {
 		Map<String, Object> map = new HashMap<String, Object>();
 		PropertyDescriptor[] propDescripts = null;
 		try {
@@ -496,15 +490,6 @@ public class JSONHelper {
 					getPropertyDescriptors();
 		} catch (IntrospectionException e) {
 			logger.error("class to map error", e);
-		}
-		
-		Map<String, Object> mapHead = null;
-		
-		if (arHeads != null) {
-			mapHead = new CaseInsensitiveHashMap();
-			for (int i = 0; i < arHeads.length; i ++) {
-				mapHead.put(arHeads[i], true);
-			}
 		}
 		
 		for (int i=0; i<propDescripts.length; i++) {

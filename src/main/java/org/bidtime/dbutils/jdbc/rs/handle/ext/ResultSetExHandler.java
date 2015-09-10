@@ -14,13 +14,24 @@ import org.bidtime.dbutils.jdbc.rs.BeanProcessorEx;
  */
 public class ResultSetExHandler<T> implements ResultSetHandler<T> {
 
-	protected boolean addHead = false;
+	private boolean thumbsHead = false;
+
+	public boolean isThumbsHead() {
+		return thumbsHead;
+	}
+
+//	public void setThumbsHead(boolean thumbsHead) {
+//		this.thumbsHead = thumbsHead;
+//		if (thumbsHead) {
+//			setMapColumnNames(new CaseInsensitiveHashMap());
+//		}
+//	}
 
 	protected Class<T> type;
 
 	protected BeanProcessorEx convert = null;
 
-	protected static final BeanProcessorEx ROW_PROCESSOR = new BeanProcessorEx();
+	//protected BeanProcessorEx ROW_PROCESSOR = new BeanProcessorEx();
 
 	protected boolean countSql = false;
 
@@ -32,31 +43,29 @@ public class ResultSetExHandler<T> implements ResultSetHandler<T> {
 		this.countSql = countSql;
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public void setProp(Class type, BeanProcessorEx convert, boolean countSql) {
-		this.type = type;
-		this.convert = convert;
-		this.countSql = countSql;
-	}
+//	@SuppressWarnings({ "rawtypes" })
+//	public void setProp(Class type, BeanProcessorEx convert, boolean countSql) {
+//		setProp(type, convert, countSql, false);
+//	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void setProp(Class type, BeanProcessorEx convert, boolean countSql,
-			boolean addHead) {
+			boolean thumbsHead) {
 		this.type = type;
 		this.convert = convert;
 		this.countSql = countSql;
-		this.addHead = addHead;
+		this.thumbsHead = thumbsHead;
 	}
 
-	@SuppressWarnings("rawtypes")
-	public void setProp(Class type, boolean countSql) {
-		setProp(type, ROW_PROCESSOR, countSql);
-	}
-
-	@SuppressWarnings("rawtypes")
-	public void setProp(Class type) {
-		setProp(type, false);
-	}
+//	@SuppressWarnings("rawtypes")
+//	public void setProp(Class type, boolean countSql) {
+//		setProp(type, new BeanProcessorEx(), countSql);
+//	}
+//
+//	@SuppressWarnings("rawtypes")
+//	public void setProp(Class type) {
+//		setProp(type, false);
+//	}
 
 	@Override
 	public T handle(ResultSet rs) throws SQLException {
