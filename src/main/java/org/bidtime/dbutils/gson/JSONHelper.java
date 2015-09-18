@@ -469,7 +469,7 @@ public class JSONHelper {
 			} else if (retVal instanceof Map) {
 				jsonObject.put(key, mapToJson((Map)retVal));
 			} else {
-				jsonObject.put(key, JSONHelper.objToJsonObj(retVal, mapHead));
+				jsonObject.put(key, JSONHelper.objToJsonObj(retVal, null));
 			}
 		}
 		return jsonObject;
