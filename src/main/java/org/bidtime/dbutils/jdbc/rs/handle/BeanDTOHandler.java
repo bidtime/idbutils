@@ -3,6 +3,7 @@ package org.bidtime.dbutils.jdbc.rs.handle;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import org.bidtime.dbutils.jdbc.rs.BeanAdapt;
 import org.bidtime.dbutils.jdbc.rs.BeanProcessorEx;
 import org.bidtime.dbutils.jdbc.rs.handle.ext.ResultSetDTOHandler;
 
@@ -19,20 +20,28 @@ public class BeanDTOHandler<T> extends ResultSetDTOHandler<T> {
     }
 
     public BeanDTOHandler(Class<T> type, boolean countSql) {
-    	this(type, countSql, true);
+    	this(type, countSql, BeanAdapt.AUTO);
+    }
+    
+    public BeanDTOHandler(Class<T> type, BeanAdapt beanAdpat) {
+    	this(type, false, BeanAdapt.AUTO);
     }
 
-    public BeanDTOHandler(Class<T> type, boolean countSql, boolean thumbsHead) {
-    	this(type, new BeanProcessorEx(), countSql, thumbsHead);
+    public BeanDTOHandler(Class<T> type, BeanAdapt beanAdpat, boolean countSql) {
+    	this(type, new BeanProcessorEx(), countSql, beanAdpat);
+    }
+    
+    public BeanDTOHandler(Class<T> type, boolean countSql, BeanAdapt beanAdpat) {
+    	this(type, new BeanProcessorEx(), countSql, beanAdpat);
     }
     
     public BeanDTOHandler(Class<T> type, BeanProcessorEx convert, boolean countSql) {
-    	this(type, convert, countSql, true);
+    	this(type, convert, countSql, BeanAdapt.AUTO);
     }
     
     public BeanDTOHandler(Class<T> type, BeanProcessorEx convert, boolean countSql,
-    		boolean thumbsHead) {
-        setProp(type, convert, countSql, thumbsHead);
+    		BeanAdapt beanAdapt) {
+    	super.setProp(type, convert, countSql, beanAdapt);
     }
     
 	@Override

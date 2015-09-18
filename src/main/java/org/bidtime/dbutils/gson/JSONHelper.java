@@ -7,7 +7,6 @@ import java.lang.reflect.Method;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -97,8 +96,7 @@ public class JSONHelper {
 	 * @param object
 	 * @return jsonObject
 	 */
-	@SuppressWarnings("rawtypes")
-	public static Object objToJsonObj(Object objRaw, Map mapColPros) {
+	public static Object objToJsonObj(Object objRaw, Set<String> mapColPros) {
 		Object objData = null;
 		if (objRaw == null) {		//要转换成json.null
 			objData = JSONObject.NULL;
@@ -131,7 +129,7 @@ public class JSONHelper {
 	}
 	
 	@SuppressWarnings("rawtypes")
-	public static JSONArray listToJson(List list, Map mapColPros) {
+	public static JSONArray listToJson(List list, Set<String> mapColPros) {
 		JSONArray jsonObject1 = new JSONArray();
 		for (int i=0; i<list.size(); i++) {
 			Object obj = list.get(i);
@@ -387,7 +385,7 @@ public class JSONHelper {
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private static JSONArray listToJsonArray(List list, Map mapColPros) {
+	private static JSONArray listToJsonArray(List list, Set<String> mapColPros) {
 		JSONArray jsonArray = new JSONArray();
 		if (list != null && list.size()>0) {
 			for (int i = 0; i < list.size(); i++) {
@@ -422,7 +420,7 @@ public class JSONHelper {
 	}
 	
 	@SuppressWarnings("rawtypes")
-	public static JSONArray clazzToJsonArray(List list, Map mapColPros) {
+	public static JSONArray clazzToJsonArray(List list, Set<String> mapColPros) {
 		List<Map<String, Object>> listResult = new ArrayList<>();
 		for (Object o:list) {
 			Map<String, Object> map = clazzToMap(o, mapColPros);
@@ -436,7 +434,7 @@ public class JSONHelper {
 	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public static JSONObject clazzToJson(Object object, Map mapHead) {
+	public static JSONObject clazzToJson(Object object, Set<String> mapHead) {
 		JSONObject jsonObject = new JSONObject();
 		PropertyDescriptor[] propDescripts = null;
 		try {
@@ -456,7 +454,7 @@ public class JSONHelper {
 				continue;
 			}
 
-			if (mapHead != null && !mapHead.containsKey(key)) {
+			if (mapHead != null && !mapHead.contains(key)) {
 				continue;
 			}
 
@@ -467,7 +465,7 @@ public class JSONHelper {
 				logger.error("clazzToJson", e);
 			}
 			if (retVal instanceof List) {
-				jsonObject.put(key, listToJsonArray((List)retVal, mapHead));
+				jsonObject.put(key, listToJsonArray((List)retVal, null));
 			} else if (retVal instanceof Map) {
 				jsonObject.put(key, mapToJson((Map)retVal));
 			} else {
@@ -481,9 +479,8 @@ public class JSONHelper {
 		return clazzToMap(object,  null);
 	}
 	
-	@SuppressWarnings("rawtypes")
-	public static Map<String, Object> clazzToMap(Object object, Map mapHead) {
-		Map<String, Object> map = new HashMap<String, Object>();
+	public static Map<String, Object> clazzToMap(Object object, Set<String> mapHead) {
+		Map<String, Object> map = new LinkedHashMap<String, Object>();
 		PropertyDescriptor[] propDescripts = null;
 		try {
 			propDescripts = Introspector.getBeanInfo(object.getClass()).
@@ -500,7 +497,7 @@ public class JSONHelper {
 			if (setter == null || setter.getName().equals("getClass")) {
 				continue;
 			}
-			if (mapHead != null && !mapHead.containsKey(key)) {
+			if (mapHead != null && !mapHead.contains(key)) {
 				continue;
 			}
 			Object retVal = null;	//通过反射把该类对象传递给invoke方法来调用对应的方法  

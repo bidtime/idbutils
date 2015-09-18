@@ -32,6 +32,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.dbutils.BasicRowProcessor;
 import org.bidtime.utils.comm.CaseInsensitiveHashMap;
@@ -73,7 +74,7 @@ public class BeanProcessorEx {
      */
     private final Map<String, String> columnToPropertyOverrides;
 
-    private final Map<String, String> mapColumnNames;
+    private final Set<String> mapColumnNames;
 
     static {
         primitiveDefaults.put(Integer.TYPE, Integer.valueOf(0));
@@ -105,8 +106,7 @@ public class BeanProcessorEx {
         this.columnToPropertyOverrides = columnToPropertyOverrides;
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-	public BeanProcessorEx(Map<String, String> columnToPropertyOverrides, Map columnNames) {
+	public BeanProcessorEx(Map<String, String> columnToPropertyOverrides, Set<String> columnNames) {
         super();
         this.mapColumnNames = columnNames;
         this.columnToPropertyOverrides = columnToPropertyOverrides;
@@ -149,12 +149,11 @@ public class BeanProcessorEx {
         return toBean(rs, type, columnToPropertyOverrides, this.mapColumnNames);
     }
 
-    public <T> T toBean(ResultSet rs, Class<T> type, Map<String,String> mapBeanProps) throws SQLException {
+    public <T> T toBean(ResultSet rs, Class<T> type, Map<String, String> mapBeanProps) throws SQLException {
         return toBean(rs, type, mapBeanProps, this.mapColumnNames);
     }
 
-    @SuppressWarnings("rawtypes")
-	public <T> T toBean(ResultSet rs, Class<T> type, Map<String,String> mapBeanProps, Map mapCloumns) throws SQLException {
+	public <T> T toBean(ResultSet rs, Class<T> type, Map<String, String> mapBeanProps, Set<String> mapCloumns) throws SQLException {
         PropertyDescriptor[] props = this.propertyDescriptors(type);
         ResultSetMetaData rsmd = rs.getMetaData();
         int[] columnToProperty = this.mapColumnsToProperties(rsmd, props, mapBeanProps, mapCloumns);
@@ -202,8 +201,7 @@ public class BeanProcessorEx {
         return toBeanList(rs, type, mapBeanProps, this.mapColumnNames);
     }
 
-    @SuppressWarnings("rawtypes")
-	public <T> List<T> toBeanList(ResultSet rs, Class<T> type, Map<String,String> mapBeanProps, Map mapCloumns) throws SQLException {
+	public <T> List<T> toBeanList(ResultSet rs, Class<T> type, Map<String,String> mapBeanProps, Set<String> mapCloumns) throws SQLException {
         List<T> results = new ArrayList<T>();
         if (!rs.next()) {
             return results;
@@ -430,7 +428,7 @@ public class BeanProcessorEx {
     
     @SuppressWarnings({ "rawtypes", "unchecked" })
 	protected int[] mapColumnsToProperties(ResultSetMetaData rsmd,
-            PropertyDescriptor[] props, Map<String,String> mapBeanReflactColumn, Map mapColumnNames) throws SQLException {
+            PropertyDescriptor[] props, Map<String,String> mapBeanReflactColumn, Set<String> mapColumnNames) throws SQLException {
         int cols = rsmd.getColumnCount();
         int[] columnToProperty = new int[cols + 1];
         Arrays.fill(columnToProperty, PROPERTY_NOT_FOUND);
@@ -448,7 +446,7 @@ public class BeanProcessorEx {
 	            }
 	            // mapCloPros put
 	            if (mapColumnNames != null) {
-	            	mapColumnNames.put(columnName, true);
+	            	mapColumnNames.add(columnName);
 	            }
 	            // try get pro from map
 	            String propertyName = null;

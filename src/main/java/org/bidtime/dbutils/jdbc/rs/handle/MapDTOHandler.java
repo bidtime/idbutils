@@ -20,21 +20,12 @@ public class MapDTOHandler extends ResultSetDTOHandler<Map<String, Object>> {
 	}
 
 	public MapDTOHandler(boolean countSql) {
-		this(countSql, false);
-	}
-
-	public MapDTOHandler(boolean countSql, boolean thumbsHead) {
-		this(new BeanProcessorEx(), countSql, thumbsHead);
+		this(new BeanProcessorEx(), false);
 	}
 
 	public MapDTOHandler(BeanProcessorEx convert,
 			boolean countSql) {
-		this(convert, countSql, false);
-	}
-	
-	public MapDTOHandler(BeanProcessorEx convert,
-			boolean countSql, boolean thumbsHead) {
-		super.setProp(Map.class, convert, countSql, thumbsHead);
+		super.setProp(Map.class, convert, countSql);
 	}
  
     @Override

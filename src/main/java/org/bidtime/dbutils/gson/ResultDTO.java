@@ -3,34 +3,34 @@ package org.bidtime.dbutils.gson;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class ResultDTO<T> implements Serializable {
 	
-	@SuppressWarnings("rawtypes")
-	Map mapColPros = null;
+	Set<String> colMapProps = null;
+
+	public Set<String> getColMapProps() {
+		return colMapProps;
+	}
+
+	public void setColMapProps(Set<String> setPro) {
+		this.colMapProps = setPro;
+	}
 	
-//	String[] head = null;
-//
-//	public String[] getHead() {
-//		return head;
+//	public void addColMapProps(String col) {
+//		if (colMapProps != null) {
+//			colMapProps.add(col);
+//		}
 //	}
-//
-//	public void setHead(String[] head) {
-//		this.head = head;
+	
+//	public void addColMapProps(Set<String> colMapProps) {
+//		if (colMapProps != null) {
+//			colMapProps.addAll(colMapProps);
+//		}
 //	}
-
-	@SuppressWarnings("rawtypes")
-	public Map getMapColPros() {
-		return mapColPros;
-	}
-
-	@SuppressWarnings("rawtypes")
-	public void setMapColPros(Map mapColPros) {
-		this.mapColPros = mapColPros;
-	}
 
 	/**
 	 * serialVersionUID
@@ -167,11 +167,11 @@ public class ResultDTO<T> implements Serializable {
 				jsonArray = JSONHelper
 						.listMapToJsonArray((List<Map<String, Object>>) data);
 			} else {
-				jsonArray = JSONHelper.clazzToJsonArray((List) data, mapColPros);
+				jsonArray = JSONHelper.clazzToJsonArray((List) data, colMapProps);
 			}
 		} else {
 			jsonArray = new JSONArray();
-			JSONObject jsonObject = JSONHelper.clazzToJson(data, mapColPros);
+			JSONObject jsonObject = JSONHelper.clazzToJson(data, colMapProps);
 			jsonArray.put(jsonObject);
 		}
 		//} else {

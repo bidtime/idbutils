@@ -129,8 +129,6 @@ public class GZIPResponseWrapper extends HttpServletResponseWrapper implements S
         return writer;
     }
 
-
-
     /**
      * @see javax.servlet.http.HttpServletResponseWrapper#addHeader(java.lang.String, java.lang.String)
      */

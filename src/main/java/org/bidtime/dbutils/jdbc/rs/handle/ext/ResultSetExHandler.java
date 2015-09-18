@@ -4,6 +4,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.apache.commons.dbutils.ResultSetHandler;
+import org.bidtime.dbutils.jdbc.rs.BeanAdapt;
 import org.bidtime.dbutils.jdbc.rs.BeanProcessorEx;
 
 /**
@@ -14,10 +15,10 @@ import org.bidtime.dbutils.jdbc.rs.BeanProcessorEx;
  */
 public class ResultSetExHandler<T> implements ResultSetHandler<T> {
 
-	private boolean thumbsHead = false;
+	private BeanAdapt beanAdapt = null;
 
-	public boolean isThumbsHead() {
-		return thumbsHead;
+	public boolean isBeanAdapt() {
+		return ( beanAdapt != null && beanAdapt == BeanAdapt.AUTO ) ? true : false;
 	}
 
 //	public void setThumbsHead(boolean thumbsHead) {
@@ -50,11 +51,18 @@ public class ResultSetExHandler<T> implements ResultSetHandler<T> {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void setProp(Class type, BeanProcessorEx convert, boolean countSql,
-			boolean thumbsHead) {
+			BeanAdapt beanAdapt) {
 		this.type = type;
 		this.convert = convert;
 		this.countSql = countSql;
-		this.thumbsHead = thumbsHead;
+		this.beanAdapt = beanAdapt;
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public void setProp(Class type, BeanProcessorEx convert, boolean countSql) {
+		this.type = type;
+		this.convert = convert;
+		this.countSql = countSql;
 	}
 
 //	@SuppressWarnings("rawtypes")

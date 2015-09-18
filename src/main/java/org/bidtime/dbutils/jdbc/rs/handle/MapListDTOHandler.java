@@ -19,21 +19,12 @@ public class MapListDTOHandler extends AbstractListDTOHandler<Map<String, Object
 	}
 
 	public MapListDTOHandler(boolean countSql) {
-		this(countSql, false);
-	}
-
-	public MapListDTOHandler(boolean countSql, boolean thumbsHead) {
-		this(new BeanProcessorEx(), countSql, thumbsHead);
+		this(new BeanProcessorEx(), countSql);
 	}
 
 	public MapListDTOHandler(BeanProcessorEx convert,
 			boolean countSql) {
-		this(convert, countSql, false);
-	}
-
-	public MapListDTOHandler(BeanProcessorEx convert,
-			boolean countSql, boolean thumbsHead) {
-		super.setProp(Map.class, convert, countSql, thumbsHead);
+		super.setProp(Map.class, convert, countSql);
 	}
   
     @Override

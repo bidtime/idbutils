@@ -52,9 +52,9 @@ public class GZIPFilter implements Filter {
 
         if (!isIncluded(request) && headerContainsAcceptEncodingGzip(request) && !response.isCommitted()) {
             // Client accepts zipped content
-            //if (LOG.isDebugEnabled()) {
-            //    LOG.debug(request.getRequestURL() + ". Writing with gzip compression");
-           // }
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(request.getRequestURL() + ". Writing with gzip compression");
+            }
 
             // Create a gzip stream
             final ByteArrayOutputStream compressed = new ByteArrayOutputStream();
@@ -82,8 +82,6 @@ public class GZIPFilter implements Filter {
                     return;
                 default:
             }
-
-
 
             // Saneness checks
             byte[] compressedBytes = compressed.toByteArray();
@@ -125,13 +123,6 @@ public class GZIPFilter implements Filter {
         }
         return includeRequest;
     }
-
-
-
-
-
-
-
 
     /**
      * Checks if request contains the header value.

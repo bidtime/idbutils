@@ -3,9 +3,10 @@ package org.bidtime.dbutils.jdbc.rs.handle.ext;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
+import java.util.Set;
 
 import org.bidtime.dbutils.gson.ResultDTO;
-import org.bidtime.utils.comm.CaseInsensitiveHashMap;
+import org.bidtime.utils.comm.CaseInsensitiveHashSet;
 
 /**
  * @author jss
@@ -16,15 +17,15 @@ import org.bidtime.utils.comm.CaseInsensitiveHashMap;
 public class ResultSetDTOHandler<T> extends ResultSetExHandler<ResultDTO<T>> {
 	
 	protected Map<String, String> mapBeanPropColumns = null;
-	protected Map<String, Object> mapColumns = null;
+	protected Set<String> mapColumns = null;
 
 	@Override
 	public ResultDTO<T> handle(ResultSet rs) throws SQLException {
     	ResultDTO<T> t = new ResultDTO<T>();
-   		if (this.isThumbsHead()) {
-   			mapColumns = new CaseInsensitiveHashMap();
+   		if (this.isBeanAdapt()) {
+   			mapColumns = new CaseInsensitiveHashSet();
    			t.setData(doDTO(rs));
-   			t.setMapColPros(mapColumns);
+   			t.setColMapProps(mapColumns);
    		} else {
    			t.setData(doDTO(rs));
    		}

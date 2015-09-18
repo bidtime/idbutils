@@ -3,6 +3,7 @@ package org.bidtime.dbutils.jdbc.rs.handle;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import org.bidtime.dbutils.jdbc.rs.BeanAdapt;
 import org.bidtime.dbutils.jdbc.rs.BeanProcessorEx;
 
 /**
@@ -19,21 +20,29 @@ public class BeanListDTOHandler<T> extends AbstractListDTOHandler<T> {
 	}
 
 	public BeanListDTOHandler(Class<T> type, boolean countSql) {
-		this(type, new BeanProcessorEx(), countSql);
+		this(type, countSql, BeanAdapt.AUTO);
+	}
+
+	public BeanListDTOHandler(Class<T> type, BeanAdapt beanAdapt) {
+		this(type, false, beanAdapt);
+	}
+
+//	public BeanListDTOHandler(Class<T> type, BeanProcessorEx convert,
+//			boolean countSql) {
+//		this(type, convert, countSql, BeanAdapt.AUTO);
+//	}
+
+	public BeanListDTOHandler(Class<T> type, boolean countSql, BeanAdapt beanAdapt) {
+		this(type, new BeanProcessorEx(), countSql, beanAdapt);
+	}
+
+	public BeanListDTOHandler(Class<T> type, BeanAdapt beanAdapt, boolean countSql) {
+		this(type, new BeanProcessorEx(), countSql, beanAdapt);
 	}
 
 	public BeanListDTOHandler(Class<T> type, BeanProcessorEx convert,
-			boolean countSql) {
-		this(type, convert, countSql, true);
-	}
-
-	public BeanListDTOHandler(Class<T> type, boolean countSql, boolean thumbsHead) {
-		this(type, new BeanProcessorEx(), countSql, thumbsHead);
-	}
-
-	public BeanListDTOHandler(Class<T> type, BeanProcessorEx convert,
-			boolean countSql, boolean thumbsHead) {
-		super.setProp(type, convert, countSql, thumbsHead);
+			boolean countSql, BeanAdapt beanAdapt) {
+		super.setProp(type, convert, countSql, beanAdapt);
 	}
 
 	@SuppressWarnings("unchecked")
