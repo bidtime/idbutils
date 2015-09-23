@@ -5,32 +5,73 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.bidtime.utils.comm.CaseInsensitiveHashSet;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class ResultDTO<T> implements Serializable {
 	
-	Set<String> colMapProps = null;
+	Map<String, Set<String>> colMapProps = null;
+	protected Class<T> type;
+	
+	@SuppressWarnings("rawtypes")
+	public Class getType() {
+		return type;
+	}
 
-	public Set<String> getColMapProps() {
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public void setType(Class type) {
+		this.type = type;
+	}
+
+	public Map<String, Set<String>> getColMapProps() {
 		return colMapProps;
 	}
 
-	public void setColMapProps(Set<String> setPro) {
+	public void setColMapProps(Map<String, Set<String>> setPro) {
 		this.colMapProps = setPro;
 	}
-	
-//	public void addColMapProps(String col) {
+
+//	public Set<String> getColSetProps() {
+//		return (colMapProps != null && type != null) ? colMapProps.get(type.getName()) : null;
+//	}
+
+//	public void setColSetProps(Set<String> setPro) throws Exception {
+//		if (data == null) {
+//			throw new Exception("data is not null.");
+//		}
 //		if (colMapProps != null) {
-//			colMapProps.add(col);
+//			colMapProps.put(data.getClass().getName(), setPro);
+//		} else {
+//			colMapProps = new HashMap<String ,Set<String>>();
+//			colMapProps.put(data.getClass().getName(), setPro);
 //		}
 //	}
 	
-//	public void addColMapProps(Set<String> colMapProps) {
-//		if (colMapProps != null) {
-//			colMapProps.addAll(colMapProps);
-//		}
-//	}
+	public void addColSetProps(String col) {
+		if (colMapProps == null || type == null) {
+			return;
+		}
+		
+		Set<String> setColPro = colMapProps.get(type.getName());
+		if (setColPro == null) {
+			setColPro = new CaseInsensitiveHashSet();
+		}
+		setColPro.add(col);
+		colMapProps.put(type.getName(), setColPro);
+	}
+	
+	public void addColSetProps(Set<String> colSetProps) {
+		if (colMapProps == null || type == null) {
+			return;
+		}
+		Set<String> setColPro = colMapProps.get(type.getName());
+		if (setColPro == null) {
+			setColPro = new CaseInsensitiveHashSet();
+		}
+		setColPro.addAll(colSetProps);
+		colMapProps.put(type.getName(), setColPro);
+	}
 
 	/**
 	 * serialVersionUID
@@ -46,14 +87,32 @@ public class ResultDTO<T> implements Serializable {
 		return data;
 	}
 
-	@SuppressWarnings("rawtypes")
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void setData(T data) {
 		if (data != null) {
 			if (data instanceof List) {
 				this.len = ((List)data).size();
+			} else if (data instanceof ResultDTO) {
+				ResultDTO resultDTO = (ResultDTO)data;
+				if ( this.colMapProps == null ) {
+					colMapProps = resultDTO.colMapProps;
+				} else {
+					colMapProps.putAll(resultDTO.colMapProps);
+				}
 			}
 		}
 		this.data = data;
+	}
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public void putMapHead(ResultDTO resultDTO) {
+		if ( this.colMapProps == null ) {
+			colMapProps = resultDTO.colMapProps;
+		} else {
+			if (resultDTO.colMapProps != null) {
+				colMapProps.putAll(resultDTO.colMapProps);
+			}
+		}		
 	}
 	
 	public boolean isSuccess() {

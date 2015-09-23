@@ -96,7 +96,7 @@ public class JSONHelper {
 	 * @param object
 	 * @return jsonObject
 	 */
-	public static Object objToJsonObj(Object objRaw, Set<String> mapColPros) {
+	public static Object objToJsonObj(Object objRaw, Map<String, Set<String>> mapColPros) {
 		Object objData = null;
 		if (objRaw == null) {		//要转换成json.null
 			objData = JSONObject.NULL;
@@ -129,7 +129,7 @@ public class JSONHelper {
 	}
 	
 	@SuppressWarnings("rawtypes")
-	public static JSONArray listToJson(List list, Set<String> mapColPros) {
+	public static JSONArray listToJson(List list, Map<String, Set<String>> mapColPros) {
 		JSONArray jsonObject1 = new JSONArray();
 		for (int i=0; i<list.size(); i++) {
 			Object obj = list.get(i);
@@ -385,7 +385,7 @@ public class JSONHelper {
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private static JSONArray listToJsonArray(List list, Set<String> mapColPros) {
+	private static JSONArray listToJsonArray(List list, Map<String, Set<String>> mapColPros) {
 		JSONArray jsonArray = new JSONArray();
 		if (list != null && list.size()>0) {
 			for (int i = 0; i < list.size(); i++) {
@@ -420,7 +420,7 @@ public class JSONHelper {
 	}
 	
 	@SuppressWarnings("rawtypes")
-	public static JSONArray clazzToJsonArray(List list, Set<String> mapColPros) {
+	public static JSONArray clazzToJsonArray(List list, Map<String, Set<String>> mapColPros) {
 		List<Map<String, Object>> listResult = new ArrayList<>();
 		for (Object o:list) {
 			Map<String, Object> map = clazzToMap(o, mapColPros);
@@ -434,7 +434,7 @@ public class JSONHelper {
 	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public static JSONObject clazzToJson(Object object, Set<String> mapHead) {
+	public static JSONObject clazzToJson(Object object, Map<String, Set<String>> mapHead) {
 		JSONObject jsonObject = new JSONObject();
 		PropertyDescriptor[] propDescripts = null;
 		try {
@@ -454,8 +454,11 @@ public class JSONHelper {
 				continue;
 			}
 
-			if (mapHead != null && !mapHead.contains(key)) {
-				continue;
+			if (mapHead != null) {
+				Set<String> setColPro = mapHead.get(object.getClass().getName());
+				if (setColPro != null && !setColPro.contains(key)) {
+					continue;
+				}
 			}
 
 			Object retVal = null;	//通过反射把该类对象传递给invoke方法来调用对应的方法  
@@ -465,11 +468,11 @@ public class JSONHelper {
 				logger.error("clazzToJson", e);
 			}
 			if (retVal instanceof List) {
-				jsonObject.put(key, listToJsonArray((List)retVal, null));
+				jsonObject.put(key, listToJsonArray((List)retVal, mapHead));
 			} else if (retVal instanceof Map) {
 				jsonObject.put(key, mapToJson((Map)retVal));
 			} else {
-				jsonObject.put(key, JSONHelper.objToJsonObj(retVal, null));
+				jsonObject.put(key, JSONHelper.objToJsonObj(retVal, mapHead));
 			}
 		}
 		return jsonObject;
@@ -479,7 +482,7 @@ public class JSONHelper {
 		return clazzToMap(object,  null);
 	}
 	
-	public static Map<String, Object> clazzToMap(Object object, Set<String> mapHead) {
+	public static Map<String, Object> clazzToMap(Object object, Map<String, Set<String>> mapHead) {
 		Map<String, Object> map = new LinkedHashMap<String, Object>();
 		PropertyDescriptor[] propDescripts = null;
 		try {
@@ -497,8 +500,11 @@ public class JSONHelper {
 			if (setter == null || setter.getName().equals("getClass")) {
 				continue;
 			}
-			if (mapHead != null && !mapHead.contains(key)) {
-				continue;
+			if (mapHead != null) {
+				Set<String> setColPro = mapHead.get(object.getClass().getName());
+				if (setColPro != null && !setColPro.contains(key)) {
+					continue;
+				}
 			}
 			Object retVal = null;	//通过反射把该类对象传递给invoke方法来调用对应的方法  
 			try {

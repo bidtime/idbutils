@@ -3,41 +3,25 @@
 		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-<!--
 	<parent>
 		<groupId>com.pch</groupId>
 		<artifactId>pch-parent</artifactId>
 		<version>1.0-SNAPSHOT</version>
 	</parent>
--->
-	
-	<parent>
-		<groupId>com.baturu</groupId>
-		<artifactId>baturu-parent</artifactId>
-		<version>1.0.0-SNAPSHOT</version>
-	</parent>
 
-	<groupId>com.bidtime.utils</groupId>
+	<groupId>org.bidtime.utils</groupId>
 	<artifactId>idbutils</artifactId>
 	<packaging>jar</packaging>
-	<version>1.0.2-SNAPSHOT</version>
+	<version>1.0.6-SNAPSHOT</version>
 	<name>idbutils</name>
 
 	<dependencies>
 
 		<dependency>
-			<groupId>com.baturu.utils</groupId>
-			<artifactId>json-common</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
-		</dependency>
-
-		<!--
-		<dependency>
 			<groupId>com.bidtime.utils</groupId>
 			<artifactId>json</artifactId>
 			<version>1.0.0-SNAPSHOT</version>
 		</dependency>
-		-->
 
 		<dependency>
 			<groupId>commons-dbutils</groupId>

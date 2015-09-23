@@ -48,7 +48,7 @@ public class BeanListDTOHandler<T> extends AbstractListDTOHandler<T> {
 	@SuppressWarnings("unchecked")
 	@Override
 	protected T handleRow(ResultSet rs) throws SQLException {
-		return (T) this.convert.toBean(rs, this.type, this.mapBeanPropColumns, mapColumns);
+		return (T) this.convert.toBean(rs, this.type, this.mapBeanPropColumns, setColumns);
 	}
 
 }
