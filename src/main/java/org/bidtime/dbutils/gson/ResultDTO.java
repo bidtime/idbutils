@@ -230,7 +230,12 @@ public class ResultDTO<T> implements Serializable {
 			}
 		} else {
 			jsonArray = new JSONArray();
-			JSONObject jsonObject = JSONHelper.clazzToJson(data, colMapProps);
+			JSONObject jsonObject = null;
+			if (data instanceof Map) {
+				jsonObject = JSONHelper.mapToJson((Map)(data));
+			} else {
+				jsonObject = JSONHelper.clazzToJson(data, colMapProps);
+			}
 			jsonArray.put(jsonObject);
 		}
 		//} else {

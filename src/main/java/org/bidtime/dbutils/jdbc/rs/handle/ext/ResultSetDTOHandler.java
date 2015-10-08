@@ -23,17 +23,15 @@ public class ResultSetDTOHandler<T> extends ResultSetExHandler<ResultDTO<T>> {
 	@Override
 	public ResultDTO<T> handle(ResultSet rs) throws SQLException {
     	ResultDTO<T> t = new ResultDTO<T>();
+		t.setData(doDTO(rs));
+		t.setType(type);
    		if (this.isBeanAdapt()) {
    			setColumns = new CaseInsensitiveHashSet();
-   			t.setData(doDTO(rs));
    			if (type != null) {
-   				t.setType(type);
    				Map<String, Set<String>> mapColPro = new HashMap<String, Set<String>>();
    				mapColPro.put(type.getName(), setColumns);
    				t.setColMapProps(mapColPro);
    			}
-   		} else {
-   			t.setData(doDTO(rs));
    		}
     	return t;
 	}

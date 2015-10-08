@@ -103,11 +103,10 @@ public class SqlParser {
 			int end = matcher.end();
 			result.append(inSql.substring(0, start));
 			String group = matcher.group().substring(1, matcher.group().length()-1);
-			
 			String name = getParaName(group);
 			Object replace = params.get(name);
 			//String replace = (String) params.get(group
-			//		.replaceAll("\\[|\\]", "").trim());
+			//		.replaceAll("\\{|\\}", "").trim());
 			if (replace == null) {
 				result.append(" ");
 			} else {
@@ -182,8 +181,8 @@ public class SqlParser {
 								result.append(", ");
 							}
 							result.append(value);
-						} else {
-							System.out.println("err: " + key + " - " + valueArr[0]);
+						//} else {
+							//log.info("err: " + key + " - " + valueArr[0]);
 						}
 					}
 				}

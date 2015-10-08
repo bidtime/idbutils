@@ -403,7 +403,7 @@ public class JSONHelper {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private static JSONObject mapToJson(Map<String, Object> map) {
+	public static JSONObject mapToJson(Map<String, Object> map) {
 		JSONObject jsonObject = new JSONObject();
 		for (Entry<String, Object> entry: map.entrySet()) {
 			Object objData = entry.getValue();
@@ -429,9 +429,9 @@ public class JSONHelper {
 		return listMapToJsonArray(listResult);
 	}
 	
-	public static JSONObject clazzToJson(Object object) {
-		return clazzToJson(object, null);
-	}
+//	private static JSONObject clazzToJson(Object object) {
+//		return clazzToJson(object, null);
+//	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static JSONObject clazzToJson(Object object, Map<String, Set<String>> mapHead) {
