@@ -195,15 +195,15 @@ public class SqlParser {
 
 	public static void main(String[] args) {
 		String sql = "select id, code, name from xx "
-				// + " {idsort} " + " \n\r "
-				+ "{order by id=#idSort# , <<code=#codeSort#>> , name=#nameSort#}"
-				//+ " [ <<order by id2=#id2Sort#>> <<, code2=#code2Sort#>> <<, name2=#name2Sort#>>] "
-				// + " [ # idSort # ] "
-				;
+			// + " {idsort} " + " \n\r "
+			+ "{order by id=#idSort#, <<code=#codeSort#>>, name=#nameSort#}"
+			//+ " [ <<order by id2=#id2Sort#>> <<, code2=#code2Sort#>> <<, name2=#name2Sort#>>] "
+			// + " [ # idSort # ] "
+			;
 		
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("idSort", "id asc");
-		//params.put("codeSort", "code desc");
+		params.put("codeSort", "code desc");
 		
 		String repl = SqlParser.replaceOrderBy(sql, params);
 		//String repl = SqlParser.replace(sql, params);

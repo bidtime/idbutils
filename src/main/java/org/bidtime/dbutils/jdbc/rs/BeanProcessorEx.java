@@ -55,7 +55,7 @@ import org.bidtime.utils.comm.CaseInsensitiveHashMap;
  */
 public class BeanProcessorEx {
 
-    /**
+	/**
      * Special array value used by <code>mapColumnsToProperties</code> that
      * indicates there is no bean property that matches a column from a
      * <code>ResultSet</code>.
