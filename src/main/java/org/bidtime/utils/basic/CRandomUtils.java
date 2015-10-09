@@ -6,7 +6,7 @@ package org.bidtime.utils.basic;
 import java.util.Random;
 
 /**
- * @author Administrator
+ * @author jss
  *
  */
 public class CRandomUtils {
@@ -25,12 +25,12 @@ public class CRandomUtils {
 	 */
 	public static String getCode(int length) {
 		Random r = new Random();       
-		char[] buf = new char[length];
+		StringBuilder sbRand = new StringBuilder();
 		for (int i = 0; i < length; i++) {
 			int rnd = Math.abs(r.nextInt()) % DICTION.length;
-			buf[i] = DICTION[rnd];
+			sbRand.append(DICTION[rnd]);
 		}
-		return new String(buf);
+		return sbRand.toString();
 	}
 	
 	/**
@@ -38,13 +38,13 @@ public class CRandomUtils {
 	 * @return
 	 */
 	public static String getCodeNoneZero(int length) {
-		Random r = new Random();       
-		char[] buf = new char[length];
+		Random r = new Random();
+		StringBuilder sbRand = new StringBuilder();
 		for (int i = 0; i < length; i++) {
 			int rnd = Math.abs(r.nextInt()) % DICTION_REMOVE_ZERO.length;
-			buf[i] = DICTION_REMOVE_ZERO[rnd];
+			sbRand.append(DICTION_REMOVE_ZERO[rnd]);
 		}
-		return new String(buf);
+		return sbRand.toString();
 	}
 	
 	/**

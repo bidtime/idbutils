@@ -67,7 +67,6 @@ public class GsonRows {
 				}
 			}
 		}
-
 		this.setHead(head);
 		this.setData(array2);
 		this.clearIndex();
@@ -104,7 +103,6 @@ public class GsonRows {
 				}
 			}
 		}
-
 		this.setHead(head);
 		Object[][] array2 = (Object[][]) list
 				.toArray(new Object[list.size()][head.length]);

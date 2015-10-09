@@ -4,32 +4,52 @@ public class GlobalParams {
 	private String uploadPath;
 	private String downloadPath;
 	private String dataPath;
-	private String ptUrl;
-	private String apacheUrl;
-	private String apacheRoot;
+
+	private String webUrl;
+	public String getWebUrl() {
+		return webUrl;
+	}
+
+	public void setWebUrl(String webUrl) {
+		this.webUrl = webUrl;
+	}
+
+	public String getWebRoot() {
+		return webRoot;
+	}
+
+	public void setWebRoot(String webRoot) {
+		this.webRoot = webRoot;
+	}
+
+	private String webRoot;
 	
-	public String getApacheRoot() {
-		return apacheRoot;
+	private String tmpPath;
+	private String tmpDownloadPath;
+	private String tmpUploadPath;
+	
+	public String getTmpPath() {
+		return tmpPath;
 	}
 
-	public void setApacheRoot(String apacheRoot) {
-		this.apacheRoot = apacheRoot;
+	public void setTmpPath(String tmpPath) {
+		this.tmpPath = tmpPath;
+		String p = null;
+		if (tmpPath.indexOf('/') >= 0 ) {
+			p = "/";
+		} else {
+			p = "\\";
+		}
+		this.tmpDownloadPath = tmpPath + "dl" + p;
+		this.tmpUploadPath = tmpPath + "ul" + p;
 	}
 
-	public String getApacheUrl() {
-		return apacheUrl;
+	public String getTmpUploadPath() {
+		return tmpUploadPath;
 	}
 
-	public void setApacheUrl(String apacheUrl) {
-		this.apacheUrl = apacheUrl;
-	}
-
-	public String getPtUrl() {
-		return ptUrl;
-	}
-
-	public void setPtUrl(String ptUrl) {
-		this.ptUrl = ptUrl;
+	public String getTmpDownloadPath() {
+		return tmpDownloadPath;
 	}
 
 	private GlobalParams() {

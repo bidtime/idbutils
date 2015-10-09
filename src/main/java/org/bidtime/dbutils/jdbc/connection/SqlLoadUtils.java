@@ -29,13 +29,6 @@ public class SqlLoadUtils {
 		return JsonFieldXmlsLoader.getSqlOfId(clazz, id);
 	}
 
-	/**
-	 * @param ds
-	 * @param clazz
-	 * @param params
-	 * @return
-	 * @throws SQLException
-	 */
 	@SuppressWarnings("rawtypes")
 	public static int delete(DataSource ds, Class clazz, Object[] params)
 			throws SQLException {
@@ -281,9 +274,7 @@ public class SqlLoadUtils {
 			if (!tp.isNonePkInc()) {
 				g.delHead(tp.getFieldPK());
 			}
-			tp.setDefaultValue(g);
-			String sql = tp.getInsertSqlOfJsonHead(tp.getTableName(),
-					g.getHead());
+			String sql = tp.getInsertSql(g, true);
 			nReturn = DbConnection.update(ds, sql, g.getData());
 		}
 		return nReturn;
@@ -298,8 +289,7 @@ public class SqlLoadUtils {
 			if (!tp.isNonePkInc()) {
 				g.delHead(tp.getFieldPK());
 			}
-			String sql = tp.getInsertSqlOfJsonHead(tp.getTableName(),
-					g.getHead());
+			String sql = tp.getInsertSql(g, true);
 			nReturn = DbConnection.updateBatch(ds, sql, g.getData());
 			return nReturn;
 		} else {
@@ -321,8 +311,7 @@ public class SqlLoadUtils {
 				if (!tp.isNonePkInc()) {
 					g.delHead(tp.getFieldPK());
 				}
-				tp.setDefaultValue(g);
-				String sql = tp.getInsertSqlOfJsonHead(tp.getTableName(), g.getHead());
+				String sql = tp.getInsertSql(g, true);
 				return DbConnection.update(ds, sql, g.getData());
 			} catch (Exception e) {
 				throw new SQLException("insert:", e);
@@ -348,7 +337,7 @@ public class SqlLoadUtils {
 				if (!tp.isNonePkInc()) {
 					g.delHead(tp.getFieldPK());
 				}
-				String sql = tp.getInsertSqlOfJsonHead(tp.getTableName(), g.getHead());
+				String sql = tp.getInsertSql(g, true);
 				return DbConnection.updateBatch(ds, sql, g.getData());
 			} catch (Exception e) {
 				throw new SQLException("insert:", e);
@@ -368,9 +357,7 @@ public class SqlLoadUtils {
 			if (!tp.isNonePkInc()) {
 				g.delHead(tp.getFieldPK());
 			}
-			tp.setDefaultValue(g);
-			String sql = tp.getInsertSqlOfJsonHead(tp.getTableName(),
-					g.getHead());
+			String sql = tp.getInsertSql(g, true);
 			ResultSetHandler rsh = new ScalarHandler<Object>();
 			Object objReturn = DbConnection.insert(ds, sql, rsh, g.getData());
 			g.autoAddHeadData(pk, objReturn);
@@ -388,9 +375,7 @@ public class SqlLoadUtils {
 			if (!tp.isNonePkInc()) {
 				g.delHead(tp.getFieldPK());
 			}
-			tp.setDefaultValue(g);
-			String sql = tp.getInsertSqlOfJsonHead(tp.getTableName(),
-					g.getHead());
+			String sql = tp.getInsertSql(g, true);
 			ResultSetHandler rsh = new ScalarHandler<Object>();
 			return (T)DbConnection.insert(ds, sql, rsh, g.getData());
 		} else {
@@ -410,9 +395,7 @@ public class SqlLoadUtils {
 				} else {
 					g = tp.clazzToRow(o, true);
 				}
-				tp.setDefaultValue(g);
-				String sql = tp.getInsertSqlOfJsonHead(tp.getTableName(),
-						g.getHead());
+				String sql = tp.getInsertSql(g, true);;
 				return (T) DbConnection.insert(ds, sql, new ScalarHandler<Object>()
 						, g.getData());
 			} catch (Exception e) {
@@ -437,10 +420,7 @@ public class SqlLoadUtils {
 				} else {
 					g = tp.clazzToRows(list, true);
 				}
-				//TODO setDefaultValue
-				//tp.setDefaultValue(g);
-				String sql = tp.getInsertSqlOfJsonHead(tp.getTableName(),
-						g.getHead());
+				String sql = tp.getInsertSql(g, true);
 				return (T) DbConnection.insert(ds, sql, new ScalarHandler<Object>()
 						, g.getData());
 			} catch (Exception e) {
@@ -461,8 +441,7 @@ public class SqlLoadUtils {
 			if (!tp.isNonePkInc()) {
 				g.delHead(tp.getFieldPK());
 			}
-			String sql = tp.getInsertSqlOfJsonHead(tp.getTableName(),
-					g.getHead());
+			String sql = tp.getInsertSql(g, true);
 			Object generatedKeys = DbConnection.insertBatch(ds, sql,
 					new ScalarHandler<Object>(), g.getData());
 			g.autoAddHeadData(pk, generatedKeys);
@@ -480,8 +459,7 @@ public class SqlLoadUtils {
 			if (!tp.isNonePkInc()) {
 				g.delHead(tp.getFieldPK());
 			}
-			String sql = tp.getInsertSqlOfJsonHead(tp.getTableName(),
-					g.getHead());
+			String sql = tp.getInsertSql(g, true);
 			return (T) DbConnection.insertBatch(ds, sql,
 					new ScalarHandler<Object>(), g.getData());
 		} else {
@@ -712,18 +690,6 @@ public class SqlLoadUtils {
 		} else {
 			return false;
 		}
-//		if (rsh instanceof BeanDTOHandler
-//				&& ((BeanDTOHandler) rsh).isCountSql() ||
-//			rsh instanceof BeanListDTOHandler
-//				&& ((BeanListDTOHandler) rsh).isCountSql() ||
-//			rsh instanceof MapDTOHandler
-//				&& ((MapDTOHandler) rsh).isCountSql() ||
-//			rsh instanceof MapListDTOHandler
-//				&& ((MapListDTOHandler) rsh).isCountSql()) {
-//			return true;
-//		} else {
-//			return false;
-//		}
 	}
 
 	//query

@@ -139,11 +139,21 @@ public class TTableProps {
 		this.fieldPK = fieldPK;
 	}
 	
-	public String getInsertSqlOfJsonHead(String[] jsonHead) {
-		return getInsertSqlOfJsonHead(this.tableName, jsonHead);
+	public String getInsertSql(GsonRow g, boolean setDefault) {
+		if (setDefault) {
+			setDefaultValue(g);
+		}
+		return getInsertSqlOfJsonHead(tableName, g.getHead());
 	}
 	
-	public String getInsertSqlOfJsonHead(String tblName, String[] jsonHead) {
+	public String getInsertSql(GsonRows g, boolean setDefault) {
+		if (setDefault) {
+			setDefaultValue(g);
+		}
+		return getInsertSqlOfJsonHead(tableName, g.getHead());
+	}
+	
+	private String getInsertSqlOfJsonHead(String tblName, String[] jsonHead) {
 		List<String> listColumn=new ArrayList<String>();
 		for (String sIdx: jsonHead) {
 			ColumnPro p = this.mapPropertyColumn.get(sIdx.toLowerCase());
@@ -257,7 +267,7 @@ public class TTableProps {
 		setSqlHeadPro_CountSql();
 	}
 
-	public void setDefaultValue(GsonRow r) {
+	private void setDefaultValue(GsonRow r) {
 		if (r == null || !r.isExistsData() || !this.existDefault) {
 			return;
 		}
@@ -265,13 +275,61 @@ public class TTableProps {
 		List<Object> listAddData = null;
 		for (int i = 0; i < this.listDefault.size(); i++) {
 			String s = this.listDefault.get(i);
+			ColumnPro cp = this.mapPropertyColumn.get(s);
+			if (cp == null) {
+				continue;
+			}
+			Object objDefault = cp.getDefaultValue();			
 			int nIdx = r.getPosOfName(s);
-			if (nIdx == -1 || r.getValue(nIdx) != null) {
+			if (nIdx == -1) {
+				if (listAddHead == null) {
+					listAddHead = new ArrayList<String>();
+					listAddData = new ArrayList<Object>();
+				}
+				listAddHead.add(cp.getColumn());
+				listAddData.add(objDefault);
+			} else if (r.getValue(nIdx) == null) {
+				r.setValue(nIdx, objDefault);
+			}
+		}
+		if (listAddHead != null && !listAddHead.isEmpty()) {
+			r.autoInsertHeadData(
+					listAddHead.toArray(new String[listAddHead.size()]),
+					listAddData.toArray(new Object[listAddData.size()]));
+		}
+	}
+	
+	private void setDefaultValue(GsonRows r) {
+		if (r != null && r.isExistsData() && this.existDefault) {
+			List<String> listAddHead = null;
+			List<Object> listAddData = null;
+			for (int i = 0; i < this.listDefault.size(); i++) {
+				String s = this.listDefault.get(i);
 				ColumnPro cp = this.mapPropertyColumn.get(s);
-				if (cp != null) {
-					Object objDefault = cp.getDefaultValue();
-					if (objDefault != null && r.getValue(s) == null) {
-						if (listAddHead == null || listAddData == null) {
+				if (cp == null) {
+					continue;
+				}
+				Object objDefault = cp.getDefaultValue();
+				int nIdx = r.getPosOfName(s);
+				if (nIdx == -1) {
+					if (listAddHead == null) {
+						listAddHead = new ArrayList<String>();
+						listAddData = new ArrayList<Object>();
+					}
+					listAddHead.add(cp.getColumn());
+					listAddData.add(objDefault);
+				} else {
+					Object[] listOld = r.getArrayValueOfIdx(nIdx);
+					if (listOld != null && listOld.length > 0) {
+						for (int nn = 0; nn < listOld.length; nn++) {
+							Object objOld = listOld[nn];
+							if (objOld == null) {
+								listOld[nn] = objDefault;
+							}
+						}
+						r.setArrayValueOfIdx(nIdx, listOld);
+					} else {
+						if (listAddHead == null) {
 							listAddHead = new ArrayList<String>();
 							listAddData = new ArrayList<Object>();
 						}
@@ -279,20 +337,12 @@ public class TTableProps {
 						listAddData.add(objDefault);
 					}
 				}
-			} else {
-				ColumnPro cp = this.mapPropertyColumn.get(s);
-				if (cp != null && r.getValue(s) == null) {
-					Object objDefault = cp.getDefaultValue();
-					if (objDefault != null) {
-						r.setValue(nIdx, objDefault);
-					}
-				}
 			}
-		}
-		if (listAddHead != null && listAddHead.size() > 0) {
-			r.autoInsertHeadData(
+			if (listAddHead != null && !listAddHead.isEmpty()) {
+				r.autoInsertHeadData(
 					listAddHead.toArray(new String[listAddHead.size()]),
 					listAddData.toArray(new Object[listAddData.size()]));
+			}
 		}
 	}
 
@@ -329,44 +379,6 @@ public class TTableProps {
 			}
 		}
 	}
-	
-//	public void setDefaultValue(GsonRows r) {
-//		if (r != null && r.isExistsData() && this.existDefault) {
-//			List<String> listAddHead = null;
-//			List<Object> listAddData = null;
-//			for (int i = 0; i < this.listDefault.size(); i++) {
-//				String s = this.listDefault.get(i);
-//				int nIdx = r.getPosOfName(s);
-//				if (nIdx == -1 || r.getValue(nIdx) != null) {
-//					ColumnPro cp = this.mapPropertyColumn.get(s);
-//					if (cp != null) {
-//						Object objDefault = cp.getDefaultValue();
-//						if (objDefault != null && r.getValue(s) == null) {
-//							if (listAddHead == null || listAddData == null) {
-//								listAddHead = new ArrayList<String>();
-//								listAddData = new ArrayList<Object>();
-//							}
-//							listAddHead.add(cp.getColumn());
-//							listAddData.add(objDefault);
-//						}
-//					}
-//				} else {
-//					ColumnPro cp = this.mapPropertyColumn.get(s);
-//					if (cp != null && r.getValue(s) == null) {
-//						Object objDefault = cp.getDefaultValue();
-//						if (objDefault != null) {
-//							r.setValue(nIdx, objDefault);
-//						}
-//					}
-//				}
-//			}
-//			if (listAddHead != null && listAddHead.size() > 0) {
-//				r.autoInsertHeadData(
-//					listAddHead.toArray(new String[listAddHead.size()]),
-//					listAddData.toArray(new Object[listAddData.size()]));
-//			}
-//		}
-//	}
 
 	public void addColsPkPro(String sJsonColumn, ColumnPro p) {
 		if (StringUtils.isNotEmpty(sJsonColumn)) {
