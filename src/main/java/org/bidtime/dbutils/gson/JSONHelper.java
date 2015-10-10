@@ -16,6 +16,7 @@ import java.util.Queue;
 import java.util.Set;
 
 import org.bidtime.dbutils.gson.dataset.JsonData;
+import org.bidtime.utils.basic.ObjectComm;
 import org.bidtime.utils.comm.CaseInsensitiveHashMap;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -285,6 +286,47 @@ public class JSONHelper {
 			return rs.get(key);
 		}
 	}
+	
+	protected static Object processObject(Object o, String key, Class<?> propType)
+			throws Exception {	
+		if (o == null) {
+			return (Object)null;
+		}
+
+		if (propType.equals(String.class)) {
+			return (String)o;
+		} else if (propType.equals(Integer.TYPE) || propType.equals(Integer.class)) {
+			return ObjectComm.objectToInteger(o);
+		} else if (propType.equals(Boolean.TYPE) || propType.equals(Boolean.class)) {
+			return ObjectComm.objectToBoolean(o);
+		} else if (propType.equals(Long.TYPE) || propType.equals(Long.class)) {
+			return ObjectComm.objectToLong(o);
+		} else if (propType.equals(Double.TYPE) || propType.equals(Double.class)) {
+			return ObjectComm.objectToDouble(o);
+		} else if (propType.equals(Float.TYPE) || propType.equals(Float.class)) {
+			return ObjectComm.objectToFloat(o);
+		} else if (propType.equals(Short.TYPE) || propType.equals(Short.class)) {
+			return ObjectComm.objectToShort(o);
+		} else if (propType.equals(Byte.TYPE) || propType.equals(Byte.class)) {
+			return ObjectComm.objectToByte(o);
+		} else if (propType.equals(Date.class)) {
+			if (propType.equals(Date.class)) {
+				if (o instanceof Date) {
+					return o;
+				} else if (o instanceof String) {
+					return yyyyMMddHHmmssToDate(o.toString());
+				} else {
+					return o;
+				}
+			} else {
+				return o;
+			}
+		} else if (propType.equals(List.class) || propType.equals(Map.class) ) {
+			return o;
+		} else {
+			return o;
+		}
+	}
 
 	public static <T> T jsonStrToClazz(String json, Class<T> type)
 			throws Exception {
@@ -348,6 +390,78 @@ public class JSONHelper {
 	            Object objValue = null;
 	            if(propType != null) {
 	            	objValue = processColumn(jsonObj, jsonKey, propType);
+	            }
+				callSetter(bean, pd, objValue);
+			}
+        } finally {
+        	mColumns = null;
+        }
+		return bean;
+	}
+	
+//	public static void main(String[] args) throws Exception {
+//		User u = new User();
+//		u.setUserId(1);
+//		u.setFirstTime(new Date());
+//		
+//		Map map = clazzToMap(u);
+//		
+//		User uu = mapToClazz(map, User.class);
+//		System.out.println(uu);
+//	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public static <T> T mapToClazz(Map map, Class<T> type)
+			throws Exception {
+        T bean = type.newInstance();
+		PropertyDescriptor[] props = null;
+		try {
+			props = Introspector.getBeanInfo(type).
+					getPropertyDescriptors();
+		} catch (IntrospectionException e) {
+			logger.error("class to map error", e);
+		}
+		
+        Map<String, Object> mColumns = new CaseInsensitiveHashMap();
+        try {
+			for (int i=0; i<props.length; i++) {
+				PropertyDescriptor pro = props[i];
+				Method setter = pro.getWriteMethod();
+				String head = pro.getName();
+				//Method setter = pro.getReadMethod();
+				if (setter == null || setter.getName().equals("getClass")) {
+					continue;
+				}
+				mColumns.put(head, i);
+			}
+			//Iterator<String> it = jsonObj.keys();
+			Iterator<Map.Entry> it = map.entrySet().iterator();
+			while (it.hasNext()) {
+				Map.Entry entry = (Map.Entry)it.next();
+				String key = (String)entry.getKey();//jsonKeys.next();
+				if ( !mColumns.containsKey(key) ) {
+					continue;
+				}
+				int nIdx = (Integer)mColumns.get(key);
+				PropertyDescriptor pd = props[nIdx];
+				Class<?> propType = pd.getPropertyType();
+				//Object jsonValObj = jsonObj.get(jsonKey);
+//				if (jsonValObj == JSONObject.NULL) {	//如果是json.null, 要转换成 (object)null
+//					objReturn = (Object)null;
+//				} else if (jsonValObj instanceof JSONArray) {
+//					//objReturn = JSONHelper.jsonToList((JSONArray) jsonValObj);
+//				} else if (jsonValObj instanceof JSONObject) {
+//					//objReturn = JSONHelper.jsonToMap((JSONObject) jsonValObj);
+//				} else {
+//					//objReturn = JSONHelper.jsonObjToObj(jsonValObj);
+//					objReturn = jsonValObj;
+//				}
+				
+	            Object objValue = null;
+	            if (propType != null) {
+	            	objValue = processObject(entry.getValue(), key, propType);
+	            } else {
+	            	objValue = entry.getValue();
 	            }
 				callSetter(bean, pd, objValue);
 			}
