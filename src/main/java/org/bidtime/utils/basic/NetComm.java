@@ -1,7 +1,7 @@
 package org.bidtime.utils.basic;
 
 
-public class CNetComm {
+public class NetComm {
 
 	public static int isInnerIP(long a_ip) {
 		int bValid = -1;

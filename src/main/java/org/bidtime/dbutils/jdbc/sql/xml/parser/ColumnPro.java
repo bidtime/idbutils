@@ -5,7 +5,7 @@ import java.util.Date;
 
 import org.apache.commons.lang.StringUtils;
 import org.bidtime.dbutils.jdbc.sql.SqlUtils;
-import org.bidtime.utils.basic.CDateTimeComm;
+import org.bidtime.utils.basic.DateTimeComm;
 
 public class ColumnPro {
 	private String name;
@@ -59,7 +59,7 @@ public class ColumnPro {
 			if ((String.valueOf(defaultValue)).equalsIgnoreCase("now()")) {
 				this.defaultValue = defaultValue;
 			} else {
-				this.defaultValue = CDateTimeComm.yyyyMMddHHmmssToDate(String.valueOf(defaultValue));
+				this.defaultValue = DateTimeComm.yyyyMMddHHmmssToDate(String.valueOf(defaultValue));
 			}
 		} else {
 			this.defaultValue = SqlUtils.getDefaultOfType(this.type, defaultValue);

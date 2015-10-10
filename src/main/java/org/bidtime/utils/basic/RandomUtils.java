@@ -9,7 +9,7 @@ import java.util.Random;
  * @author jss
  *
  */
-public class CRandomUtils {
+public class RandomUtils {
 	
 	//private static String S_DICTION = "abcdefghijklmnopqrstuvwxyz0123456789";
 	private static char[] DICTION = "abcdefghijklmnopqrstuvwxyz0123456789".toCharArray();

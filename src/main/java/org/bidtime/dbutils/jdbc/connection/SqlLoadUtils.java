@@ -20,7 +20,7 @@ import org.bidtime.dbutils.jdbc.sql.SqlUtils;
 import org.bidtime.dbutils.jdbc.sql.xml.JsonFieldXmlsLoader;
 import org.bidtime.dbutils.jdbc.sql.xml.parser.HeadSqlArray;
 import org.bidtime.dbutils.jdbc.sql.xml.parser.TTableProps;
-import org.bidtime.utils.basic.CArrayComm;
+import org.bidtime.utils.basic.ArrayComm;
 
 public class SqlLoadUtils {
 
@@ -46,7 +46,7 @@ public class SqlLoadUtils {
 			List<String> listJsonPk = new ArrayList<String>();
 			String sql = tp.getDeleteSqlOfHead(tp.getTableName(),
 					o.getHead(), listJsonPk);
-			GsonRow r = o.remain(CArrayComm.listToStringArray(listJsonPk));
+			GsonRow r = o.remain(ArrayComm.listToStringArray(listJsonPk));
 			try {
 				nReturn = DbConnection.update(ds, sql, r.getData());
 			} finally {
@@ -89,7 +89,7 @@ public class SqlLoadUtils {
 			List<String> listJsonPk = new ArrayList<String>();
 			String sql = tp.getDeleteSqlOfHead(tp.getTableName(),
 					o.getHead(), listJsonPk);
-			GsonRows r = o.remain(CArrayComm.listToStringArray(listJsonPk));
+			GsonRows r = o.remain(ArrayComm.listToStringArray(listJsonPk));
 			try {
 				nReturn = DbConnection.updateBatch(ds, sql, r.getData());
 			} finally {
@@ -136,7 +136,7 @@ public class SqlLoadUtils {
 			}
 			try {
 				String sql = tp.getDeleteSqlOfHead(tp.getTableName(), g.getHead(), listJsonPk);
-				g.remain(CArrayComm.listToStringArray(listJsonPk));
+				g.remain(ArrayComm.listToStringArray(listJsonPk));
 				return DbConnection.update(ds, sql, g.getData());
 			} catch (Exception e) {
 				throw new SQLException("delete:" + e.getMessage());
@@ -188,7 +188,7 @@ public class SqlLoadUtils {
 						g = tp.clazzToRows(list);
 					}
 					String sql = tp.getDeleteSqlOfHead(tp.getTableName(), g.getHead(), listJsonPk);
-					g.remain(CArrayComm.listToStringArray(listJsonPk));
+					g.remain(ArrayComm.listToStringArray(listJsonPk));
 					return DbConnection.updateBatch(ds, sql, g.getData());
 				} finally {
 					listJsonPk.clear();
@@ -629,7 +629,7 @@ public class SqlLoadUtils {
 
 	public static int updateSqlBatch(DataSource ds, String sql,
 			List<Object[]> list) throws SQLException {
-		return DbConnection.updateBatch(ds, sql, CArrayComm.listToObjectArray(list));
+		return DbConnection.updateBatch(ds, sql, ArrayComm.listToObjectArray(list));
 	}
 
 	public static int updateSqlBatch(DataSource ds, String sql,

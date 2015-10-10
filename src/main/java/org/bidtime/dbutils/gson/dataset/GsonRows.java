@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.bidtime.dbutils.gson.JSONHelper;
-import org.bidtime.utils.basic.CArrayComm;
+import org.bidtime.utils.basic.ArrayComm;
 import org.bidtime.utils.basic.ObjectComm;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -305,7 +305,7 @@ public class GsonRows {
 	}
 
 	private void addHeadData(String arHead, Object o, boolean bInitIndex) {
-		head = CArrayComm.mergeStringArray(head, arHead);
+		head = ArrayComm.mergeStringArray(head, arHead);
 		Object[][] objReturn = new Object[data.length][head.length];
 		for (int i = 0; i < data.length; i++) {
 			for (int j = 0; j < head.length; j++) {
@@ -328,7 +328,7 @@ public class GsonRows {
 	
 	private void addHeadArray(String oneHead, Object[] arObject, boolean bInitIndex)
 			throws Exception {
-		head = CArrayComm.mergeStringArray(head, oneHead);
+		head = ArrayComm.mergeStringArray(head, oneHead);
 		Object[][] objReturn = new Object[data.length][head.length];
 		for (int i = 0; i < data.length; i++) {
 			for (int j = 0; j < head.length; j++) {
@@ -346,7 +346,7 @@ public class GsonRows {
 	}
 
 	private void insertHeadData(String arHead, Object o, boolean bInitIndex) {
-		head = CArrayComm.mergeStringArray(arHead, head);
+		head = ArrayComm.mergeStringArray(arHead, head);
 		Object[][] objReturn = new Object[data.length][head.length];
 		for (int i = 0; i < data.length; i++) {
 			for (int j = 0; j < head.length; j++) {
@@ -376,7 +376,7 @@ public class GsonRows {
 	}
 	
 	private void insertHeadArray(String arHead, Object[] arObject, boolean bInitIndex) {
-		head = CArrayComm.mergeStringArray(arHead, head);
+		head = ArrayComm.mergeStringArray(arHead, head);
 		Object[][] objReturn = new Object[data.length][head.length];
 		for (int i = 0; i < data.length; i++) {
 			for (int j = 0; j < head.length; j++) {
@@ -497,7 +497,7 @@ public class GsonRows {
 		List<String> list = new ArrayList<String>();			
 		for (int i=0; i<this.head.length; i++) {
 			String sHeadRaw = head[i];
-			int nPos = CArrayComm.getIgnoreCasePosOfName(arHead, sHeadRaw);
+			int nPos = ArrayComm.getIgnoreCasePosOfName(arHead, sHeadRaw);
 			if (nPos<0) {
 				list.add(sHeadRaw);
 			}
@@ -526,9 +526,9 @@ public class GsonRows {
 	public void delHead(int nIdx, boolean bInitIndex) {
 		if (nIdx > -1) {
 			List<String> listHead = new ArrayList<String>();
-			CArrayComm.arraysToList(head, listHead);
+			ArrayComm.arraysToList(head, listHead);
 			listHead.remove(nIdx);
-			head = CArrayComm.listToStringArray(listHead);
+			head = ArrayComm.listToStringArray(listHead);
 			//
 			Object[][] objReturn = new Object[data.length][head.length];
 			for (int i = 0; i < data.length; i++) {
@@ -834,26 +834,26 @@ public class GsonRows {
 	public void sortASC(String headName) {
 		int index = getPosOfName(headName);
 		if (index > -1) {
-			CArrayComm.sortASC(this.data, index);
+			ArrayComm.sortASC(this.data, index);
 		}
 	}
 
 	public void sortDESC(String headName) {
 		int index = getPosOfName(headName);
 		if (index > -1) {
-			CArrayComm.sortDESC(this.data, index);
+			ArrayComm.sortDESC(this.data, index);
 		}
 	}
 
 	public void sortASC(int index) {
 		if (index > -1) {
-			CArrayComm.sortASC(this.data, index);
+			ArrayComm.sortASC(this.data, index);
 		}
 	}
 
 	public void sortDESC(int index) {
 		if (index > -1) {
-			CArrayComm.sortDESC(this.data, index);
+			ArrayComm.sortDESC(this.data, index);
 		}
 	}
 

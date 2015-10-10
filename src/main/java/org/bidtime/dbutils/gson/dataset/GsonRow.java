@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.bidtime.dbutils.gson.JSONHelper;
-import org.bidtime.utils.basic.CArrayComm;
+import org.bidtime.utils.basic.ArrayComm;
 import org.bidtime.utils.basic.ObjectComm;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -248,26 +248,26 @@ public class GsonRow {
 	}
 
 	public void insertHeadData(String arHead, Object arData) {
-		head = CArrayComm.mergeStringArray(arHead, head);
-		data = CArrayComm.mergeArray(arData, data);
+		head = ArrayComm.mergeStringArray(arHead, head);
+		data = ArrayComm.mergeArray(arData, data);
 		clearIndex();
 	}
 
 	public void insertHeadData(String[] arHead, Object[] arData) {
-		head = CArrayComm.mergeStringArray(arHead, head);
-		data = CArrayComm.mergeArray(arData, data);
+		head = ArrayComm.mergeStringArray(arHead, head);
+		data = ArrayComm.mergeArray(arData, data);
 		clearIndex();
 	}
 
 	public void addHeadData(String arHead, Object arData) {
-		head = CArrayComm.mergeStringArray(head, arHead);
-		data = CArrayComm.mergeArray(data, arData);
+		head = ArrayComm.mergeStringArray(head, arHead);
+		data = ArrayComm.mergeArray(data, arData);
 		clearIndex();
 	}
 
 	public void addHeadData(String[] arHead, Object[] arData) {
-		head = CArrayComm.mergeStringArray(head, arHead);
-		data = CArrayComm.mergeArray(data, arData);
+		head = ArrayComm.mergeStringArray(head, arHead);
+		data = ArrayComm.mergeArray(data, arData);
 		clearIndex();
 	}
 
@@ -302,7 +302,7 @@ public class GsonRow {
 		List<String> list = new ArrayList<String>();			
 		for (int i=0; i<this.head.length; i++) {
 			String sHeadRaw = head[i];
-			int nPos = CArrayComm.getIgnoreCasePosOfName(arHead, sHeadRaw);
+			int nPos = ArrayComm.getIgnoreCasePosOfName(arHead, sHeadRaw);
 			if (nPos<0) {
 				list.add(sHeadRaw);
 			}
@@ -321,12 +321,12 @@ public class GsonRow {
 	public void delHead(int nIdx) {
 		if (nIdx > -1) {
 			List<String> listHead = new ArrayList<String>();
-			CArrayComm.arraysToList(head, listHead);
+			ArrayComm.arraysToList(head, listHead);
 			listHead.remove(nIdx);
-			head = CArrayComm.listToStringArray(listHead);
+			head = ArrayComm.listToStringArray(listHead);
 			//
 			List<Object> listData = new ArrayList<Object>();
-			CArrayComm.arraysToList(data, listData);
+			ArrayComm.arraysToList(data, listData);
 			listData.remove(nIdx);
 			data = listData.toArray();
 			clearIndex();

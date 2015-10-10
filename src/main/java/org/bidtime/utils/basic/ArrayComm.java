@@ -8,7 +8,7 @@ import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 
-public class CArrayComm {
+public class ArrayComm {
 	
 //	public static Long[] stringToLongArray(String[] strs) throws Exception {
 //		if (strs == null || strs.length<=0) {
@@ -187,9 +187,9 @@ public class CArrayComm {
 	}
 
 	public static String[] mapStringArray(String[] obj1, String[] obj2) {
-		if (CArrayComm.getLenOfArray(obj1) <= 0) {
+		if (ArrayComm.getLenOfArray(obj1) <= 0) {
 			return obj2;
-		} else if (CArrayComm.getLenOfArray(obj2) <= 0) {
+		} else if (ArrayComm.getLenOfArray(obj2) <= 0) {
 			return obj1;
 		} else {
 			Map<String, String> map = new HashMap<String, String>();
@@ -206,9 +206,9 @@ public class CArrayComm {
 	}
 
 	public static String[] mergeStringArray(String[] obj1, String[] obj2) {
-		if (CArrayComm.getLenOfArray(obj1) <= 0) {
+		if (ArrayComm.getLenOfArray(obj1) <= 0) {
 			return obj2;
-		} else if (CArrayComm.getLenOfArray(obj2) <= 0) {
+		} else if (ArrayComm.getLenOfArray(obj2) <= 0) {
 			return obj1;
 		} else {
 			List<String> list = new ArrayList<String>();

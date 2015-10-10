@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
 import org.bidtime.dbutils.gson.JSONHelper;
-import org.bidtime.utils.basic.CArrayComm;
+import org.bidtime.utils.basic.ArrayComm;
 import org.bidtime.utils.spring.SpringMessageUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -153,7 +153,7 @@ public class RequestUtils {
 		if (sId == null) {
 			throw new Exception("params is null");
 		} else {
-			return CArrayComm.StringsToLongArray(sId.split(splitChar));
+			return ArrayComm.StringsToLongArray(sId.split(splitChar));
 		}
 	}
 
@@ -163,7 +163,7 @@ public class RequestUtils {
 		if (sId == null) {
 			throw new Exception("params is null");
 		} else {
-			return CArrayComm.StringsToIntegerArray(sId.split(splitChar));
+			return ArrayComm.StringsToIntegerArray(sId.split(splitChar));
 		}
 	}
 

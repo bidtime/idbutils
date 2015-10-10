@@ -5,7 +5,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
-public class CDateTimeComm {
+import org.slf4j.Logger;
+
+public class DateTimeComm {
 
 	public static Date objectToDate(Object o) {
 		if (o != null) {
@@ -159,6 +161,38 @@ public class CDateTimeComm {
 		return "span: " + c.get(Calendar.MINUTE) + "m:"
 				+ c.get(Calendar.SECOND) + "s:" + c.get(Calendar.MILLISECOND)
 				+ "ms";
+	}
+	
+	public static void logFormatEndTime(long startTime, long endTime, final Logger logger) {
+		long spanSeconds = endTime - startTime;
+		if (logger.isDebugEnabled()) {
+			logger.debug(getFmtDiffMillseconds(spanSeconds));
+		}
+	}
+
+	public static String getFmtDiffMillseconds(long spanSeconds) {
+		Calendar c = Calendar.getInstance();
+		c.setTimeInMillis(spanSeconds);
+		return getFmtCalendar(c);
+	}
+	
+	private static String getFmtCalendar(Calendar c) {
+		StringBuilder sb = new StringBuilder("\tspan:");
+		sb.append(c.get(Calendar.MINUTE));
+		sb.append("m:");
+		sb.append(c.get(Calendar.SECOND));
+		sb.append("s:");
+		sb.append(c.get(Calendar.MILLISECOND));
+		sb.append("ms");
+//		if (spanTime > 0) {
+//			if (logger.isWarnEnabled()) {
+//				sb.append("(exceed ");
+//				sb.append(spanTime);
+//				sb.append("ms)");
+//			}
+//		}
+		sb.append(".");
+		return sb.toString();
 	}
 
 }

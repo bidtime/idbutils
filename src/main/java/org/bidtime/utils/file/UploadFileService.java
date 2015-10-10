@@ -14,8 +14,9 @@ import javax.servlet.http.HttpServletResponse;
  */
 
 public class UploadFileService extends HttpServlet {
+	
 	private static final long serialVersionUID = 1L;
-	private static String uploadPath = "d:/uploads/"; // 定义文件的上传路径
+	//private static String uploadPath = "d:/uploads/"; // 定义文件的上传路径
 	//private static int MAXFILESIZE = 100 * 1024 * 1024; // 限制文件的上传大小
 
 	public UploadFileService() {
@@ -26,10 +27,10 @@ public class UploadFileService extends HttpServlet {
 		super.destroy();
 	}
 
-	public void processRequest(HttpServletRequest request,
-			HttpServletResponse response) throws ServletException, IOException {
-		UploadFile.uploadFileOfRequest(request, response, uploadPath);
-	}
+//	public void processRequest(HttpServletRequest request,
+//			HttpServletResponse response) throws ServletException, IOException {
+//		UploadFile.uploadFileOfRequest(request, response, uploadPath);
+//	}
 
 	/**
 	 * * Handles the HTTP <code>GET</code> method. * * @param request * servlet
@@ -38,7 +39,7 @@ public class UploadFileService extends HttpServlet {
 	// 如果是 GET 请求,则调用 doGet 方法.
 	protected void doGet(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
-		processRequest(request, response);
+		//processRequest(request, response);
 	}
 
 	/**
@@ -48,7 +49,7 @@ public class UploadFileService extends HttpServlet {
 	// 如果是 POST 请求,则调用 doPost 方法
 	protected void doPost(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
-		processRequest(request, response);
+		//processRequest(request, response);
 	}
 
 	/** * Returns a short description of the servlet. */

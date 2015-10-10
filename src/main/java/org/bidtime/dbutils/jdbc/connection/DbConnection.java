@@ -19,7 +19,7 @@ import org.bidtime.dbutils.jdbc.connection.log.LogUpdateSql;
 import org.bidtime.dbutils.jdbc.dialect.CAutoFitSql;
 import org.bidtime.dbutils.jdbc.sql.SqlUtils;
 import org.bidtime.dbutils.jdbc.sql.xml.parser.HeadSqlArray;
-import org.bidtime.utils.basic.CArrayComm;
+import org.bidtime.utils.basic.ArrayComm;
 import org.bidtime.utils.basic.ObjectComm;
 import org.springframework.jdbc.datasource.ConnectionHolder;
 import org.springframework.jdbc.datasource.DataSourceUtils;
@@ -274,7 +274,7 @@ public class DbConnection {
 			Object[] out) throws SQLException {
 		long startTime = System.currentTimeMillis();
 		boolean bReturn = true;
-		Object[] params = CArrayComm.mergeArray(in, out);
+		Object[] params = ArrayComm.mergeArray(in, out);
 		try {
 			CallableStatement cstmt = conn.prepareCall(sql);
 			if (params != null && params.length > 0) {
@@ -363,10 +363,10 @@ public class DbConnection {
 				paramAll = params;
 			} else {
 				if (nPageIdx != null) {
-					paramAll = CArrayComm.mergeArray(params, nPageIdx * nPageSize,
+					paramAll = ArrayComm.mergeArray(params, nPageIdx * nPageSize,
 						nPageSize);
 				} else {
-					paramAll = CArrayComm.mergeArray(params, 0 * nPageSize,
+					paramAll = ArrayComm.mergeArray(params, 0 * nPageSize,
 							nPageSize);					
 				}
 			}

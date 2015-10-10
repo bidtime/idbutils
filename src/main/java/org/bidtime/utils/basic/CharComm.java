@@ -1,6 +1,6 @@
 package org.bidtime.utils.basic;
 
-public class CCharComm {
+public class CharComm {
 	
 	public static String getLimitText(String text, int nLimit) {
 		if (text != null) {

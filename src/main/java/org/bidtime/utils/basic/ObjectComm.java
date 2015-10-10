@@ -335,7 +335,7 @@ public class ObjectComm {
 			if (o instanceof Date) {
 				return ((Date) o);
 			} else if (o instanceof String) {
-				return CDateTimeComm.yyyyMMddHHmmssToDate((String) o);
+				return DateTimeComm.yyyyMMddHHmmssToDate((String) o);
 			} else {
 				return null;
 			}
@@ -358,7 +358,7 @@ public class ObjectComm {
 			if (o instanceof Date) {
 				return ((Date) o);
 			} else if (o instanceof String) {
-				return CDateTimeComm.yymmddToDate((String) o);
+				return DateTimeComm.yymmddToDate((String) o);
 			} else {
 				return null;
 			}
@@ -381,7 +381,7 @@ public class ObjectComm {
 			if (o instanceof Date) {
 				return ((Date) o);
 			} else if (o instanceof String) {
-				return CDateTimeComm.StringToDate((String) o, sFmt);
+				return DateTimeComm.StringToDate((String) o, sFmt);
 			} else {
 				return null;
 			}
