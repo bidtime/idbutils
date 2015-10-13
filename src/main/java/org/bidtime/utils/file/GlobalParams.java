@@ -1,10 +1,9 @@
 package org.bidtime.utils.file;
 
 public class GlobalParams {
-	private String uploadPath;
-	private String downloadPath;
-	private String dataPath;
-
+	
+	private final static String TMP = "tmp";
+	//private String dataPath;
 	private String webUrl;
 	public String getWebUrl() {
 		return webUrl;
@@ -24,33 +23,46 @@ public class GlobalParams {
 
 	private String webRoot;
 	
-	private String tmpPath;
-	private String tmpDownloadPath;
-	private String tmpUploadPath;
+//	private String getExistsSlash(String path) {
+//		String result = null;
+//		if ( path.indexOf('/') >= 0 ) {
+//			result = "/";
+//		} else {
+//			result = "\\";
+//		}
+//		return result;
+//	}
+	
+	public String mergeUrl(String s) {
+		StringBuilder sb = new StringBuilder();
+		sb.append(webUrl);
+		sb.append(s);
+		sb.append("/");
+		return sb.toString();
+	}
+	
+	public String getTmpUrl() {
+		return mergeUrl(TMP);
+	}
+	
+	public String mergePath(String s) {
+		StringBuilder sb = new StringBuilder();
+		sb.append(webRoot);
+		sb.append(s);
+		sb.append("/");
+		return sb.toString();
+	}
 	
 	public String getTmpPath() {
-		return tmpPath;
+		return mergePath(TMP);
 	}
 
-	public void setTmpPath(String tmpPath) {
-		this.tmpPath = tmpPath;
-		String p = null;
-		if (tmpPath.indexOf('/') >= 0 ) {
-			p = "/";
-		} else {
-			p = "\\";
-		}
-		this.tmpDownloadPath = tmpPath + "dl" + p;
-		this.tmpUploadPath = tmpPath + "ul" + p;
-	}
-
-	public String getTmpUploadPath() {
-		return tmpUploadPath;
-	}
-
-	public String getTmpDownloadPath() {
-		return tmpDownloadPath;
-	}
+//	public void setTmpPath(String tmpPath) {
+//		this.tmpPath = tmpPath;
+//		String p = getExistsSlash(tmpPath);
+//		this.tmpDownloadPath = tmpPath + "dl" + p;
+//		this.tmpUploadPath = tmpPath + "ul" + p;
+//	}
 
 	private GlobalParams() {
 	}
@@ -80,28 +92,12 @@ public class GlobalParams {
 		instance = this;
 	}
 
-	public String getDownloadPath() {
-		return downloadPath;
-	}
-
-	public void setDownloadPath(String downloadPath) {
-		this.downloadPath = downloadPath;
-	}
-
-	public String getUploadPath() {
-		return uploadPath;
-	}
-
-	public void setUploadPath(String uploadPath) {
-		this.uploadPath = uploadPath;
-	}
-
-	public String getDataPath() {
-		return dataPath;
-	}
-
-	public void setDataPath(String dataPath) {
-		this.dataPath = dataPath;
-	}
+//	public String getDataPath() {
+//		return this.dataPath;
+//	}
+//
+//	public void setDataPath(String dataPath) {
+//		this.dataPath = dataPath;
+//	}
 
 }

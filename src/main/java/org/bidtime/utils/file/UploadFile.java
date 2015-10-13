@@ -74,7 +74,11 @@ public class UploadFile {
 			return false;
 		} finally {
 			long end = System.currentTimeMillis();
-			DateTimeComm.logFormatEndTime(end, start, logger);
+			if (logger.isDebugEnabled()) {
+				String lstr = DateTimeComm.getFormatSpanTime(start, end);
+				logger.debug(lstr);
+			}
+			//DateTimeComm.logFormatEndTime(start, end, logger);
 			sb.setLength(0);
 			sb = null;
 		}

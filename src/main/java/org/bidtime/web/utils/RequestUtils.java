@@ -4,6 +4,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.ParseException;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -117,14 +118,25 @@ public class RequestUtils {
 //		}
 //	}
 //	
-	public static Map<String, Object> getPaserJsonMapOfRequest(HttpServletRequest request, String sParam) throws Exception {
+	public static Map<String, Object> jsonStrToMap(HttpServletRequest request, String sParam) throws Exception {
 		String jsonObject = RequestUtils.getString(request, sParam);
 		return JSONHelper.jsonStrToMap(jsonObject);
 	}
 
-	public static <T> T getPaserJsonMapOfRequest(HttpServletRequest request, String sParam, Class<T> type) throws Exception {
+	public static <T> T jsonStrToClazz(HttpServletRequest request, String sParam, Class<T> type) throws Exception {
 		String json = RequestUtils.getString(request, sParam);
 		return JSONHelper.jsonStrToClazz(json, type);
+	}
+	
+	@SuppressWarnings("rawtypes")
+	public static <T> T paramsMapToClazz(HttpServletRequest request, Class<T> type) throws Exception {
+		Map map = getMapOfRequest(request);
+		if (map != null) {
+			return (T)JSONHelper.mapToClazz(map, type);
+			//BeanUtils.populate(t, request.getParameterMap());
+		} else {
+			return null;
+		}
 	}
 
 	public static Object[] getSplit(HttpServletRequest request, String sParam,
@@ -719,6 +731,26 @@ public class RequestUtils {
 			}
 		}
 		return sb.toString();
+	}
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public static Map getMapOfRequest(HttpServletRequest request) {
+		Map mapRtn = new HashMap();
+		Map map = request.getParameterMap();
+		Set keSet = map.entrySet();
+		for (Iterator itr = keSet.iterator(); itr.hasNext();) {
+			Map.Entry entry = (Map.Entry) itr.next();
+			String key = (String)(entry.getKey());
+			Object objectValue = entry.getValue();
+			Object valRtn = null;
+			if (objectValue instanceof Object[]) {
+				valRtn = ((Object[]) objectValue)[0];
+			} else {
+				valRtn = objectValue;
+			}
+			mapRtn.put(key, valRtn);
+		}
+		return mapRtn;
 	}
 
 }

@@ -12,7 +12,7 @@
 	<groupId>org.bidtime.utils</groupId>
 	<artifactId>idbutils</artifactId>
 	<packaging>jar</packaging>
-	<version>1.0.8-SNAPSHOT</version>
+	<version>1.0.9-SNAPSHOT</version>
 	<name>idbutils</name>
 
 	<dependencies>

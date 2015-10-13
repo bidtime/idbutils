@@ -3,8 +3,10 @@ package org.bidtime.dbutils.gson;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 
+import org.bidtime.dbutils.gson.dataset.JsonData;
 import org.bidtime.utils.comm.CaseInsensitiveHashSet;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -90,6 +92,7 @@ public class ResultDTO<T> implements Serializable {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void setData(T data) {
 		if (data != null) {
+			//this.setType(data.getClass());
 			if (data instanceof List) {
 				this.len = ((List)data).size();
 			} else if (data instanceof ResultDTO) {
@@ -214,19 +217,46 @@ public class ResultDTO<T> implements Serializable {
 //		}
 //		return (o != null && o instanceof Map) ? true : false;
 //	}
+	
+	private static boolean isJavaSimpleClazz(Class<?> type) {
+		boolean result = false;
+		if (type == null) {		//要转换成json.null
+			result = false;
+		} else if (type.equals(String.class) || type.equals(Number.class) ||
+			type.equals(StringBuilder.class) || type.equals(StringBuffer.class) ||
+			type.equals(Boolean.class) || type.equals(Appendable.class)) {
+			result = true;
+		} else if (type.equals(java.util.Date.class)) {
+			//objData = dateToyyyyMMddHHmmss((Date) objRaw);
+			result = true;
+		} else if (type.equals(JsonData.class)) {
+			result = false;
+		} else if (type.equals(Set.class) || type.equals(Queue.class) ||
+			type.equals(Character.class) ||
+			type.equals(Math.class) || type.equals(Enum.class)) {
+			result = true;
+		} else {
+			result = false;
+		}
+		return result;
+	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private JSONArray dataToJson() {
 		JSONArray jsonArray = null;
 		//if (data != null) {
-		if (data instanceof List) {
+		if (data instanceof List && !((List) data).isEmpty()) {
 			Object o = ((List) data).get(0);
 			boolean bMap = (o != null && o instanceof Map) ? true : false;
 			if (bMap) {
 				jsonArray = JSONHelper
 						.listMapToJsonArray((List<Map<String, Object>>) data);
 			} else {
-				jsonArray = JSONHelper.clazzToJsonArray((List) data, colMapProps);
+				if (o != null && isJavaSimpleClazz(o.getClass())) {
+					jsonArray = new JSONArray((List) data);
+				} else {
+					jsonArray = JSONHelper.clazzToJsonArray((List) data, colMapProps);
+				}
 			}
 		} else {
 			jsonArray = new JSONArray();
@@ -234,7 +264,11 @@ public class ResultDTO<T> implements Serializable {
 			if (data instanceof Map) {
 				jsonObject = JSONHelper.mapToJson((Map)(data));
 			} else {
-				jsonObject = JSONHelper.clazzToJson(data, colMapProps);
+				if (this.type != null && isJavaSimpleClazz(type)) {
+					jsonObject = new JSONObject(data);
+				} else {
+					jsonObject = JSONHelper.clazzToJson(data, colMapProps);
+				}
 			}
 			jsonArray.put(jsonObject);
 		}

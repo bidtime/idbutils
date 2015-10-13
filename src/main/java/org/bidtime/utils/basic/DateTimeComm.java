@@ -5,8 +5,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
-import org.slf4j.Logger;
-
 public class DateTimeComm {
 
 	public static Date objectToDate(Object o) {
@@ -120,19 +118,6 @@ public class DateTimeComm {
 		return c.getTime();
 	}
 
-	@Deprecated
-	public static Date getAddDate(Date d) {
-		return getAddDate(d, 1);
-	}
-
-	@Deprecated
-	public static Date getAddDate(Date d, int n) {
-		Calendar c = new GregorianCalendar();
-		c.setTime(d);
-		c.add(Calendar.DATE, n);
-		return c.getTime();
-	}
-
 	public static Date getLastDayOfMonth(Date date) {
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(date);
@@ -163,36 +148,36 @@ public class DateTimeComm {
 				+ "ms";
 	}
 	
-	public static void logFormatEndTime(long startTime, long endTime, final Logger logger) {
-		long spanSeconds = endTime - startTime;
-		if (logger.isDebugEnabled()) {
-			logger.debug(getFmtDiffMillseconds(spanSeconds));
-		}
-	}
+//	public static void logFormatEndTime(long startTime, long endTime, final Logger logger) {
+//		long spanSeconds = endTime - startTime;
+//		if (logger.isDebugEnabled()) {
+//			logger.debug(getFmtDiffMillseconds(spanSeconds));
+//		}
+//	}
+//
+//	public static String getFmtDiffMillseconds(long spanSeconds) {
+//		Calendar c = Calendar.getInstance();
+//		c.setTimeInMillis(spanSeconds);
+//		return getFmtCalendar(c);
+//	}
+//	
+//	private static String getFmtCalendar(Calendar c) {
+//		StringBuilder sb = new StringBuilder("\tspan:");
+//		sb.append(c.get(Calendar.MINUTE));
+//		sb.append("m:");
+//		sb.append(c.get(Calendar.SECOND));
+//		sb.append("s:");
+//		sb.append(c.get(Calendar.MILLISECOND));
+//		sb.append("ms");
+//		sb.append(".");
+//		return sb.toString();
+//	}
 
-	public static String getFmtDiffMillseconds(long spanSeconds) {
-		Calendar c = Calendar.getInstance();
-		c.setTimeInMillis(spanSeconds);
-		return getFmtCalendar(c);
+	public static String getDirectoryOfDate(String type) {
+		return type + dateToString(new Date(), "yyyy/MM/dd/");
 	}
 	
-	private static String getFmtCalendar(Calendar c) {
-		StringBuilder sb = new StringBuilder("\tspan:");
-		sb.append(c.get(Calendar.MINUTE));
-		sb.append("m:");
-		sb.append(c.get(Calendar.SECOND));
-		sb.append("s:");
-		sb.append(c.get(Calendar.MILLISECOND));
-		sb.append("ms");
-//		if (spanTime > 0) {
-//			if (logger.isWarnEnabled()) {
-//				sb.append("(exceed ");
-//				sb.append(spanTime);
-//				sb.append("ms)");
-//			}
-//		}
-		sb.append(".");
-		return sb.toString();
+	public static String getDirectoryOfDate() {
+	    return dateToString(new Date(), "yyyy/MM/dd/");
 	}
-
 }

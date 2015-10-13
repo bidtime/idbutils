@@ -535,6 +535,7 @@ public class JSONHelper {
 	
 	@SuppressWarnings("rawtypes")
 	public static JSONArray clazzToJsonArray(List list, Map<String, Set<String>> mapColPros) {
+		
 		List<Map<String, Object>> listResult = new ArrayList<>();
 		for (Object o:list) {
 			Map<String, Object> map = clazzToMap(o, mapColPros);

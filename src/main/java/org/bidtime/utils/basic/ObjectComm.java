@@ -53,6 +53,90 @@ public class ObjectComm {
 		}
 	}
 
+	public static Float objectToFloat(Object o) {
+		if (o != null) {
+			if (o instanceof Float) {
+				return (Float) o;
+			} else if (o instanceof Double) {
+				return ((Double) o).floatValue();
+			} else if (o instanceof BigDecimal) {
+				return ((BigDecimal) o).floatValue();
+			} else if (o instanceof Integer) {
+				return ((Integer) o).floatValue();
+			} else if (o instanceof Long) {
+				return ((Long) o).floatValue();
+			} else if (o instanceof Short) {
+				return ((Short) o).floatValue();
+			} else if (o instanceof Byte) {
+				return ((Byte) o).floatValue();
+			} else if (o instanceof String) {
+				return Float.valueOf((String)o);
+			} else if (o instanceof BigInteger) {
+				return ((BigInteger) o).floatValue();
+			} else {
+				return Float.valueOf(String.valueOf(o));
+			}
+		} else {
+			return null;
+		}
+	}
+
+	public static Short objectToShort(Object o) {
+		if (o != null) {
+			if (o instanceof Short) {
+				return ((Short) o);
+			} else if (o instanceof Integer) {
+				return ((Integer) o).shortValue();
+			} else if (o instanceof Float) {
+				return ((Float) o).shortValue();
+			} else if (o instanceof Double) {
+				return ((Double) o).shortValue();
+			} else if (o instanceof BigDecimal) {
+				return ((BigDecimal) o).shortValue();
+			} else if (o instanceof Long) {
+				return ((Long) o).shortValue();
+			} else if (o instanceof Byte) {
+				return ((Byte) o).shortValue();
+			} else if (o instanceof String) {
+				return Short.valueOf((String)o);
+			} else if (o instanceof BigInteger) {
+				return ((BigInteger) o).shortValue();
+			} else {
+				return Short.valueOf(String.valueOf(o));
+			}
+		} else {
+			return null;
+		}
+	}
+	
+	public static Byte objectToByte(Object o) {
+		if (o != null) {
+			if (o instanceof Byte) {
+				return ((Byte) o);
+			} else if (o instanceof Short) {
+				return ((Short) o).byteValue();
+			} else if (o instanceof Integer) {
+				return ((Integer) o).byteValue();
+			} else if (o instanceof Float) {
+				return ((Float) o).byteValue();
+			} else if (o instanceof Double) {
+				return ((Double) o).byteValue();
+			} else if (o instanceof BigDecimal) {
+				return ((BigDecimal) o).byteValue();
+			} else if (o instanceof Long) {
+				return ((Long) o).byteValue();
+			} else if (o instanceof String) {
+				return Byte.valueOf((String)o);
+			} else if (o instanceof BigInteger) {
+				return ((BigInteger) o).byteValue();
+			} else {
+				return Byte.valueOf(String.valueOf(o));
+			}
+		} else {
+			return null;
+		}
+	}
+
 	public static Long objectToLong(Object o, Object objDefault) {
 		Object obj = objectToLong(o);
 		if (obj != null) {

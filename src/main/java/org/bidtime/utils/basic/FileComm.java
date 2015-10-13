@@ -122,7 +122,7 @@ public class FileComm {
 		return result;
 	}
 	
-//	public static boolean fileChannelCopy(File s, File t) {
+//	public static boolean copyFile(File s, File t) {
 //		boolean result = false;
 //		FileInputStream fin = null;
 //		FileOutputStream fout = null;
@@ -169,17 +169,21 @@ public class FileComm {
 		}
 	}
 	
-	public static boolean renameTo(String s, String t) {
-		return renameTo(new File(s), new File(t));
+	public static boolean moveFile(String s, String t) {
+		return moveFile(new File(s), new File(t));
 	}
 
-	public static boolean renameTo(File s, File t) {
+	public static boolean moveFile(File s, File t) {
 		try {
-			s.renameTo(t);
-			return true;
+			return s.renameTo(t);
 		} catch (Exception e) {
-			logger.error("renameTo", e);
+			logger.error("moveFile", e);
 			return false;
 		}
+	}
+	
+	public static String getFileNameOfURL(String s) {
+		int n = s.lastIndexOf("/");
+		return s.substring(n + 1);
 	}
 }
