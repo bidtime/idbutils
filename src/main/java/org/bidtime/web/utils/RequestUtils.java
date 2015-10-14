@@ -14,7 +14,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang.StringUtils;
 import org.bidtime.dbutils.gson.JSONHelper;
 import org.bidtime.utils.basic.ArrayComm;
-import org.bidtime.utils.spring.SpringMessageUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,15 +29,15 @@ public class RequestUtils {
 	public final static String ID = "id";
 	public final static String DATA = "data";
 	public final static String DETL = "detl";
-	public final static short LIMIT_TEN_PAGE_SIZE = 10;
-	public final static short LIMIT_PAGE_SIZE = 100;
+	public final static short PAGE_SIZE_10 = 10;
+	public final static short PAGE_SIZE_100 = 100;
 	public final static String COMMA = ",";
 
 	private static final Logger logger = LoggerFactory
 			.getLogger(RequestUtils.class);
 
 	public static Short getRequestValidPageSize(Short pageSize) {
-		return getRequestValidPageSize(pageSize, LIMIT_PAGE_SIZE);
+		return getRequestValidPageSize(pageSize, PAGE_SIZE_100);
 	}
 
 	public static Short getRequestValidPageSize(Short pageSize, Short nDefault) {
@@ -49,7 +48,7 @@ public class RequestUtils {
 				return pageSize;
 			}
 		} else {
-			return LIMIT_TEN_PAGE_SIZE;
+			return PAGE_SIZE_10;
 		}
 	}
 
@@ -191,11 +190,11 @@ public class RequestUtils {
 			return s;
 	}
 
-	public static Integer getInt(HttpServletRequest request, String sParam) {
-		return getInt(request, sParam, null);
+	public static Integer getInteger(HttpServletRequest request, String sParam) {
+		return getInteger(request, sParam, null);
 	}
 
-	public static Integer getInt(HttpServletRequest request, String sParam,
+	public static Integer getInteger(HttpServletRequest request, String sParam,
 			Integer nDefault) {
 		String s = request.getParameter(sParam);
 		if (logger.isDebugEnabled()) {
@@ -323,9 +322,8 @@ public class RequestUtils {
 		}
 	}
 
-	private static Date yymmddToDate(String sDate) {
-		// String s2 = "1996-02-45"; // yyyyMMdd
-		java.text.DateFormat df2 = new java.text.SimpleDateFormat("yyyy-MM-dd");
+	private static Date strToDate(String sDate, String fmt) {
+		java.text.DateFormat df2 = new java.text.SimpleDateFormat(fmt);
 		try {
 			Date date2 = df2.parse(sDate);
 			return date2;
@@ -347,340 +345,32 @@ public class RequestUtils {
 		if (s == null) {
 			return tDefault;
 		} else {
-			return yymmddToDate(s);
+			return strToDate(s, "yyyy-MM-dd");
+		}
+	}
+	
+	public static Date getDateTime(HttpServletRequest request, String sParam) {
+		return getDateTime(request, sParam, null);
+	}
+
+	public static Date getDateTime(HttpServletRequest request, String sParam,
+			Date tDefault) {
+		String s = request.getParameter(sParam);
+		if (logger.isDebugEnabled()) {
+			logger.debug(sParam + ":" + s);
+		}
+		if (s == null) {
+			return tDefault;
+		} else {
+			return strToDate(s, "yyyy-MM-dd HH:mm:ss");
 		}
 	}
 
-	public static String toString(Object o) {
-		return o == null ? null : o.toString();
-	}
-
-	public static boolean isEmpty(String s) {
-		return s == null || s.equals("");
-	}
-
-	public static String repeat(String s, int n) {
-		StringBuilder sb = new StringBuilder();
-		for (int i = 0; i < n; i++) {
-			sb.append(s);
-		}
-		return sb.toString();
-	}
-
-	// /////////////////////////////////////////////////////////////////////////////////////////////
-	// 消息
-
-	public static String getMessage(String msgId, HttpServletRequest request) {
-		return SpringMessageUtils.getMessage(request, msgId);
-	}
-
-	public static String getMessage(String msgId, String defaultValue,
-			HttpServletRequest request) {
-		return SpringMessageUtils.getMessage(request, msgId, defaultValue);
-	}
-
-	public static String getMessageLocalId(String msgId, String paramId,
-			HttpServletRequest request) {
-		return SpringMessageUtils.getMessageLocalId(request, msgId, paramId);
-	}
-
-	public static String getMessageLocal(String msgId, Object[] params,
-			HttpServletRequest request) {
-		return SpringMessageUtils.getMessageLocal(request, msgId, params);
-	}
-
-	// ////////////////////////////////////////////////////////////////////////////////////////////////
-	
-	public static String getUploadPicErrorMessage(HttpServletRequest request) {
-		return getUploadErrorMessage("controller.pic", request);
-	}
-	
-	public static String getUploadDataErrorMessage(HttpServletRequest request) {
-		return getUploadErrorMessage("controller.data", request);
-	}
-	
-	public static String getCancelDataErrorMessage(HttpServletRequest request) {
-		return getCancelErrorMessage("controller.data", request);
-	}
-	
-	public static String getCheckDataErrorMessage(HttpServletRequest request) {
-		return getCheckErrorMessage("controller.data", request);
-	}
-	
-	public static String getApplyDataErrorMessage(HttpServletRequest request) {
-		return getApplyErrorMessage("controller.data", request);
-	}
-
-	/**
-	 * 读取错误数据的格式化信息
-	 * 
-	 * @param request
-	 *            : Http request
-	 * @return
-	 */
-	public static String getReadDataErrorMessage(HttpServletRequest request) {
-		return getReadErrorMessage("controller.data", request);
-	}
-
-	/**
-	 * 读取错误Json数据的格式化信息
-	 * 
-	 * @param request
-	 *            : Http request
-	 * @return
-	 */
-	public static String getReadJsonDataErrorMessage(HttpServletRequest request) {
-		return getReadErrorMessage("controller.json.data", request);
-	}
-
-	/**
-	 * 读取错误的格式化信息
-	 * 
-	 * @param paramId
-	 *            : 格式化参数的Id
-	 * @param request
-	 *            : Http request
-	 * @return
-	 */
-	public static String getReadErrorMessage(String paramId,
-			HttpServletRequest request) {
-		String msg = getMessageLocalId("controller.read.error", paramId,
-				request);
-		return msg;
-	}
-
-	/**
-	 * 读取错误的格式化信息
-	 * 
-	 * @param paramId
-	 *            : 格式化参数的Id
-	 * @param request
-	 *            : Http request
-	 * @return
-	 */
-	public static String getCancelErrorMessage(String paramId,
-			HttpServletRequest request) {
-		String msg = getMessageLocalId("controller.cancel.error", paramId,
-				request);
-		return msg;
-	}
-
-	/**
-	 * 读取错误的格式化信息
-	 * 
-	 * @param paramId
-	 *            : 格式化参数的Id
-	 * @param request
-	 *            : Http request
-	 * @return
-	 */
-	public static String getUploadErrorMessage(String paramId,
-			HttpServletRequest request) {
-		String msg = getMessageLocalId("controller.upload.error", paramId,
-				request);
-		return msg;
-	}
-
-	/**
-	 * 读取错误的格式化信息
-	 * 
-	 * @param paramId
-	 *            : 格式化参数的Id
-	 * @param request
-	 *            : Http request
-	 * @return
-	 */
-	public static String getApplyErrorMessage(String paramId,
-			HttpServletRequest request) {
-		String msg = getMessageLocalId("controller.apply.error", paramId,
-				request);
-		return msg;
-	}
-
-	/**
-	 * 读取错误的格式化信息
-	 * 
-	 * @param paramId
-	 *            : 格式化参数的Id
-	 * @param request
-	 *            : Http request
-	 * @return
-	 */
-	public static String getCheckErrorMessage(String paramId,
-			HttpServletRequest request) {
-		String msg = getMessageLocalId("controller.check.error", paramId,
-				request);
-		return msg;
-	}
-
-	/**
-	 * 写错误数据的格式化信息
-	 * 
-	 * @param request
-	 *            : Http request
-	 * @return
-	 */
-	public static String getWriteDataErrorMessage(HttpServletRequest request) {
-		return getWriteErrorMessage("controller.data", request);
-	}
-
-	/**
-	 * 写错误Json数据的格式化信息
-	 * 
-	 * @param request
-	 *            : Http request
-	 * @return
-	 */
-	public static String getWriteJsonDataErrorMessage(HttpServletRequest request) {
-		return getWriteErrorMessage("controller.json.data", request);
-	}
-
-	/**
-	 * 写错误的格式化信息
-	 * 
-	 * @param paramId
-	 *            : 格式化参数的Id
-	 * @param request
-	 *            : Http request
-	 * @return
-	 */
-	public static String getWriteErrorMessage(String paramId,
-			HttpServletRequest request) {
-		String msg = getMessageLocalId("controller.write.error", paramId,
-				request);
-		return msg;
-	}
-
-	/**
-	 * 得到查找数据格式化消息
-	 * 
-	 * @param paramId
-	 * @param request
-	 * @return
-	 */
-	public static String getFindDataErrorMessage(HttpServletRequest request) {
-		return getSqlFindErrorMessage("controller.data", request);
-	}
-
-	/**
-	 * 得到查找格式化消息
-	 * 
-	 * @param paramId
-	 * @param request
-	 * @return
-	 */
-	public static String getSqlFindErrorMessage(String paramId,
-			HttpServletRequest request) {
-		String msg = getMessageLocalId("controller.find.error", paramId,
-				request);
-		return msg;
-	}
-
-	/**
-	 * 得到删除数据格式化消息
-	 * 
-	 * @param paramId
-	 * @param request
-	 * @return
-	 */
-	public static String getSqlDeleteDataErrorMessage(HttpServletRequest request) {
-		return getSqlDeleteErrorMessage("controller.data", request);
-	}
-
-	/**
-	 * 得到删除格式化消息
-	 * 
-	 * @param paramId
-	 * @param request
-	 * @return
-	 */
-	public static String getSqlDeleteErrorMessage(String paramId,
-			HttpServletRequest request) {
-		String msg = getMessageLocalId("controller.delete.error", paramId,
-				request);
-		return msg;
-	}
-
-	/**
-	 * 得到增加数据格式化消息
-	 * 
-	 * @param paramId
-	 * @param request
-	 * @return
-	 */
-	public static String getSqlInsertDataErrorMessage(HttpServletRequest request) {
-		return getSqlInsertErrorMessage("controller.data", request);
-	}
-
-	/**
-	 * 得到增加格式化消息
-	 * 
-	 * @param paramId
-	 * @param request
-	 * @return
-	 */
-	public static String getSqlInsertErrorMessage(String paramId,
-			HttpServletRequest request) {
-		String msg = getMessageLocalId("controller.insert.error", paramId,
-				request);
-		return msg;
-	}
-
-	/**
-	 * 得到修改数据格式化消息
-	 * 
-	 * @param request
-	 * @return
-	 */
-	public static String getSqlUpdateDataErrorMessage(HttpServletRequest request) {
-		return getSqlUpdateErrorMessage("controller.data", request);
-	}
-
-	/**
-	 * 得到修改数据格式化消息
-	 * 
-	 * @param request
-	 * @return
-	 */
-	public static String getSqlCheckDataErrorMessage(HttpServletRequest request) {
-		return getSqlCheckErrorMessage("controller.data", request);
-	}
-
-	/**
-	 * 得到修改格式化消息
-	 * 
-	 * @param paramId
-	 * @param request
-	 * @return
-	 */
-	public static String getSqlUpdateErrorMessage(String paramId,
-			HttpServletRequest request) {
-		String msg = getMessageLocalId("controller.edit.error", paramId,
-				request);
-		return msg;
-	}
-
-	/**
-	 * 得到审核格式化消息
-	 * 
-	 * @param paramId
-	 * @param request
-	 * @return
-	 */
-	public static String getSqlCheckErrorMessage(String paramId,
-			HttpServletRequest request) {
-		String msg = getMessageLocalId("controller.check.error", paramId,
-				request);
-		return msg;
-	}
-	
-	/////////////////////////////////////////////////////////////////////////////
-
-	public static String UrlEncodeUtf8(String s) {
+	private static String UrlEncodeUtf8(String s) {
 		return UrlEncode(s, "UTF-8");
 	}
 
-	public static String UrlEncode(String s, String sEncode) {
+	private static String UrlEncode(String s, String sEncode) {
 		try {
 			return URLEncoder.encode(s, sEncode);
 		} catch (UnsupportedEncodingException e) {

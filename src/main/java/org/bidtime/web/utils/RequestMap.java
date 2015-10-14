@@ -93,7 +93,7 @@ public class RequestMap {
 	}
 	
 	public void addIntegerToMap(String key, String param) {
-		MapParamsUtils.addToMap(map, key, RequestUtils.getInt(request, param));
+		MapParamsUtils.addToMap(map, key, RequestUtils.getInteger(request, param));
 	}
 	
 	public void addLongToMap(String key, String param) {
