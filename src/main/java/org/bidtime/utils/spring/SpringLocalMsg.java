@@ -16,7 +16,7 @@ import org.springframework.web.servlet.support.RequestContext;
  * 提供对Spring消息国际化的处理
  *
  */
-public class SpringMessageUtils {
+public class SpringLocalMsg {
 
 	public static String getMessage(HttpServletRequest request, String message) {
 		return getMessage(request, message, null, "",

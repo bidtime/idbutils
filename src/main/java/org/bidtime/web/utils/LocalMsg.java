@@ -2,30 +2,30 @@ package org.bidtime.web.utils;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.bidtime.utils.spring.SpringMessageUtils;
+import org.bidtime.utils.spring.SpringLocalMsg;
 
-public class LocalMsg {
+public class LocalMsg extends SpringLocalMsg {
 
 	// /////////////////////////////////////////////////////////////////////////////////////////////
 	// 消息
 
-	public static String get(String msgId, HttpServletRequest request) {
-		return SpringMessageUtils.getMessage(request, msgId);
+	public static String getMessage(String msgId, HttpServletRequest request) {
+		return getMessage(request, msgId);
 	}
 
-	public static String get(String msgId, String defaultValue,
+	public static String getMessage(String msgId, String defaultValue,
 			HttpServletRequest request) {
-		return SpringMessageUtils.getMessage(request, msgId, defaultValue);
+		return getMessage(request, msgId, defaultValue);
 	}
 
 	public static String getMessageLocalId(String msgId, String paramId,
 			HttpServletRequest request) {
-		return SpringMessageUtils.getMessageLocalId(request, msgId, paramId);
+		return getMessageLocalId(request, msgId, paramId);
 	}
 
 	public static String getMessageLocal(String msgId, Object[] params,
 			HttpServletRequest request) {
-		return SpringMessageUtils.getMessageLocal(request, msgId, params);
+		return getMessageLocal(request, msgId, params);
 	}
 
 	// ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -300,6 +300,10 @@ public class LocalMsg {
 		return getUpdateError("controller.data", request);
 	}
 
+	public static String getVerifyInputError(HttpServletRequest request) {
+		return getVerifyError("controller.input", request);
+	}
+
 	/**
 	 * 得到修改格式化消息
 	 * 
@@ -310,6 +314,12 @@ public class LocalMsg {
 	public static String getUpdateError(String paramId,
 			HttpServletRequest request) {
 		return getMessageLocalId("controller.edit.error", paramId,
+				request);
+	}
+
+	public static String getVerifyError(String paramId,
+			HttpServletRequest request) {
+		return getMessageLocalId("controller.verify.error", paramId,
 				request);
 	}
 
