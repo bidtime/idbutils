@@ -58,7 +58,7 @@ public class GsonEbUtils {
 	}
 
 	public static Map<String, Object> clazzToMap(Object object,
-			Map<String, ColumnPro> mapProperty) throws SQLException {
+			Map<String, ColumnPro> mapProperty, boolean force) throws SQLException {
 		Map<String, Object> map = new CaseInsensitiveHashMap();
 		PropertyDescriptor[] propDescripts=null;
 		try {
@@ -93,7 +93,7 @@ public class GsonEbUtils {
 				} else {
 					map.put(head, retVal);
 				}
-			} else {
+			} else if (force) {
 				map.put(head, retVal);
 			}
 		}

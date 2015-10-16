@@ -47,8 +47,9 @@ public class TTableProps {
 		this.existDefault = existDefault;
 	}
 
-	private Map<String,ColumnPro> mapPropertyColumn = new HashMap<>();
-	private Map<String,String> mapColumnDescript = new HashMap<>();
+	private Map<String, ColumnPro> mapPropertyColumn = new HashMap<>();
+	private Map<String, String> mapColumnDescript = new HashMap<>();
+	
 	public Map<String, String> getMapColumnDescript() {
 		return mapColumnDescript;
 	}
@@ -451,7 +452,7 @@ public class TTableProps {
 	}
 	
 	public Map<String, Object> clazzToMap(Object object) throws SQLException {
-		return GsonEbUtils.clazzToMap(object, this.mapPropertyColumn);
+		return GsonEbUtils.clazzToMap(object, this.mapPropertyColumn, false);
 	}
 	
 	@SuppressWarnings("rawtypes")
@@ -460,7 +461,7 @@ public class TTableProps {
 			List<Map<String, Object>> listMap = new ArrayList<>();
 			for (int i=0; i<list.size(); i++) {
 				Object object = list.get(i);
-				Map<String, Object> map = GsonEbUtils.clazzToMap(object, this.mapPropertyColumn);
+				Map<String, Object> map = GsonEbUtils.clazzToMap(object, this.mapPropertyColumn, false);
 				listMap.add(map);
 			}
 			return listMap;
