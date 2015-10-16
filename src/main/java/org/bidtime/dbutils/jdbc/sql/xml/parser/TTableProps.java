@@ -47,14 +47,13 @@ public class TTableProps {
 		this.existDefault = existDefault;
 	}
 
-	private Map<String, ColumnPro> mapPropertyColumn = new HashMap<>();
-	private Map<String, String> mapColumnDescript = new HashMap<>();
-	
-	public Map<String, String> getMapColumnDescript() {
+	private Map<String, Object> mapPropertyColumn = new CaseInsensitiveHashMap();
+	private Map<String, Object> mapColumnDescript = new CaseInsensitiveHashMap();
+	public Map<String, Object> getMapColumnDescript() {
 		return mapColumnDescript;
 	}
 
-	public void setMapColumnDescript(Map<String, String> mapColumnDescript) {
+	public void setMapColumnDescript(Map<String, Object> mapColumnDescript) {
 		this.mapColumnDescript = mapColumnDescript;
 	}
 
@@ -157,7 +156,7 @@ public class TTableProps {
 	private String getInsertSqlOfJsonHead(String tblName, String[] jsonHead) {
 		List<String> listColumn=new ArrayList<String>();
 		for (String sIdx: jsonHead) {
-			ColumnPro p = this.mapPropertyColumn.get(sIdx.toLowerCase());
+			ColumnPro p = (ColumnPro)this.mapPropertyColumn.get(sIdx.toLowerCase());
 			if (p!=null) {
 				listColumn.add(p.getColumn());
 			} else {
@@ -174,7 +173,7 @@ public class TTableProps {
 			List<String> listPks = new ArrayList<String>();
 			for (int i = 0; i < jsonAllHead.length; i++) {
 				String sIdx = jsonAllHead[i];
-				ColumnPro p = this.mapPropertyColumn.get(sIdx.toLowerCase());
+				ColumnPro p = (ColumnPro)this.mapPropertyColumn.get(sIdx.toLowerCase());
 				if (p != null) {
 					if (mapJsonPkHead.containsKey(sIdx)) {
 						listPks.add(p.getColumn());
@@ -201,7 +200,7 @@ public class TTableProps {
 		List<String> listPk=new ArrayList<String>();
 		for (int i = 0; i< jsonHead.length; i++) {
 			String sIdx = jsonHead[i].toLowerCase();
-			ColumnPro p = this.mapPropertyColumn.get(sIdx);
+			ColumnPro p = (ColumnPro)this.mapPropertyColumn.get(sIdx);
 			if (p != null) {
 				if (p.getPk()) {
 					listPk.add(p.getColumn());
@@ -232,7 +231,7 @@ public class TTableProps {
 		List<String> listPk = new ArrayList<>();
 		for (int i=0; i<heads.length; i++) {
 			String sIdx = heads[i];
-			ColumnPro p = this.mapPropertyColumn.get(sIdx.toLowerCase());
+			ColumnPro p = (ColumnPro)this.mapPropertyColumn.get(sIdx.toLowerCase());
 			if (p != null) {
 				listPk.add(p.getColumn());
 			}
@@ -244,7 +243,7 @@ public class TTableProps {
 		List<String> listPk = new ArrayList<>();
 		for (int i=0; i<heads.length; i++) {
 			String sIdx = heads[i];
-			ColumnPro p = this.mapPropertyColumn.get(sIdx.toLowerCase());
+			ColumnPro p = (ColumnPro)this.mapPropertyColumn.get(sIdx.toLowerCase());
 			if (p != null && p.getPk()) {
 				listPk.add(p.getColumn());
 				listJsonPk.add(sIdx);
@@ -276,7 +275,7 @@ public class TTableProps {
 		List<Object> listAddData = null;
 		for (int i = 0; i < this.listDefault.size(); i++) {
 			String s = this.listDefault.get(i);
-			ColumnPro cp = this.mapPropertyColumn.get(s);
+			ColumnPro cp = (ColumnPro)this.mapPropertyColumn.get(s);
 			if (cp == null) {
 				continue;
 			}
@@ -306,7 +305,7 @@ public class TTableProps {
 			List<Object> listAddData = null;
 			for (int i = 0; i < this.listDefault.size(); i++) {
 				String s = this.listDefault.get(i);
-				ColumnPro cp = this.mapPropertyColumn.get(s);
+				ColumnPro cp = (ColumnPro)this.mapPropertyColumn.get(s);
 				if (cp == null) {
 					continue;
 				}
@@ -461,7 +460,8 @@ public class TTableProps {
 			List<Map<String, Object>> listMap = new ArrayList<>();
 			for (int i=0; i<list.size(); i++) {
 				Object object = list.get(i);
-				Map<String, Object> map = GsonEbUtils.clazzToMap(object, this.mapPropertyColumn, false);
+				Map<String, Object> map = GsonEbUtils.clazzToMap(object
+						, this.mapPropertyColumn, false);
 				listMap.add(map);
 			}
 			return listMap;

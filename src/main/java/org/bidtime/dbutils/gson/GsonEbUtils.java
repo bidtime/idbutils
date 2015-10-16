@@ -58,7 +58,7 @@ public class GsonEbUtils {
 	}
 
 	public static Map<String, Object> clazzToMap(Object object,
-			Map<String, ColumnPro> mapProperty, boolean force) throws SQLException {
+			Map<String, Object> mapProperty, boolean force) throws SQLException {
 		Map<String, Object> map = new CaseInsensitiveHashMap();
 		PropertyDescriptor[] propDescripts=null;
 		try {
@@ -71,7 +71,7 @@ public class GsonEbUtils {
 			PropertyDescriptor pro = propDescripts[i];
 			//Method setter = pd.getWriteMethod();
 			String head = pro.getName();
-			Method setter = pro.getReadMethod();  
+			Method setter = pro.getReadMethod();
 
 	        if (setter == null) {
 	            continue;
@@ -87,10 +87,10 @@ public class GsonEbUtils {
 				throw new SQLException("class to map error");
 			}
 			if (mapProperty != null && !mapProperty.isEmpty()) {
-				ColumnPro cp = mapProperty.get(head);
+				ColumnPro cp = (ColumnPro)mapProperty.get(head);
 				if (cp != null) {
 					map.put(cp.getColumn(), retVal);
-				} else {
+				} else if (force) {
 					map.put(head, retVal);
 				}
 			} else if (force) {

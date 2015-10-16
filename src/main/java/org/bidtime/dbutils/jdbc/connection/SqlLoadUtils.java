@@ -499,14 +499,18 @@ public class SqlLoadUtils {
 		}
 	}
 
-	@SuppressWarnings("rawtypes")
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static int update(DataSource ds, Class clazz,
 			Object o, String[] heads) throws SQLException {
 		if (o != null) {
 			TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
 			GsonRow g = null;
 			try {
-				g = tp.clazzToRow(o);
+				if (o instanceof Map) {
+					g = tp.mapToRow((Map)o);
+				} else {
+					g = tp.clazzToRow(o);
+				}
 				g.moveToEnd(heads);
 			} catch (Exception e) {
 				throw new SQLException(e.getMessage());

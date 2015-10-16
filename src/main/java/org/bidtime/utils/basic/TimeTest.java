@@ -12,7 +12,7 @@ public class TimeTest {
 	private int weeks = 0;
 	// private int MaxDate;
 	private int MaxYear;
-
+	
 	// public static void main(String[] args) {
 	// TimeTest tt = new TimeTest();
 	// System.out.println("getNowTime:"+tt.getNowTime("yyyy-MM-dd"));

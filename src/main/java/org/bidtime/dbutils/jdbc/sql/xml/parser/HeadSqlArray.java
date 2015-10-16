@@ -6,13 +6,13 @@ public class HeadSqlArray {
 	private String sql;
 	private String countSql;
 	private String[] headFlds;
-	private Map<String, String> mapColumnDescript;
+	private Map<String, Object> mapColumnDescript;
 	
-	public Map<String, String> getMapColumnDescript() {
+	public Map<String, Object> getMapColumnDescript() {
 		return mapColumnDescript;
 	}
 
-	public void setMapColumnDescript(Map<String, String> mapColumnDescript) {
+	public void setMapColumnDescript(Map<String, Object> mapColumnDescript) {
 		this.mapColumnDescript = mapColumnDescript;
 	}
 
@@ -30,7 +30,7 @@ public class HeadSqlArray {
 	}
 	
 	public HeadSqlArray(String sql, String[] headFlds, 
-			String countSql, Map<String, String> mapColumnDescript) {
+			String countSql, Map<String, Object> mapColumnDescript) {
 		this.sql = sql;
 		this.headFlds = headFlds;
 		this.countSql = countSql;
