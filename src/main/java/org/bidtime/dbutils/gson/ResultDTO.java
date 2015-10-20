@@ -242,25 +242,25 @@ public class ResultDTO<T> implements Serializable {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private JSONArray dataToJson() {
-		JSONArray jsonArray = null;
+	private Object dataToJson() {
+		Object jsonObject = null;
 		//if (data != null) {
 		if (data instanceof List && !((List) data).isEmpty()) {
 			Object o = ((List) data).get(0);
 			boolean bMap = (o != null && o instanceof Map) ? true : false;
 			if (bMap) {
-				jsonArray = JSONHelper
+				jsonObject = JSONHelper
 						.listMapToJsonArray((List<Map<String, Object>>) data);
 			} else {
 				if (o != null && isJavaSimpleClazz(o.getClass())) {
-					jsonArray = new JSONArray((List) data);
+					jsonObject = new JSONArray((List) data);
 				} else {
-					jsonArray = JSONHelper.clazzToJsonArray((List) data, colMapProps);
+					jsonObject = JSONHelper.clazzToJsonArray((List) data, colMapProps);
 				}
 			}
 		} else {
-			jsonArray = new JSONArray();
-			JSONObject jsonObject = null;
+			//jsonArray = new JSONArray();
+			//JSONObject jsonObject = null;
 			if (data instanceof Map) {
 				jsonObject = JSONHelper.mapToJson((Map)(data));
 			} else {
@@ -270,12 +270,12 @@ public class ResultDTO<T> implements Serializable {
 					jsonObject = JSONHelper.clazzToJson(data, colMapProps);
 				}
 			}
-			jsonArray.put(jsonObject);
+			//jsonArray.put(jsonObject);
 		}
 		//} else {
 		//	jsonArray = new JSONArray();
 		//}
-		return jsonArray;
+		return jsonObject;
 	}
 
 	public JSONObject toJson() {

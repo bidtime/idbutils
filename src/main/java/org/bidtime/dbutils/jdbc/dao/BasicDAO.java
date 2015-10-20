@@ -11,7 +11,6 @@ import org.bidtime.dbutils.gson.dataset.GsonRow;
 import org.bidtime.dbutils.gson.dataset.GsonRows;
 import org.bidtime.dbutils.jdbc.connection.DbConnection;
 import org.bidtime.dbutils.jdbc.connection.SqlLoadUtils;
-import org.bidtime.dbutils.jdbc.dialect.Dialect;
 import org.bidtime.dbutils.jdbc.sql.xml.JsonFieldXmlsLoader;
 import org.bidtime.dbutils.jdbc.sql.xml.parser.TTableProps;
 import org.bidtime.utils.spring.SpringContextUtils;
@@ -24,7 +23,7 @@ import org.bidtime.utils.spring.SpringContextUtils;
  */
 public class BasicDAO {
 
-	protected Dialect dialect = null;
+	//protected Dialect dialect = null;
 
 	// 单连接应用,每个Dao对象互相隔离
 	// private final ThreadLocal<Connection> connLocal = new
@@ -44,8 +43,6 @@ public class BasicDAO {
 	}
 
 	protected DataSource dataSource = null;
-	protected static final int ONE_PAGE_IDX = 0;
-	protected static final short ONE_PAGE_SIZE = 1;
 
 	public DataSource getDataSource() {
 		return dataSource;

@@ -322,12 +322,12 @@ public class GsonRows {
 		}
 	}
 
-	public void addHeadArray(String headName, Object[] arObject) throws Exception {
+	public void addHeadArray(String headName, Object[] arObject) {
 		addHeadArray(headName, arObject, true);
 	}
 	
-	private void addHeadArray(String oneHead, Object[] arObject, boolean bInitIndex)
-			throws Exception {
+	private void addHeadArray(String oneHead, Object[] arObject, 
+			boolean bInitIndex) {
 		head = ArrayComm.mergeStringArray(head, oneHead);
 		Object[][] objReturn = new Object[data.length][head.length];
 		for (int i = 0; i < data.length; i++) {
@@ -857,7 +857,7 @@ public class GsonRows {
 		}
 	}
 
-	public boolean moveToEnd(String moveHead) throws Exception {
+	public boolean moveToEnd(String moveHead) {
 		int idx = getPosOfName(moveHead);
 		if (idx > -1) {
 			if (idx == this.head.length-1) {
@@ -873,7 +873,7 @@ public class GsonRows {
 		}
 	}
 	
-	public boolean moveToEnd(String[] moveHeads) throws Exception {
+	public boolean moveToEnd(String[] moveHeads) {
 		boolean bReturn = false;
 		for (int i=0; i<moveHeads.length; i++) {
 			if (moveToEnd(moveHeads[i])) {

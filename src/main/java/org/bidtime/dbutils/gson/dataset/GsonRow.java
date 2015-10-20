@@ -654,7 +654,7 @@ public class GsonRow {
 		return getDataLength() > 0 ? true:false;
 	}
 	
-	public boolean moveToEnd(String moveHead) throws Exception {
+	public boolean moveToEnd(String moveHead) {
 		int idx = getPosOfName(moveHead);
 		if (idx > -1) {
 			if (idx == this.head.length-1) {
@@ -670,7 +670,7 @@ public class GsonRow {
 		}
 	}
 	
-	public boolean moveToEnd(String[] moveHeads) throws Exception {
+	public boolean moveToEnd(String[] moveHeads) {
 		boolean bReturn = false;
 		for (int i=0; i<moveHeads.length; i++) {
 			if (moveToEnd(moveHeads[i])) {
