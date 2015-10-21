@@ -250,7 +250,8 @@ public class ResultDTO<T> implements Serializable {
 			boolean bMap = (o != null && o instanceof Map) ? true : false;
 			if (bMap) {
 				jsonObject = JSONHelper
-						.listMapToJsonArray((List<Map<String, Object>>) data);
+						.listMapToJsonArray((List<Map<String, Object>>) data
+								, colMapProps);
 			} else {
 				if (o != null && isJavaSimpleClazz(o.getClass())) {
 					jsonObject = new JSONArray((List) data);
@@ -262,7 +263,7 @@ public class ResultDTO<T> implements Serializable {
 			//jsonArray = new JSONArray();
 			//JSONObject jsonObject = null;
 			if (data instanceof Map) {
-				jsonObject = JSONHelper.mapToJson((Map)(data));
+				jsonObject = JSONHelper.mapToJson((Map)(data), colMapProps);
 			} else {
 				if (this.type != null && isJavaSimpleClazz(type)) {
 					jsonObject = new JSONObject(data);

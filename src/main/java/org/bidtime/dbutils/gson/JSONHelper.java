@@ -63,12 +63,13 @@ public class JSONHelper {
 		}
 	}
 	
-	public static JSONArray listMapToJsonArray(List<Map<String, Object>> data) {
+	public static JSONArray listMapToJsonArray(List<Map<String, Object>> data,
+			Map<String, Set<String>> mapColPros) {
 		JSONArray jsonArray = new JSONArray();
 		if (data != null && data.size()>0) {
 			for (int i = 0; i < data.size(); i++) {
 				//map to json
-				JSONObject jsonObject = mapToJson(data.get(i));
+				JSONObject jsonObject = mapToJson(data.get(i), mapColPros);
 				//add to json array
 				jsonArray.put(jsonObject);
 			}
@@ -507,7 +508,7 @@ public class JSONHelper {
 				if (objData instanceof List) {
 					jsonArray.put(listToJsonArray((List)objData, mapColPros));
 				} else if (objData instanceof Map) {
-					jsonArray.put(mapToJson((Map)objData));
+					jsonArray.put(mapToJson((Map)objData, mapColPros));
 				} else {
 					jsonArray.put(JSONHelper.objToJsonObj(objData, mapColPros));
 				}
@@ -517,31 +518,32 @@ public class JSONHelper {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public static JSONObject mapToJson(Map<String, Object> map) {
+	public static JSONObject mapToJson(Map<String, Object> map,
+			Map<String, Set<String>> mapColPros) {
 		JSONObject jsonObject = new JSONObject();
 		for (Entry<String, Object> entry: map.entrySet()) {
 			Object objData = entry.getValue();
 			if (objData instanceof List) {
-				jsonObject.put(entry.getKey(), listToJsonArray((List)objData, null));
+				jsonObject.put(entry.getKey(), listToJsonArray((List)objData, mapColPros));
 			} else if (objData instanceof Map) {
-				jsonObject.put(entry.getKey(), mapToJson((Map)objData));
+				jsonObject.put(entry.getKey(), mapToJson((Map)objData, mapColPros));
 			} else {
 				jsonObject.put(entry.getKey(),
-						JSONHelper.objToJsonObj(objData, null));
+						JSONHelper.objToJsonObj(objData, mapColPros));
 			}
 		}
 		return jsonObject;
 	}
 	
 	@SuppressWarnings("rawtypes")
-	public static JSONArray clazzToJsonArray(List list, Map<String, Set<String>> mapColPros) {
-		
+	public static JSONArray clazzToJsonArray(List list,
+			Map<String, Set<String>> mapColPros) {
 		List<Map<String, Object>> listResult = new ArrayList<>();
 		for (Object o:list) {
 			Map<String, Object> map = clazzToMap(o, mapColPros);
 			listResult.add(map);
 		}
-		return listMapToJsonArray(listResult);
+		return listMapToJsonArray(listResult, mapColPros);
 	}
 	
 //	private static JSONObject clazzToJson(Object object) {
@@ -585,7 +587,7 @@ public class JSONHelper {
 			if (retVal instanceof List) {
 				jsonObject.put(key, listToJsonArray((List)retVal, mapHead));
 			} else if (retVal instanceof Map) {
-				jsonObject.put(key, mapToJson((Map)retVal));
+				jsonObject.put(key, mapToJson((Map)retVal, mapHead));
 			} else {
 				jsonObject.put(key, JSONHelper.objToJsonObj(retVal, mapHead));
 			}
