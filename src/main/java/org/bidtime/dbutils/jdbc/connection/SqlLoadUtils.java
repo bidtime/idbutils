@@ -658,10 +658,18 @@ public class SqlLoadUtils {
 		return query(ds, h, params, nPageIdx, nPageSize, rsh);
 	}
 	
+	@SuppressWarnings("rawtypes")
 	private static boolean isJavaSimpleClazz(Object o) {
 		boolean result = false;
 		if (o == null) {		//要转换成json.null
 			result = true;
+		} else if (o instanceof Map) {
+			result = false;
+		} else if (o instanceof List && !((List)(o)).isEmpty()) {
+			Object m = ((List)o).get(0);
+			if (m != null && m instanceof Map) {
+				result = false;
+			}
 		} else if (o instanceof String || o instanceof Number ||
 			o instanceof StringBuilder || o instanceof StringBuffer ||
 			o instanceof Boolean || o instanceof Appendable) {
@@ -670,7 +678,7 @@ public class SqlLoadUtils {
 			return true;
 		} else if (o instanceof java.util.Date) {
 			result = true;
-		} else if (o instanceof Set || o instanceof Queue ||
+		} else if (o instanceof Set || o instanceof Queue || o instanceof List ||
 			o instanceof Character ||
 			o instanceof Math || o instanceof Enum) {
 			result = true;
@@ -680,7 +688,7 @@ public class SqlLoadUtils {
 		return result;
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings({ "rawtypes" })
 	public static <T> T queryExByPK(DataSource ds, Class clazz, String sqlId,
 			Object o, Integer nPageIdx, Integer nPageSize,
 			ResultSetHandler<T> rsh) throws SQLException {
@@ -691,35 +699,41 @@ public class SqlLoadUtils {
 		HeadSqlArray h = tp.getHeadSqlArrayOfId(sqlId);
 		Map<String, Object> params = SqlParser.getMapOfFieldPK(h.getSql(), tp.getSetPk());
 		if (params == null || params.isEmpty()) {
-			SQLException e = new SQLException("primary key error");
-			throw e;
+			throw new SQLException("primary key error");
 		} else if (params.size() == 1) {
-			if (o instanceof Map || o instanceof Object[]) {
-				SQLException e = new SQLException("pk params error: isn't map or Object[]");
-				throw e;
-			}
 			for (Map.Entry<String, Object> entry:params.entrySet()) {
 				entry.setValue(o);
 			}
 		} else {
-			if (o instanceof Map) { 
-				if (params.size() != ((Map)o).size()) {
-					SQLException e = new SQLException("pk params error: size is not equal");
-					throw e;				
-				}
-				params.putAll((Map)o);
-			} else if (o instanceof Object[]) {
+			if (o instanceof Object[]) {
 				if (params.size() != ((Object[])o).length) {
-					SQLException e = new SQLException("pk params error: length is not equal");
-					throw e;				
+					throw new SQLException("pk params error: length is not equal");
 				}
 				int i = 0;
 				for (Map.Entry<String, Object> entry:params.entrySet()) {
 					entry.setValue(((Object[])o)[i]);
 					i ++;
 				}
+			} else if (o instanceof Iterable) {
+//				if (params.size() != ((Iterable)o).) {
+					throw new SQLException("pk params error: type not support.");
+//				}
+//				int i = 0;
+//				for (Map.Entry<String, Object> entry:params.entrySet()) {
+//					entry.setValue(((Object[])o)[i]);
+//					i ++;
+//				}
+			} else if (o instanceof List) {
+				if (params.size() != ((List)o).size()) {
+					throw new SQLException("pk params error: size is not equal");
+				}
+				int i = 0;
+				for (Map.Entry<String, Object> entry:params.entrySet()) {
+					entry.setValue(((List)o).get(i));
+					i ++;
+				}
 			} else {
-				throw new SQLException("pk params error: must be map or object[]."
+				throw new SQLException("pk params error: object[]."
 					+ o.getClass().getSimpleName());
 			}
 		}
