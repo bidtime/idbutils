@@ -48,24 +48,6 @@ public class ParserSqlXML {
 //		result.append(inSql);
 //		return result.toString();
 //	}
-//	
-//	public static void main(String[] args) {
-////		Map<String, Object> p = new HashMap<String, Object>();
-////		p.put("ob1", "ruldId1 asc");
-//		//p.put("idOrderBy1", "ruldId1 asc");
-//		//p.put("ob2", "ruldId2 asc");
-//		
-//		Pattern temp = Pattern
-//					.compile("([^[,|\\{|\\}|\\S]&[\\s]]+?)");
-//		
-//		String input = "{ob1, ob2}";
-//		Matcher matcher = temp.matcher(input);
-//		int i = 0;
-//		while(matcher.find()){
-//			System.err.println(matcher.group(i));
-//			i++;
-//		}
-//	}
 
 	/**
 	 * @param args
@@ -339,7 +321,6 @@ public class ParserSqlXML {
 			if (elementSql != null) {
 				visitSqlElementChild_tp(elementSql, tp);
 			}
-			//
 			tp.finished();
 		} finally {
 			try {

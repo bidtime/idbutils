@@ -4,6 +4,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
+import java.util.Set;
 
 import javax.sql.DataSource;
 
@@ -14,7 +16,6 @@ import org.bidtime.dbutils.gson.dataset.GsonRow;
 import org.bidtime.dbutils.gson.dataset.GsonRows;
 import org.bidtime.dbutils.jdbc.rs.handle.ext.ResultSetDTOHandler;
 import org.bidtime.dbutils.jdbc.sql.ArrayUtils;
-import org.bidtime.dbutils.jdbc.sql.SqlHolder;
 import org.bidtime.dbutils.jdbc.sql.SqlParser;
 import org.bidtime.dbutils.jdbc.sql.SqlUtils;
 import org.bidtime.dbutils.jdbc.sql.xml.JsonFieldXmlsLoader;
@@ -103,7 +104,6 @@ public class SqlLoadUtils {
 		if (o == null) {
 			return 0;
 		}
-
 		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
 		GsonRows r = o.remain(heads);
 		try {
@@ -543,9 +543,10 @@ public class SqlLoadUtils {
 	public static int update(DataSource ds, Class clazz, String sqlId,
 			Map<String, ?> params) throws SQLException {
 		String sql = getSqlOfId(clazz, sqlId);
-		SqlHolder holder = SqlParser.parse(sql, params);
-		return DbConnection.update(ds, holder.getSql(),
-				holder.getObjectArray());
+		List<Object> paramList = new ArrayList<Object>();
+		String finalSql = SqlParser.parse(sql, params, paramList);
+		return DbConnection.update(ds, finalSql,
+				paramList.toArray());
 	}
 
 	//updateBatch
@@ -608,26 +609,37 @@ public class SqlLoadUtils {
 	}
 
 	//query
+
+	@SuppressWarnings("rawtypes")
+	private static <T> T query(DataSource ds, HeadSqlArray h,
+			Map<String, ?> params, Integer nPageIdx, Integer nPageSize,
+			ResultSetHandler<T> rsh) throws SQLException {
+		List<Object> paramList = new ArrayList<Object>();
+		h.setSql(SqlParser.parse(h.getSql(), params, paramList));
+		if (rsh instanceof ResultSetDTOHandler 
+				&& ((ResultSetDTOHandler) rsh).isCountSql()) {
+			String countSql = null;
+			if (StringUtils.isNotEmpty(h.getCountSql()) ) {
+				countSql = SqlParser
+					.parse(h.getCountSql(), params, null);
+			} else {
+				countSql = SqlUtils.getCountSql(h.getSql());
+			}
+			h.setCountSql(countSql);
+		}
+		return DbConnection.query(ds, h, paramList.toArray(),
+				nPageIdx, nPageSize, rsh);
+	}
 	
 	public static <T> T query(DataSource ds, String sql, ResultSetHandler<T> rsh,
 			Map<String, ?> params) throws SQLException {
 		return query(ds, sql, rsh, params, null, null);
 	}
 
-	@SuppressWarnings("rawtypes")
 	public static <T> T query(DataSource ds, String sql, ResultSetHandler<T> rsh,
 			Map<String, ?> params, Integer nPageIdx, Integer nPageSize) throws SQLException {
-		SqlHolder holder = SqlParser.parse(sql, params);
-		String countSql = null;
-		if (rsh instanceof ResultSetDTOHandler 
-				&& ((ResultSetDTOHandler) rsh).isCountSql()) {
-			SqlHolder holderCount = SqlParser
-					.parse(SqlUtils.getCountSql(sql), params);
-			countSql = holderCount.getSql();
-		}
-		HeadSqlArray a = new HeadSqlArray(holder.getSql(), countSql);
-		return DbConnection.query(ds, a, holder.getObjectArray(),
-				nPageIdx, nPageSize, rsh);
+		HeadSqlArray ha = new HeadSqlArray(sql, null);
+		return query(ds, ha, params, nPageIdx, nPageSize, rsh);
 	}
 	
 	public static <T> T queryOne(DataSource ds, String sql, ResultSetHandler<T> rsh,
@@ -643,23 +655,85 @@ public class SqlLoadUtils {
 			ResultSetHandler<T> rsh) throws SQLException {
 		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
 		HeadSqlArray h = tp.getHeadSqlArrayOfId(sqlId);
-		SqlHolder holder = SqlParser.parse(h.getSql(), params);
-		h.setSql(holder.getSql());
-		if (rsh instanceof ResultSetDTOHandler 
-				&& ((ResultSetDTOHandler) rsh).isCountSql()) {
-			String countSql = null;
-			if (StringUtils.isNotEmpty(h.getCountSql()) ) {
-				SqlHolder holderCount = SqlParser
-					.parse(h.getCountSql(), params);
-				countSql = holderCount.getSql();
-			} else {
-				countSql = SqlUtils.getCountSql(holder.getSql());
-			}
-			h.setCountSql(countSql);
-		}
-		return DbConnection.query(ds, h, holder.getObjectArray(),
-				nPageIdx, nPageSize, rsh);
+		return query(ds, h, params, nPageIdx, nPageSize, rsh);
 	}
+	
+	private static boolean isJavaSimpleClazz(Object o) {
+		boolean result = false;
+		if (o == null) {		//要转换成json.null
+			result = true;
+		} else if (o instanceof String || o instanceof Number ||
+			o instanceof StringBuilder || o instanceof StringBuffer ||
+			o instanceof Boolean || o instanceof Appendable) {
+			result = true;
+		} else if (o instanceof Object[]) {
+			return true;
+		} else if (o instanceof java.util.Date) {
+			result = true;
+		} else if (o instanceof Set || o instanceof Queue ||
+			o instanceof Character ||
+			o instanceof Math || o instanceof Enum) {
+			result = true;
+		} else {
+			result = false;
+		}
+		return result;
+	}
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public static <T> T queryExByPK(DataSource ds, Class clazz, String sqlId,
+			Object o, Integer nPageIdx, Integer nPageSize,
+			ResultSetHandler<T> rsh) throws SQLException {
+		if ( !isJavaSimpleClazz(o) ) {
+			throw new SQLException("primary key type is error");
+		}
+		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
+		HeadSqlArray h = tp.getHeadSqlArrayOfId(sqlId);
+		Map<String, Object> params = SqlParser.getMapOfFieldPK(h.getSql(), tp.getSetPk());
+		if (params == null || params.isEmpty()) {
+			SQLException e = new SQLException("primary key error");
+			throw e;
+		} else if (params.size() == 1) {
+			if (o instanceof Map || o instanceof Object[]) {
+				SQLException e = new SQLException("pk params error: isn't map or Object[]");
+				throw e;
+			}
+			for (Map.Entry<String, Object> entry:params.entrySet()) {
+				entry.setValue(o);
+			}
+		} else {
+			if (o instanceof Map) { 
+				if (params.size() != ((Map)o).size()) {
+					SQLException e = new SQLException("pk params error: size is not equal");
+					throw e;				
+				}
+				params.putAll((Map)o);
+			} else if (o instanceof Object[]) {
+				if (params.size() != ((Object[])o).length) {
+					SQLException e = new SQLException("pk params error: length is not equal");
+					throw e;				
+				}
+				int i = 0;
+				for (Map.Entry<String, Object> entry:params.entrySet()) {
+					entry.setValue(((Object[])o)[i]);
+					i ++;
+				}
+			} else {
+				throw new SQLException("pk params error: must be map or object[]."
+					+ o.getClass().getSimpleName());
+			}
+		}
+		return query(ds, h, params, nPageIdx, nPageSize, rsh);
+	}
+	
+//	@SuppressWarnings("rawtypes")
+//	public static <T> T queryEx(DataSource ds, Class clazz,
+//			Map<String, ?> params, Integer nPageIdx, Integer nPageSize,
+//			ResultSetHandler<T> rsh) throws SQLException {
+//		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
+//		String sql = tp.getSelectSql();
+//		return query(ds, sql, rsh, params, nPageIdx, nPageSize);
+//	}
 
 	@SuppressWarnings("rawtypes")
 	public static <T> T queryEx(DataSource ds, Class clazz, String sqlId, ResultSetHandler<T> rsh,
@@ -668,9 +742,33 @@ public class SqlLoadUtils {
 	}
 
 	@SuppressWarnings("rawtypes")
+	public static <T> T queryExByPK(DataSource ds, Class clazz, String sqlId, ResultSetHandler<T> rsh,
+			Object o) throws SQLException {
+		return queryExByPK(ds, clazz, sqlId, o, null, null, rsh);
+	}
+
+//	@SuppressWarnings("rawtypes")
+//	public static <T> T queryEx(DataSource ds, Class clazz, ResultSetHandler<T> rsh,
+//			Map<String, ?> params) throws SQLException {
+//		return queryEx(ds, clazz, params, null, null, rsh);
+//	}
+
+	@SuppressWarnings("rawtypes")
 	public static <T> T queryExOne(DataSource ds, Class clazz, String sqlId, ResultSetHandler<T> rsh,
 			Map<String, ?> params) throws SQLException {
 		return queryEx(ds, clazz, sqlId, params, 0, 1, rsh);
 	}
+
+	@SuppressWarnings("rawtypes")
+	public static <T> T queryExOneByPK(DataSource ds, Class clazz, String sqlId, ResultSetHandler<T> rsh,
+			Object o) throws SQLException {
+		return queryExByPK(ds, clazz, sqlId, o, 0, 1, rsh);
+	}
+
+//	@SuppressWarnings("rawtypes")
+//	public static <T> T queryExOne(DataSource ds, Class clazz, ResultSetHandler<T> rsh,
+//			Map<String, ?> params) throws SQLException {
+//		return queryEx(ds, clazz, params, 0, 1, rsh);
+//	}
 	
 }

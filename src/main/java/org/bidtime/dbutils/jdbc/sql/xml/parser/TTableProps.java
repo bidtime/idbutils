@@ -1,7 +1,12 @@
 package org.bidtime.dbutils.jdbc.sql.xml.parser;
 
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
+import java.lang.reflect.Method;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -14,7 +19,8 @@ import org.bidtime.dbutils.gson.dataset.GsonRow;
 import org.bidtime.dbutils.gson.dataset.GsonRows;
 import org.bidtime.dbutils.jdbc.sql.ArrayUtils;
 import org.bidtime.dbutils.jdbc.sql.SqlUtils;
-import org.bidtime.utils.comm.CaseInsensitiveHashMap;
+import org.bidtime.utils.comm.SimpleHashMap;
+import org.bidtime.utils.comm.SimpleHashSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,7 +31,17 @@ public class TTableProps {
 
 	private String className="";
 	private String tableName="";
-	private String[] fieldPK=null;
+	private Set<String> setPk;
+	
+	public void setSetPk(Set<String> setPk) {
+		this.setPk = setPk;
+	}
+	
+	public Set<String> getSetPk() {
+		return this.setPk;
+	}
+
+	//private String[] fieldPK=null;
 	private boolean nonePkInc=false;
 	public boolean isNonePkInc() {
 		return nonePkInc;
@@ -47,13 +63,13 @@ public class TTableProps {
 		this.existDefault = existDefault;
 	}
 
-	private Map<String, Object> mapPropertyColumn = new CaseInsensitiveHashMap();
-	private Map<String, Object> mapColumnDescript = new CaseInsensitiveHashMap();
-	public Map<String, Object> getMapColumnDescript() {
+	private Map<String, ColumnPro> mapPropertyColumn = new SimpleHashMap<ColumnPro>();
+	private Map<String, String> mapColumnDescript = new SimpleHashMap<String>();
+	public Map<String, String> getMapColumnDescript() {
 		return mapColumnDescript;
 	}
 
-	public void setMapColumnDescript(Map<String, Object> mapColumnDescript) {
+	public void setMapColumnDescript(Map<String, String> mapColumnDescript) {
 		this.mapColumnDescript = mapColumnDescript;
 	}
 
@@ -63,20 +79,14 @@ public class TTableProps {
 	//新的xml配置,使用此方法
 	public HeadSqlArray getHeadSqlArrayOfId(String id) throws SQLException {
 		if (logger.isDebugEnabled()) {
-			logger.debug("sqlId:"+id);
+			logger.debug("sqlId:" + id);
 		}
 		HeadSqlArray headSqlArray = null;
 		SqlHeadCountPro sqlHeadPro = getShcProOfId(id);
 		if (sqlHeadPro != null) {
-			JsonHeadPro jsonHeadPro = getJsonHeadProOfId(sqlHeadPro.getHeadId());
-			if (jsonHeadPro != null) {
-				headSqlArray = new HeadSqlArray(sqlHeadPro.getSql(), jsonHeadPro.getArHeadFlds(),
-					sqlHeadPro.getCountSql(), this.mapColumnDescript);					
-			} else {
-				headSqlArray = new HeadSqlArray(sqlHeadPro.getSql(), sqlHeadPro.getCountSql());
-			}
+			headSqlArray = new HeadSqlArray(sqlHeadPro.getSql(), sqlHeadPro.getCountSql());
 		} else {
-			throw new SQLException("id:" + id + " is none sql props");
+			throw new SQLException("id:" + id + " is none sql props.");
 		}
 		return headSqlArray;
 	}
@@ -132,11 +142,13 @@ public class TTableProps {
 	}
 	
 	public String[] getFieldPK() {
-		return fieldPK;
+		List<String> list = new ArrayList<String>(this.setPk);
+		return (String[])list.toArray(new String[list.size()]);
 	}
 
 	public void setFieldPK(String[] fieldPK) {
-		this.fieldPK = fieldPK;
+		List<String> list = Arrays.asList(fieldPK);
+		this.setPk = new SimpleHashSet(list);
 	}
 	
 	public String getInsertSql(GsonRow g, boolean setDefault) {
@@ -156,7 +168,7 @@ public class TTableProps {
 	private String getInsertSqlOfJsonHead(String tblName, String[] jsonHead) {
 		List<String> listColumn=new ArrayList<String>();
 		for (String sIdx: jsonHead) {
-			ColumnPro p = (ColumnPro)this.mapPropertyColumn.get(sIdx.toLowerCase());
+			ColumnPro p = this.mapPropertyColumn.get(sIdx);
 			if (p!=null) {
 				listColumn.add(p.getColumn());
 			} else {
@@ -167,15 +179,15 @@ public class TTableProps {
 	}
 
 	public String getUpdateSqlHead(String tblName, String[] jsonAllHead, String[] jsonPkHead) {
-		Map<String, Object> mapJsonPkHead = new CaseInsensitiveHashMap(jsonPkHead);
+		Set<String> setJsonPkHead = new SimpleHashSet(Arrays.asList(jsonPkHead));
 		try {
 			List<String> listCols = new ArrayList<String>();
 			List<String> listPks = new ArrayList<String>();
 			for (int i = 0; i < jsonAllHead.length; i++) {
 				String sIdx = jsonAllHead[i];
-				ColumnPro p = (ColumnPro)this.mapPropertyColumn.get(sIdx.toLowerCase());
+				ColumnPro p = this.mapPropertyColumn.get(sIdx);
 				if (p != null) {
-					if (mapJsonPkHead.containsKey(sIdx)) {
+					if (setJsonPkHead.contains(sIdx)) {
 						listPks.add(p.getColumn());
 					} else {
 						listCols.add(p.getColumn());
@@ -184,12 +196,21 @@ public class TTableProps {
 					listCols.add(sIdx);						
 				}
 			}
-			return SqlUtils.getUpdateSql(tblName,ArrayUtils.listToStringArray(listCols)
-					,ArrayUtils.listToStringArray(listPks));
+			return SqlUtils.getUpdateSql(tblName, ArrayUtils.listToStringArray(listCols),
+					ArrayUtils.listToStringArray(listPks));
 		} finally {
-			mapJsonPkHead.clear();
-			mapJsonPkHead = null;
+			setJsonPkHead.clear();
+			setJsonPkHead = null;
 		}
+	}
+
+	public String getSelectSql(String tblName) {
+		String sql = SqlUtils.getSelectSql(tblName, mapPropertyColumn);
+		return sql;
+	}
+
+	public String getSelectSql() {
+		return SqlUtils.getSelectSql(this.tableName, mapPropertyColumn);
 	}
 
 	/*
@@ -198,40 +219,47 @@ public class TTableProps {
 	public String getUpdateSqlPk(String tblName, String[] jsonHead, List<String> listPkJson) {
 		List<String> listColumn=new ArrayList<String>();
 		List<String> listPk=new ArrayList<String>();
-		for (int i = 0; i< jsonHead.length; i++) {
-			String sIdx = jsonHead[i].toLowerCase();
-			ColumnPro p = (ColumnPro)this.mapPropertyColumn.get(sIdx);
-			if (p != null) {
-				if (p.getPk()) {
-					listPk.add(p.getColumn());
-					listPkJson.add(sIdx);
+		try {
+			for (int i = 0; i< jsonHead.length; i++) {
+				String sIdx = jsonHead[i];
+				ColumnPro p = this.mapPropertyColumn.get(sIdx);
+				if (p != null) {
+					if (p.getPk()) {
+						listPk.add(p.getColumn());
+						listPkJson.add(sIdx);
+					} else {
+						listColumn.add(p.getColumn());
+					}
 				} else {
-					listColumn.add(p.getColumn());
+					listColumn.add(sIdx);
 				}
-			} else {
-				listColumn.add(sIdx);
 			}
+			return SqlUtils.getUpdateSql(tblName, ArrayUtils.listToStringArray(listColumn),
+					ArrayUtils.listToStringArray(listPk));
+		} finally {
+			listColumn.clear();
+			listColumn = null;
+			listPk.clear();
+			listPk = null;
 		}
-		return SqlUtils.getUpdateSql(tblName,ArrayUtils.listToStringArray(listColumn),
-				ArrayUtils.listToStringArray(listPk));
 	}
 	
 	/*
 	 * 获取可以执行的delete sql
 	 */
-	public String getDeleteSql(String tblName) {
-		return SqlUtils.getDeleteSql(tblName, this.fieldPK);
-	}
+//	public String getDeleteSql(String tblName) {
+//		return SqlUtils.getDeleteSql(tblName, this.fieldPK);
+//	}
 
 	public String getDeleteSql(String tblName, Object[] ids) {
-		return SqlUtils.getDeleteSql(tblName, this.fieldPK, ids);
+		return SqlUtils.getDeleteSql(tblName, getFieldPK(), ids);
 	}
 
 	public String getDeleteSqlOfHead(String tblName, String[] heads) {
 		List<String> listPk = new ArrayList<>();
 		for (int i=0; i<heads.length; i++) {
 			String sIdx = heads[i];
-			ColumnPro p = (ColumnPro)this.mapPropertyColumn.get(sIdx.toLowerCase());
+			ColumnPro p = this.mapPropertyColumn.get(sIdx);
 			if (p != null) {
 				listPk.add(p.getColumn());
 			}
@@ -243,7 +271,7 @@ public class TTableProps {
 		List<String> listPk = new ArrayList<>();
 		for (int i=0; i<heads.length; i++) {
 			String sIdx = heads[i];
-			ColumnPro p = (ColumnPro)this.mapPropertyColumn.get(sIdx.toLowerCase());
+			ColumnPro p = this.mapPropertyColumn.get(sIdx);
 			if (p != null && p.getPk()) {
 				listPk.add(p.getColumn());
 				listJsonPk.add(sIdx);
@@ -275,7 +303,7 @@ public class TTableProps {
 		List<Object> listAddData = null;
 		for (int i = 0; i < this.listDefault.size(); i++) {
 			String s = this.listDefault.get(i);
-			ColumnPro cp = (ColumnPro)this.mapPropertyColumn.get(s);
+			ColumnPro cp = this.mapPropertyColumn.get(s);
 			if (cp == null) {
 				continue;
 			}
@@ -305,7 +333,7 @@ public class TTableProps {
 			List<Object> listAddData = null;
 			for (int i = 0; i < this.listDefault.size(); i++) {
 				String s = this.listDefault.get(i);
-				ColumnPro cp = (ColumnPro)this.mapPropertyColumn.get(s);
+				ColumnPro cp = this.mapPropertyColumn.get(s);
 				if (cp == null) {
 					continue;
 				}
@@ -367,7 +395,7 @@ public class TTableProps {
 	public void addColsCommonPro(String sJsonColumn, ColumnPro p) {
 		if (StringUtils.isNotEmpty(sJsonColumn)) {
 			this.mapColumnDescript.put(p.getColumn(), sJsonColumn);
-			this.mapPropertyColumn.put(sJsonColumn.toLowerCase(), p);
+			this.mapPropertyColumn.put(sJsonColumn, p);
 			if (p.getDefaultValue() != null && p.getNotNull()) {
 				if (listDefault == null) {
 					listDefault = new ArrayList<String>();
@@ -383,7 +411,7 @@ public class TTableProps {
 	public void addColsPkPro(String sJsonColumn, ColumnPro p) {
 		if (StringUtils.isNotEmpty(sJsonColumn)) {
 			this.mapColumnDescript.put(p.getColumn(), sJsonColumn);
-			this.mapPropertyColumn.put(sJsonColumn.toLowerCase(), p);
+			this.mapPropertyColumn.put(sJsonColumn, p);
 			if (!p.getIdentity() && !this.nonePkInc) {
 				nonePkInc = true;
 			}
@@ -406,7 +434,7 @@ public class TTableProps {
 	public GsonRow mapToRow(Map<String, Object> map, boolean bRemovePk) {
 		GsonRow row = GsonEbUtils.mapToRow(map);
 		if (row != null && !isNonePkInc() && bRemovePk) {
-			row.delHead(this.getFieldPK());
+			row.delHead(getFieldPK());
 		}		
 		return row;
 	}
@@ -418,7 +446,7 @@ public class TTableProps {
 	public GsonRows mapsToRows(List<Map<String, Object>> list, boolean bRemovePk) {
 		GsonRows rows = GsonEbUtils.mapsToRows(list);
 		if (rows != null && !isNonePkInc() && bRemovePk) {
-			rows.delHead(this.getFieldPK());
+			rows.delHead(getFieldPK());
 		}
 		return rows;
 	}
@@ -430,28 +458,69 @@ public class TTableProps {
 	public GsonRow clazzToRow(Object object, boolean bRemovePk) throws SQLException {
 		GsonRow row = GsonEbUtils.mapToRow(clazzToMap(object));
 		if (row != null && !isNonePkInc() && bRemovePk) {
-			row.delHead(this.getFieldPK());
+			row.delHead(getFieldPK());
 		}
 		return row;
 	}
 	
 	@SuppressWarnings("rawtypes")
 	public GsonRows clazzToRows(List list) throws SQLException {
-		GsonRows rows = GsonEbUtils.mapsToRows(clazzToMap(list));
-		return rows;
+		return GsonEbUtils.mapsToRows(clazzToMap(list));
 	}
 	
 	@SuppressWarnings("rawtypes")
 	public GsonRows clazzToRows(List list, boolean bRemovePk) throws SQLException {
 		GsonRows rows = GsonEbUtils.mapsToRows(clazzToMap(list));
 		if (rows != null && !isNonePkInc() && bRemovePk) {
-			rows.delHead(this.getFieldPK());
+			rows.delHead(getFieldPK());
 		}
 		return rows;
 	}
+
+	public static Map<String, Object> clazzToMap(Object object,
+			Map<String, ColumnPro> mapProperty, boolean force) throws SQLException {
+		Map<String, Object> map = new SimpleHashMap<Object>();
+		PropertyDescriptor[] propDescripts=null;
+		try {
+			propDescripts = Introspector.getBeanInfo(object.getClass()).getPropertyDescriptors();
+		} catch (IntrospectionException e) {
+			logger.error("clazzToMap", e);
+			throw new SQLException("class to map error");
+		}
+		for (int i=0; i<propDescripts.length; i++) {
+			PropertyDescriptor pro = propDescripts[i];
+			//Method setter = pd.getWriteMethod();
+			Method setter = pro.getReadMethod();
+	        if (setter == null) {
+	            continue;
+	        }
+	        if (setter.getName().equals("getClass")) {
+	        	continue;
+	        }
+	        Object retVal = null;	//通过反射把该类对象传递给invoke方法来调用对应的方法  
+			try {
+				retVal = setter.invoke(object);
+			} catch (Exception e) {
+				logger.error("clazzToMap", e);
+				throw new SQLException("class to map error");
+			}
+			String head = pro.getName();
+			if (mapProperty != null && !mapProperty.isEmpty()) {
+				ColumnPro cp = mapProperty.get(head);
+				if (cp != null) {
+					map.put(cp.getColumn(), retVal);
+				} else if (force) {
+					map.put(head, retVal);
+				}
+			} else if (force) {
+				map.put(head, retVal);
+			}
+		}
+		return map;
+	}
 	
 	public Map<String, Object> clazzToMap(Object object) throws SQLException {
-		return GsonEbUtils.clazzToMap(object, this.mapPropertyColumn, false);
+		return clazzToMap(object, this.mapPropertyColumn, false);
 	}
 	
 	@SuppressWarnings("rawtypes")
@@ -460,9 +529,7 @@ public class TTableProps {
 			List<Map<String, Object>> listMap = new ArrayList<>();
 			for (int i=0; i<list.size(); i++) {
 				Object object = list.get(i);
-				Map<String, Object> map = GsonEbUtils.clazzToMap(object
-						, this.mapPropertyColumn, false);
-				listMap.add(map);
+				listMap.add(clazzToMap(object));
 			}
 			return listMap;
 		} else {

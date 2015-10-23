@@ -343,7 +343,6 @@ public class BasicDAO {
 	}
 	
 	// query
-
 	public <T> T query(String sql, ResultSetHandler<T> rsh,
 			Map<String, ?> params, Integer nPageIdx, Integer nPageSize)
 			throws SQLException {
@@ -362,13 +361,24 @@ public class BasicDAO {
 	}
 	
 	// queryEx
-
 	public <T> T queryExOne(String sqlId, ResultSetHandler<T> rsh,
 			Map<String, ?> params)
 			throws SQLException {
-		return SqlLoadUtils.queryEx(getCurrentDataSource(), this.getClass(),
-				sqlId, params, 0, 1, rsh);
+		return SqlLoadUtils.queryExOne(getCurrentDataSource(), this.getClass(),
+				sqlId, rsh, params);
 	}
+
+	public <T> T queryExOneByPK(String sqlId, ResultSetHandler<T> rsh,
+			Object params) throws SQLException {
+		return SqlLoadUtils.queryExOneByPK(getCurrentDataSource(), this.getClass(),
+				sqlId, rsh, params);
+	}
+
+//	public <T> T queryExOne(ResultSetHandler<T> rsh,
+//			Map<String, ?> params) throws SQLException {
+//		return SqlLoadUtils.queryExOne(getCurrentDataSource(), this.getClass(),
+//				rsh, params);
+//	}
 
 	public <T> T queryEx(String sqlId, ResultSetHandler<T> rsh,
 			Map<String, ?> params, Integer nPageIdx, Integer nPageSize)
@@ -377,9 +387,35 @@ public class BasicDAO {
 				sqlId, params, nPageIdx, nPageSize, rsh);
 	}
 
+	public <T> T queryExByPK(String sqlId, ResultSetHandler<T> rsh, Object params, 
+			Integer nPageIdx, Integer nPageSize)	throws SQLException {
+		return SqlLoadUtils.queryExByPK(getCurrentDataSource(), this.getClass(),
+				sqlId, params, nPageIdx, nPageSize, rsh);
+	}
+
+//	public <T> T queryEx(ResultSetHandler<T> rsh,
+//			Map<String, ?> params, Integer nPageIdx, Integer nPageSize)
+//			throws SQLException {
+//		return SqlLoadUtils.queryEx(getCurrentDataSource(), this.getClass(),
+//				params, nPageIdx, nPageSize, rsh);
+//	}
+
 	public <T> T queryEx(String sqlId, ResultSetHandler<T> rsh,
 			Map<String, ?> params) throws SQLException {
-		return queryEx(sqlId, rsh, params, null, null);
+		return SqlLoadUtils.queryEx(getCurrentDataSource(), this.getClass(),
+				sqlId, rsh, params);
 	}
+
+	public <T> T queryExByPK(String sqlId, ResultSetHandler<T> rsh,
+			Object params) throws SQLException {
+		return SqlLoadUtils.queryExByPK(getCurrentDataSource(), this.getClass(),
+				sqlId, rsh, params);
+	}
+
+//	public <T> T queryEx(ResultSetHandler<T> rsh, Map<String, ?> params)
+//			throws SQLException {
+//		return SqlLoadUtils.queryEx(getCurrentDataSource(), this.getClass(),
+//				rsh, params);
+//	}
 
 }

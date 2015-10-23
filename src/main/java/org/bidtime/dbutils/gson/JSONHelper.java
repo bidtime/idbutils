@@ -355,7 +355,7 @@ public class JSONHelper {
 			logger.error("class to map error", e);
 		}
 		
-        Map<String, Object> mColumns = new CaseInsensitiveHashMap();
+        Map<String, Object> mColumns = new CaseInsensitiveHashMap<Object>();
         try {
 			for (int i=0; i<props.length; i++) {
 				PropertyDescriptor pro = props[i];

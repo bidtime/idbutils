@@ -3,9 +3,13 @@ package org.bidtime.dbutils.jdbc.sql;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.Types;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
+import org.bidtime.dbutils.jdbc.sql.xml.parser.ColumnPro;
 import org.bidtime.utils.basic.ObjectComm;
 
 /*
@@ -99,6 +103,29 @@ public class SqlUtils {
 		}
 	}
 
+	private static String getSelectSubSqlOfListObject(Map<String, ColumnPro> map, List<String> listPk) {
+		String sql = null;
+		if (map != null && !map.isEmpty()) {
+			listPk = new ArrayList<String>();
+			StringBuilder sb = new StringBuilder();
+			for (Map.Entry<String, ColumnPro> entry : map.entrySet()) {
+				if (sb.length()>0) {
+					sb.append("\r");
+				}
+				String key = entry.getKey();
+				ColumnPro pro = entry.getValue();
+				sb.append(key);
+				sb.append(" as ");
+				sb.append(pro.getColumn());
+				if (pro.getPk()) {
+					listPk.add(pro.getColumn());
+				}
+			}
+			sql = sb.toString();
+		}
+		return sql;
+	}
+
 	private static String getUpdateSubSqlOfListObject(Object[] listFlds) {
 		String sql = null;
 		if (listFlds != null && listFlds.length > 0) {
@@ -132,6 +159,20 @@ public class SqlUtils {
 		sql.append(tableName);
 		sql.append(" set ");
 		sql.append(sFldVals);
+		if (StringUtils.isNotEmpty(sWhereSql)) {
+			sql.append(" where ");
+			sql.append(sWhereSql);
+		}
+		return sql.toString();
+	}
+
+	public static String getSelectOfTable(String tableName, String sFldVals,
+			String sWhereSql) {
+		StringBuilder sql = new StringBuilder();
+		sql.append("select ");
+		sql.append(sFldVals);
+		sql.append("from ");
+		sql.append(tableName);
 		if (StringUtils.isNotEmpty(sWhereSql)) {
 			sql.append(" where ");
 			sql.append(sWhereSql);
@@ -180,6 +221,18 @@ public class SqlUtils {
 		String sFldValsSql = getUpdateSubSqlOfListObject(fieldColumn);
 		String sWhereSql = getWhereSqlOfListObject(listPK);
 		return getUpdateOfTable(tableName, sFldValsSql, sWhereSql);
+	}
+
+	public static String getSelectSql(String tableName, Map<String, ColumnPro> map) {
+		List<String> listPk = new ArrayList<String>();
+		try {
+			String sFldValsSql = getSelectSubSqlOfListObject(map, listPk);
+			String sWhereSql = getWhereSqlOfListObject(listPk.toArray());
+			return getSelectOfTable(tableName, sFldValsSql, sWhereSql);
+		} finally {
+			listPk.clear();
+			listPk = null;
+		}
 	}
 
 	/*

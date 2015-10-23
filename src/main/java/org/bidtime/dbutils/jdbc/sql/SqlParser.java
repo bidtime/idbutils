@@ -1,16 +1,21 @@
 package org.bidtime.dbutils.jdbc.sql;
 
 import java.lang.reflect.Array;
+import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jss
@@ -20,8 +25,8 @@ import org.apache.commons.lang.StringUtils;
  */
 public class SqlParser {
 	
-//	private static final Logger logger = LoggerFactory
-//			.getLogger(SqlParser.class);
+	private static final Logger logger = LoggerFactory
+			.getLogger(SqlParser.class);
 
 	// 动态语句 匹配正则表达式  << sql >>
 	private static final Pattern D_SQL_PATT = Pattern.compile("<<.*?>>");	//"\\s<<.*?>>\\s"
@@ -45,10 +50,28 @@ public class SqlParser {
 	// 动态变量 匹配正则表达式  #name#
 	private static final Pattern PARAM_PATT = Pattern.compile("#[\\s|\\w]*#");
 
+	private static final Pattern KEY_PARAM_PATT = Pattern.compile("\\w\\s*=\\s*#[\\s|\\w]*#");
+
 	// 动态替换 匹配正则表达式  {name} -> [idsort]
 	//private static final Pattern REPL_PATT = Pattern.compile("\\[[\\s|\\w]*\\]");
 	private static final Pattern REPL_PATT = Pattern.compile("\\{.*?\\}");
 
+//	public static String parse(String sql, Long l, Set<String> setPK,
+//			List<Object> opParamList) throws SQLException {
+//		Map<String, Object> map = getMapOfFieldPK(sql, setPK);
+//		if (map == null || map.isEmpty() || map.size() > 1) {
+//			SQLException e = new SQLException("primary key error");
+//			logger.error("parse", e);
+//			throw e;
+//		}
+//		return parse(sql, map, opParamList);
+//	}
+	
+	public static String parse(String configSql, Map<String, ?> inputParams
+			, List<Object> opParamList) throws SQLException {
+		return parse(configSql, inputParams, opParamList, true);
+	}
+	
 	/**
 	 * 解析普通SQL语句
 	 * 
@@ -56,7 +79,8 @@ public class SqlParser {
 	 * @param inputParams
 	 * @return
 	 */
-	public static SqlHolder parse(String configSql, Map<String, ?> inputParams) {
+	public static String parse(String configSql, Map<String, ?> inputParams
+			, List<Object> opParamList, boolean compareKey) throws SQLException {
 		// 配置在XML中的SQL语句
 //		boolean debug = logger.isDebugEnabled();
 //		if (debug) {
@@ -69,23 +93,33 @@ public class SqlParser {
 		
 		// 替换SQL语句
 		String replaceSql = replace(repl, inputParams);
+		
+		if (compareKey && !containsAllParams(replaceSql, inputParams)) {
+			SQLException e = new SQLException("sql params is not match.");
+			logger.error("parse", e);
+			throw e;
+		}
 
 		// 根据参数 处理 动态SQL语句,得到带#name#的SQL
 		String nameSql = handleDynamic(replaceSql, inputParams);
 
-		List<Object> outputParamList = new ArrayList<Object>();
+		List<Object> opList = new ArrayList<Object>();
 
 		// 处理#name# 参数,得到最终可执行的SQL
-		String finalSql = getFinalSql(nameSql, inputParams, outputParamList);
+		String finalSql = getFinalSql(nameSql, inputParams, opList);
 //		if (debug) {
 //			logger.debug("\nfinal sql :" + finalSql);
 //			logger.debug("\nparam List:\n" + outputParamList);
 //		}
 
-		SqlHolder holder = new SqlHolder();
-		holder.setSql(finalSql);
-		holder.setParamList(outputParamList);
-		return holder;
+		//SqlHolder holder = new SqlHolder();
+		//holder.setSql(finalSql);
+		//holder.setParamList(opList);
+		//return holder;
+		if (opParamList != null) {
+			opParamList.addAll(opList);
+		}
+		return finalSql;
 	}
 
 	/**
@@ -103,7 +137,7 @@ public class SqlParser {
 			int end = matcher.end();
 			result.append(inSql.substring(0, start));
 			String group = matcher.group().substring(1, matcher.group().length()-1);
-			String name = getParaName(group);
+			String name = getParaName(group, PARAM_PATT);
 			Object replace = params.get(name);
 			//String replace = (String) params.get(group
 			//		.replaceAll("\\{|\\}", "").trim());
@@ -128,7 +162,7 @@ public class SqlParser {
 			String sPreview = nameSql.substring(0, matcher.start());
 			result.append(sPreview);
 			String group = matcher.group();
-			String name = getParaName(group);
+			String name = getParaName(group, PARAM_PATT);
 			Object value = inputParams.get(name);
 			if (value != null) {
 				result.append(value);
@@ -193,22 +227,54 @@ public class SqlParser {
 		return result.toString();
 	}
 
-	public static void main(String[] args) {
-		String sql = "select id, code, name from xx "
-			// + " {idsort} " + " \n\r "
-			+ "{order by id=#idSort#, <<code=#codeSort#>>, name=#nameSort#}"
-			//+ " [ <<order by id2=#id2Sort#>> <<, code2=#code2Sort#>> <<, name2=#name2Sort#>>] "
-			// + " [ # idSort # ] "
-			;
-		
-		Map<String, Object> params = new HashMap<String, Object>();
-		params.put("idSort", "id asc");
-		params.put("codeSort", "code desc");
-		
-		String repl = SqlParser.replaceOrderBy(sql, params);
-		//String repl = SqlParser.replace(sql, params);
-		System.out.println(repl);
+//	public static void main(String[] args) {
+//		String sql = "id=#id_#" 
+//			+ "\n\r"
+//			+ "name=#name_#"	
+//			;
+//		Set<String> set = new SimpleHashSet();
+//		set.add("id_");
+//		try {
+//			Map map = getMapOfFieldPK(sql, set);
+//			System.out.println(map);
+//		} catch (SQLException e) {
+//			e.printStackTrace();
+//		}
+//	}
+
+	public static Map<String, Object> getMapOfFieldPK(String nameSql,
+			Set<String> fieldPk) throws SQLException {
+		Map<String, Object> map = new LinkedHashMap<String, Object>();
+		StringBuilder result = new StringBuilder(nameSql.length());
+		for (Matcher matcher = KEY_PARAM_PATT.matcher(nameSql); matcher.find();
+				matcher = KEY_PARAM_PATT.matcher(nameSql)) {
+			result.append(nameSql.substring(0, matcher.start()));
+			String group = matcher.group();
+			String name = getParaName(group, PARAM_PATT);
+			if (fieldPk.contains(name)) {
+				map.put(name, null);
+			}
+			nameSql = nameSql.substring(matcher.end());
+		}
+		return map;
 	}
+	
+//	private static void doIt2() {
+//		String sql = "select id, code, name from xx "
+//			// + " {idsort} " + " \n\r "
+//			+ "{order by id=#idSort#, <<code=#codeSort#>>, name=#nameSort#}"
+//			//+ " [ <<order by id2=#id2Sort#>> <<, code2=#code2Sort#>> <<, name2=#name2Sort#>>] "
+//			// + " [ # idSort # ] "
+//			;
+//		
+//		Map<String, Object> params = new HashMap<String, Object>();
+//		params.put("idSort", "id asc");
+//		params.put("codeSort", "code desc");
+//		
+//		String repl = SqlParser.replaceOrderBy(sql, params);
+//		//String repl = SqlParser.replace(sql, params);
+//		System.out.println(repl);
+//	}
 
 	private static String getFinalSql(String nameSql,
 			Map<String, ?> inputParams, List<Object> list) {
@@ -217,7 +283,7 @@ public class SqlParser {
 				.matcher(nameSql)) {
 			result.append(nameSql.substring(0, matcher.start()));
 			String group = matcher.group();
-			String name = getParaName(group);
+			String name = getParaName(group, PARAM_PATT);
 			Object value = inputParams.get(name);
 			int sqlType = SqlUtils.getObjectType(value);
 			result.append(buildSpaceHolder(value, sqlType, list));
@@ -225,6 +291,32 @@ public class SqlParser {
 		}
 		result.append(nameSql);
 		return result.toString();
+	}
+
+	private static boolean containsAllParams(String nameSql,
+			Map<String, ?> inputParams) throws SQLException {
+		Set<String> set = new HashSet<String>();
+		StringBuilder result = new StringBuilder(nameSql.length());
+		for (Matcher matcher = PARAM_PATT.matcher(nameSql); matcher.find(); matcher = PARAM_PATT
+				.matcher(nameSql)) {
+			result.append(nameSql.substring(0, matcher.start()));
+			String group = matcher.group();
+			String name = getParaName(group, PARAM_PATT);
+			set.add(name);
+			nameSql = nameSql.substring(matcher.end());
+		}
+		boolean b = set.containsAll(inputParams.keySet());
+		if (logger.isInfoEnabled()) {
+			StringBuilder sb = new StringBuilder();
+			sb.append("contains->");
+			sb.append(b);
+			sb.append(" inp:");
+			sb.append(inputParams);
+			sb.append("alp:");
+			sb.append(set);
+			logger.info(sb.toString());
+		}
+		return b;
 	}
 	
 	@SuppressWarnings("rawtypes")
@@ -273,58 +365,6 @@ public class SqlParser {
 		}
 		return spaceHolder;
 	}
-	
-//	private static boolean isExistsOrderBy(String sql) {
-//		Matcher matcher = ORDER_BY_PATT.matcher(sql);
-//		return matcher.find();
-//	}
-
-//	private static StringBuilder isExistsColonReplaceOrderBy(String sql) {
-//		Matcher matcher = COLON_SQL_PATT.matcher(sql);
-//		if (matcher.find()) {
-//			String sRelpace = matcher.replaceFirst(" order by ");
-//			return new StringBuilder(sRelpace);
-//		} else {
-//			return null;
-//		}
-//	}
-
-//	private static String handleDynamicOrderBy(String sSql, Map<String, ?> params) {
-//		String sql = sSql;
-//		StringBuilder result = new StringBuilder(sql.length());
-//		Boolean existsOrderBy = null;
-//		boolean bAddDynamic = false;
-//		for (Matcher matcher = D_SQL_PATT.matcher(sql); matcher.find(); matcher = D_SQL_PATT
-//				.matcher(sql)) {
-//			int start = matcher.start();
-//			int end = matcher.end();
-//			String sMatcherSql = sql.substring(0, start);
-//			result.append(sMatcherSql);
-//			String group = matcher.group();
-//			if (existsOrderBy == null) {
-//				existsOrderBy = isExistsOrderBy(sql);
-//			}
-//			String name = getParaName(group);
-//			Object value = params.get(name);
-//			if (isNotEmpty(value)) {
-//				String sDynamicStr2 = group.substring(2, group.length() - 2); // <<>>需要减除
-//				if (existsOrderBy && !bAddDynamic) {
-//					bAddDynamic = true;
-//					StringBuilder sbReturn = isExistsColonReplaceOrderBy(sDynamicStr2);
-//					if (sbReturn != null) {
-//						result.append(sbReturn.toString());
-//					} else {
-//						result.append(sDynamicStr2);
-//					}
-//				} else {
-//					result.append(sDynamicStr2);
-//				}
-//			}
-//			sql = sql.substring(end);
-//		}
-//		result.append(sql);
-//		return result.toString();
-//	}
 
 	/**
 	 * 动态参数处理
@@ -343,7 +383,7 @@ public class SqlParser {
 			String sMatcherSql = sql.substring(0, start);
 			result.append(sMatcherSql);
 			String group = match.group();
-			String name = getParaName(group);
+			String name = getParaName(group, PARAM_PATT);
 			Object value = params.get(name);
 			if (isNotEmpty(value)) {		// <<>>需要减除
 				result.append(group.substring(2, group.length() - 2));
@@ -370,8 +410,19 @@ public class SqlParser {
 		return true;
 	}
 
-	private static String getParaName(String input) {
-		Matcher m = PARAM_PATT.matcher(input);
+//	private static String getParaName(String input) {
+//		return getParaName(input, PARAM_PATT);
+//		Matcher m = PARAM_PATT.matcher(input);
+//		if (m.find()) {
+//			String p = m.group();
+//			return p.substring(1, p.length() - 1).trim();
+//		} else {
+//			return StringUtils.EMPTY;
+//		}
+//	}
+
+	private static String getParaName(String input, Pattern pattern) {
+		Matcher m = pattern.matcher(input);
 		if (m.find()) {
 			String p = m.group();
 			return p.substring(1, p.length() - 1).trim();

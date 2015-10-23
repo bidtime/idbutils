@@ -1,6 +1,8 @@
 package org.bidtime.dbutils.gson;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
@@ -226,8 +228,11 @@ public class ResultDTO<T> implements Serializable {
 			type.equals(StringBuilder.class) || type.equals(StringBuffer.class) ||
 			type.equals(Boolean.class) || type.equals(Appendable.class)) {
 			result = true;
+		} else if (type.equals(Long.class) || type.equals(Integer.class)
+				|| type.equals(Short.class) || type.equals(Number.class)
+				|| type.equals(BigInteger.class) || type.equals(BigDecimal.class)) {
+			result = true;
 		} else if (type.equals(java.util.Date.class)) {
-			//objData = dateToyyyyMMddHHmmss((Date) objRaw);
 			result = true;
 		} else if (type.equals(JsonData.class)) {
 			result = false;
