@@ -6,7 +6,6 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -14,6 +13,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
+import org.bidtime.utils.comm.SimpleHashMap;
+import org.bidtime.utils.comm.SimpleHashSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,26 +51,54 @@ public class SqlParser {
 	// 动态变量 匹配正则表达式  #name#
 	private static final Pattern PARAM_PATT = Pattern.compile("#[\\s|\\w]*#");
 
-	private static final Pattern KEY_PARAM_PATT = Pattern.compile("\\w\\s*=\\s*#[\\s|\\w]*#");
+	//当只获取主键的数据时，取到主键的正则
+	private static final Pattern PRIMARY_KEY_PATT = Pattern.compile("[\\w]*\\s*=\\s*#[\\s|\\w]*#");
 
 	// 动态替换 匹配正则表达式  {name} -> [idsort]
 	//private static final Pattern REPL_PATT = Pattern.compile("\\[[\\s|\\w]*\\]");
 	private static final Pattern REPL_PATT = Pattern.compile("\\{.*?\\}");
-
-//	public static String parse(String sql, Long l, Set<String> setPK,
-//			List<Object> opParamList) throws SQLException {
-//		Map<String, Object> map = getMapOfFieldPK(sql, setPK);
-//		if (map == null || map.isEmpty() || map.size() > 1) {
-//			SQLException e = new SQLException("primary key error");
-//			logger.error("parse", e);
-//			throw e;
-//		}
-//		return parse(sql, map, opParamList);
-//	}
 	
 	public static String parse(String configSql, Map<String, ?> inputParams
 			, List<Object> opParamList) throws SQLException {
 		return parse(configSql, inputParams, opParamList, true);
+	}
+
+//	public static void main(String[] args) {
+//		String sql = "select " + 
+//	  			"id, " +
+//	  			"code, " +
+//	  			"name  " +
+//	  		"from t_duty " +
+//	  		"<<where id=#id_#>> " +
+//	  		"<<and code=#code#>> " +
+//	  		"<<and name like #name#>> "
+//			;
+//		Set<String> set = new SimpleHashSet();
+//		set.add("id");
+//		try {
+//			Map<String, Object> map = getMapOfFieldPK(sql, set);
+//			System.out.println(map);
+//		} catch (SQLException e) {
+//			e.printStackTrace();
+//		}
+//	}
+
+	public static Map<String, Object> getMapOfFieldPK(String nameSql,
+			Set<String> fieldPk) throws SQLException {
+		Map<String, Object> map = new SimpleHashMap<Object>();
+		StringBuilder result = new StringBuilder(nameSql.length());
+		for (Matcher matcher = PRIMARY_KEY_PATT.matcher(nameSql); matcher.find();
+				matcher = PRIMARY_KEY_PATT.matcher(nameSql)) {
+			result.append(nameSql.substring(0, matcher.start()));
+			String group = matcher.group();
+			String name = getPatternName(group, PARAM_PATT);
+			String[] arGroup = group.split("=");
+			if (fieldPk.contains(arGroup[0])) {
+				map.put(name, null);
+			}
+			nameSql = nameSql.substring(matcher.end());
+		}
+		return map;
 	}
 	
 	/**
@@ -138,7 +167,10 @@ public class SqlParser {
 			result.append(inSql.substring(0, start));
 			String group = matcher.group().substring(1, matcher.group().length()-1);
 			String name = getPatternName(group, PARAM_PATT);
-			Object replace = params.get(name);
+			Object replace = null;
+			if (params != null && !params.isEmpty()) {
+				replace = params.get(name);
+			}
 			//String replace = (String) params.get(group
 			//		.replaceAll("\\{|\\}", "").trim());
 			if (replace == null) {
@@ -226,38 +258,6 @@ public class SqlParser {
 		result.append(inSql);
 		return result.toString();
 	}
-
-//	public static void main(String[] args) {
-//		String sql = "id=#id_#" 
-//			+ "\n\r"
-//			+ "name=#name_#"	
-//			;
-//		Set<String> set = new SimpleHashSet();
-//		set.add("id_");
-//		try {
-//			Map map = getMapOfFieldPK(sql, set);
-//			System.out.println(map);
-//		} catch (SQLException e) {
-//			e.printStackTrace();
-//		}
-//	}
-
-	public static Map<String, Object> getMapOfFieldPK(String nameSql,
-			Set<String> fieldPk) throws SQLException {
-		Map<String, Object> map = new LinkedHashMap<String, Object>();
-		StringBuilder result = new StringBuilder(nameSql.length());
-		for (Matcher matcher = KEY_PARAM_PATT.matcher(nameSql); matcher.find();
-				matcher = KEY_PARAM_PATT.matcher(nameSql)) {
-			result.append(nameSql.substring(0, matcher.start()));
-			String group = matcher.group();
-			String name = getPatternName(group, PARAM_PATT);
-			if (fieldPk.contains(name)) {
-				map.put(name, null);
-			}
-			nameSql = nameSql.substring(matcher.end());
-		}
-		return map;
-	}
 	
 //	private static void doIt2() {
 //		String sql = "select id, code, name from xx "
@@ -284,7 +284,10 @@ public class SqlParser {
 			result.append(nameSql.substring(0, matcher.start()));
 			String group = matcher.group();
 			String name = getPatternName(group, PARAM_PATT);
-			Object value = inputParams.get(name);
+			Object value = null;
+			if (inputParams != null && !inputParams.isEmpty()) {
+				value = inputParams.get(name);
+			}
 			int sqlType = SqlUtils.getObjectType(value);
 			result.append(buildSpaceHolder(value, sqlType, list));
 			nameSql = nameSql.substring(matcher.end());
@@ -295,6 +298,9 @@ public class SqlParser {
 
 	private static boolean containsAllParams(String nameSql,
 			Map<String, ?> inputParams) throws SQLException {
+		if (inputParams == null || inputParams.isEmpty()) {
+			return true;
+		}
 		Set<String> set = new HashSet<String>();
 		StringBuilder result = new StringBuilder(nameSql.length());
 		for (Matcher matcher = PARAM_PATT.matcher(nameSql); matcher.find(); matcher = PARAM_PATT
@@ -306,7 +312,7 @@ public class SqlParser {
 			nameSql = nameSql.substring(matcher.end());
 		}
 		boolean b = set.containsAll(inputParams.keySet());
-		if (logger.isInfoEnabled()) {
+		if (logger.isDebugEnabled()) {
 			StringBuilder sb = new StringBuilder();
 			sb.append("contains->");
 			sb.append(b);
@@ -314,7 +320,7 @@ public class SqlParser {
 			sb.append(inputParams);
 			sb.append("alp:");
 			sb.append(set);
-			logger.info(sb.toString());
+			logger.debug(sb.toString());
 		}
 		return b;
 	}
@@ -384,9 +390,12 @@ public class SqlParser {
 			result.append(sMatcherSql);
 			String group = match.group();
 			String name = getPatternName(group, PARAM_PATT);
-			Object value = params.get(name);
-			if (isNotEmpty(value)) {		// <<>>需要减除
-				result.append(group.substring(2, group.length() - 2));
+			Object value = null;
+			if (params != null && !params.isEmpty()) {
+				value = params.get(name);
+				if (isNotEmpty(value)) {		// <<>>需要减除
+					result.append(group.substring(2, group.length() - 2));
+				}
 			}
 			sql = sql.substring(end);
 		}
