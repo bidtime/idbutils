@@ -137,7 +137,7 @@ public class SqlParser {
 			int end = matcher.end();
 			result.append(inSql.substring(0, start));
 			String group = matcher.group().substring(1, matcher.group().length()-1);
-			String name = getParaName(group, PARAM_PATT);
+			String name = getPatternName(group, PARAM_PATT);
 			Object replace = params.get(name);
 			//String replace = (String) params.get(group
 			//		.replaceAll("\\{|\\}", "").trim());
@@ -162,7 +162,7 @@ public class SqlParser {
 			String sPreview = nameSql.substring(0, matcher.start());
 			result.append(sPreview);
 			String group = matcher.group();
-			String name = getParaName(group, PARAM_PATT);
+			String name = getPatternName(group, PARAM_PATT);
 			Object value = inputParams.get(name);
 			if (value != null) {
 				result.append(value);
@@ -250,7 +250,7 @@ public class SqlParser {
 				matcher = KEY_PARAM_PATT.matcher(nameSql)) {
 			result.append(nameSql.substring(0, matcher.start()));
 			String group = matcher.group();
-			String name = getParaName(group, PARAM_PATT);
+			String name = getPatternName(group, PARAM_PATT);
 			if (fieldPk.contains(name)) {
 				map.put(name, null);
 			}
@@ -283,7 +283,7 @@ public class SqlParser {
 				.matcher(nameSql)) {
 			result.append(nameSql.substring(0, matcher.start()));
 			String group = matcher.group();
-			String name = getParaName(group, PARAM_PATT);
+			String name = getPatternName(group, PARAM_PATT);
 			Object value = inputParams.get(name);
 			int sqlType = SqlUtils.getObjectType(value);
 			result.append(buildSpaceHolder(value, sqlType, list));
@@ -301,7 +301,7 @@ public class SqlParser {
 				.matcher(nameSql)) {
 			result.append(nameSql.substring(0, matcher.start()));
 			String group = matcher.group();
-			String name = getParaName(group, PARAM_PATT);
+			String name = getPatternName(group, PARAM_PATT);
 			set.add(name);
 			nameSql = nameSql.substring(matcher.end());
 		}
@@ -383,7 +383,7 @@ public class SqlParser {
 			String sMatcherSql = sql.substring(0, start);
 			result.append(sMatcherSql);
 			String group = match.group();
-			String name = getParaName(group, PARAM_PATT);
+			String name = getPatternName(group, PARAM_PATT);
 			Object value = params.get(name);
 			if (isNotEmpty(value)) {		// <<>>需要减除
 				result.append(group.substring(2, group.length() - 2));
@@ -421,7 +421,7 @@ public class SqlParser {
 //		}
 //	}
 
-	private static String getParaName(String input, Pattern pattern) {
+	private static String getPatternName(String input, Pattern pattern) {
 		Matcher m = pattern.matcher(input);
 		if (m.find()) {
 			String p = m.group();

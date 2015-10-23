@@ -29,8 +29,8 @@ public class TTableProps {
 	private static final Logger logger = LoggerFactory
 			.getLogger(TTableProps.class);
 
-	private String className="";
-	private String tableName="";
+	private String className;
+	private String tableName;
 	private Set<String> setPk;
 	
 	public void setSetPk(Set<String> setPk) {
@@ -210,7 +210,7 @@ public class TTableProps {
 	}
 
 	public String getSelectSql() {
-		return SqlUtils.getSelectSql(this.tableName, mapPropertyColumn);
+		return SqlUtils.getSelectSql(tableName, mapPropertyColumn);
 	}
 
 	/*
@@ -480,7 +480,7 @@ public class TTableProps {
 	public static Map<String, Object> clazzToMap(Object object,
 			Map<String, ColumnPro> mapProperty, boolean force) throws SQLException {
 		Map<String, Object> map = new SimpleHashMap<Object>();
-		PropertyDescriptor[] propDescripts=null;
+		PropertyDescriptor[] propDescripts = null;
 		try {
 			propDescripts = Introspector.getBeanInfo(object.getClass()).getPropertyDescriptors();
 		} catch (IntrospectionException e) {
