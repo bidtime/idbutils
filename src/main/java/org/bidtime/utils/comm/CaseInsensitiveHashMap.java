@@ -54,21 +54,21 @@ public class CaseInsensitiveHashMap<V> extends HashMap<String, V> {
 		 * key are not necessaliry equals. (That's why we call
 		 * super.remove(oldKey) and not just super.put(key, value))
 		 */
-		//Object oldKey = lowerCaseMap.put(key.toLowerCase(Locale.ENGLISH), key);
-		//Object oldValue = super.remove(oldKey);
+		Object oldKey = lowerCaseMap.put(key.toLowerCase(Locale.ENGLISH), key);
+		super.remove(oldKey);		//Object oldValue = 
 		return super.put(key, value);
 	}
 
 	/** {@inheritDoc} */
-	@Override
-	public void putAll(Map<? extends String, ? extends V> m) {
-		for (Map.Entry<? extends String, ? extends V> entry : m.entrySet()) {
-			//String key = entry.getKey();
-			//Object value = entry.getValue();
-			this.put(entry.getKey(), entry.getValue());
-		}
-		super.putAll(m);
-	}
+//	@Override
+//	public void putAll(Map<? extends String, ? extends V> m) {
+//		for (Map.Entry<? extends String, ? extends V> entry : m.entrySet()) {
+//			//String key = entry.getKey();
+//			//Object value = entry.getValue();
+//			this.put(entry.getKey(), entry.getValue());
+//		}
+//		super.putAll(m);
+//	}
 
 	/** {@inheritDoc} */
 	@Override

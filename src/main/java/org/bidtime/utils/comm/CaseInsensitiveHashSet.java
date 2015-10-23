@@ -45,14 +45,6 @@ public class CaseInsensitiveHashSet extends HashSet<String> {
 	}
 
 	/** {@inheritDoc} */
-//	@Override
-//	public Object get(Object key) {
-//		Object realKey = lowerCaseMap.get(key.toString().toLowerCase(
-//				Locale.ENGLISH));
-//		return super.get(realKey);
-//	}
-
-	/** {@inheritDoc} */
 	@Override
 	public boolean add(String key) {
 		/*
@@ -65,16 +57,6 @@ public class CaseInsensitiveHashSet extends HashSet<String> {
 		super.remove(oldKey);
 		return super.add(key);
 	}
-
-	/** {@inheritDoc} */
-//	@Override
-//	public void putAll(Map<? extends String, ?> m) {
-//		for (Map.Entry<? extends String, ?> entry : m.entrySet()) {
-//			String key = entry.getKey();
-//			Object value = entry.getValue();
-//			this.put(key, value);
-//		}
-//	}
 
 	/** {@inheritDoc} */
 	@Override

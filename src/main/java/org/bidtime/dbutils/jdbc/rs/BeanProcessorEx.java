@@ -74,7 +74,7 @@ public class BeanProcessorEx {
      */
     private final Map<String, String> columnToPropertyOverrides;
 
-    private final Set<String> mapColumnNames;
+    private final Set<String> setColumnNames;
 
     static {
         primitiveDefaults.put(Integer.TYPE, Integer.valueOf(0));
@@ -102,13 +102,13 @@ public class BeanProcessorEx {
      */
     public BeanProcessorEx(Map<String, String> columnToPropertyOverrides) {
         super();
-        this.mapColumnNames = null;
+        this.setColumnNames = null;
         this.columnToPropertyOverrides = columnToPropertyOverrides;
     }
 
 	public BeanProcessorEx(Map<String, String> columnToPropertyOverrides, Set<String> columnNames) {
         super();
-        this.mapColumnNames = columnNames;
+        this.setColumnNames = columnNames;
         this.columnToPropertyOverrides = columnToPropertyOverrides;
     }
 
@@ -146,11 +146,11 @@ public class BeanProcessorEx {
      * @return the newly created bean
      */
     public <T> T toBean(ResultSet rs, Class<T> type) throws SQLException {
-        return toBean(rs, type, columnToPropertyOverrides, this.mapColumnNames);
+        return toBean(rs, type, columnToPropertyOverrides, this.setColumnNames);
     }
 
     public <T> T toBean(ResultSet rs, Class<T> type, Map<String, String> mapBeanProps) throws SQLException {
-        return toBean(rs, type, mapBeanProps, this.mapColumnNames);
+        return toBean(rs, type, mapBeanProps, this.setColumnNames);
     }
 
 	public <T> T toBean(ResultSet rs, Class<T> type, Map<String, String> mapBeanProps, Set<String> mapCloumns) throws SQLException {
@@ -198,7 +198,7 @@ public class BeanProcessorEx {
     }
 
     public <T> List<T> toBeanList(ResultSet rs, Class<T> type, Map<String,String> mapBeanProps) throws SQLException {
-        return toBeanList(rs, type, mapBeanProps, this.mapColumnNames);
+        return toBeanList(rs, type, mapBeanProps, this.setColumnNames);
     }
 
 	public <T> List<T> toBeanList(ResultSet rs, Class<T> type, Map<String,String> mapBeanProps, Set<String> mapCloumns) throws SQLException {
@@ -418,22 +418,22 @@ public class BeanProcessorEx {
     protected int[] mapColumnsToProperties(ResultSetMetaData rsmd,
             PropertyDescriptor[] props) throws SQLException {
        return mapColumnsToProperties(rsmd, props, 
-    		   this.columnToPropertyOverrides, this.mapColumnNames);
+    		   this.columnToPropertyOverrides, this.setColumnNames);
     }
 
 	protected int[] mapColumnsToProperties(ResultSetMetaData rsmd,
             PropertyDescriptor[] props, Map<String,String> mapColumnPro) throws SQLException {
-    	return mapColumnsToProperties(rsmd, props, mapColumnPro, this.mapColumnNames);
+    	return mapColumnsToProperties(rsmd, props, mapColumnPro, this.setColumnNames);
     }
     
-    @SuppressWarnings({ "rawtypes", "unchecked" })
 	protected int[] mapColumnsToProperties(ResultSetMetaData rsmd,
-            PropertyDescriptor[] props, Map<String,String> mapBeanReflactColumn, Set<String> mapColumnNames) throws SQLException {
+            PropertyDescriptor[] props, Map<String,String> mapBeanReflactColumn,
+            Set<String> setColumnNames) throws SQLException {
         int cols = rsmd.getColumnCount();
         int[] columnToProperty = new int[cols + 1];
         Arrays.fill(columnToProperty, PROPERTY_NOT_FOUND);
         
-        Map mapBeanPropsIdx = new CaseInsensitiveHashMap();
+        Map<String, Integer> mapBeanPropsIdx = new CaseInsensitiveHashMap<Integer>();
         try {
 	        for (int i = 0; i < props.length; i++) {
 	        	mapBeanPropsIdx.put(props[i].getName(), i);
@@ -445,8 +445,8 @@ public class BeanProcessorEx {
 	              columnName = rsmd.getColumnName(col);
 	            }
 	            // mapCloPros put
-	            if (mapColumnNames != null) {
-	            	mapColumnNames.add(columnName);
+	            if (setColumnNames != null) {
+	            	setColumnNames.add(columnName);
 	            }
 	            // try get pro from map
 	            String propertyName = null;
@@ -458,7 +458,7 @@ public class BeanProcessorEx {
 	            } else {
 	                propertyName = columnName;            	
 	            }
-	            Integer nColumnIdx = (Integer)mapBeanPropsIdx.get(propertyName);
+	            Integer nColumnIdx = mapBeanPropsIdx.get(propertyName);
 	            if (nColumnIdx != null) {
 	            	columnToProperty[col] = nColumnIdx;
 	            }
@@ -533,7 +533,7 @@ public class BeanProcessorEx {
     }
     
 	public Map<String, Object> toMap(ResultSet rs, Map<String, String> mapBeanReflactColumn) throws SQLException {
-        Map<String, Object> result = new CaseInsensitiveHashMap();
+        Map<String, Object> result = new CaseInsensitiveHashMap<Object>();
         ResultSetMetaData rsmd = rs.getMetaData();
         int cols = rsmd.getColumnCount();
         for (int i = 1; i <= cols; i++) {

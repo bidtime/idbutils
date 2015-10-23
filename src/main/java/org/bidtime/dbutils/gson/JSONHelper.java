@@ -546,9 +546,9 @@ public class JSONHelper {
 		return listMapToJsonArray(listResult, mapColPros);
 	}
 	
-//	private static JSONObject clazzToJson(Object object) {
-//		return clazzToJson(object, null);
-//	}
+	public static JSONObject clazzToJson(Object object) {
+		return clazzToJson(object, null);
+	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static JSONObject clazzToJson(Object object, Map<String, Set<String>> mapHead) {
