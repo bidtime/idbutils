@@ -1,8 +1,6 @@
 package org.bidtime.utils.comm;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 
@@ -12,24 +10,11 @@ import java.util.Map;
  *         提供对从ResultSet中取出数据,封装成ListMap的功能
  * 
  */
-public class CaseInsensitiveHashSet extends HashSet<String> {
+public class CaseInsensitiveLinkedHashMap<V> extends LinkedHashMap<String, V> {
 
-	private final Map<String, String> lowerCaseMap = new HashMap<String, String>();
+	private final Map<String, String> lowerCaseMap = new LinkedHashMap<String, String>();
 	
-	public CaseInsensitiveHashSet() {
-	}
-	
-//	public CaseInsensitiveHashSet(String[] heads) {
-//		for (int i=0; i<heads.length; i++) {
-//			String sIdx = heads[i];
-//			this.add(sIdx);
-//		}
-//	}
-
-	public CaseInsensitiveHashSet(Collection<? extends String> c) {
-		for (String s : c) {
-			this.add(s);
-		}
+	public CaseInsensitiveLinkedHashMap() {
 	}
 
 	/**
@@ -41,10 +26,10 @@ public class CaseInsensitiveHashSet extends HashSet<String> {
 
 	/** {@inheritDoc} */
 	@Override
-	public boolean contains(Object key) {
+	public boolean containsKey(Object key) {
 		Object realKey = lowerCaseMap.get(key.toString().toLowerCase(
 				Locale.ENGLISH));
-		return super.contains(realKey);
+		return super.containsKey(realKey);
 		// Possible optimisation here:
 		// Since the lowerCaseMap contains a mapping for all the keys,
 		// we could just do this:
@@ -53,7 +38,15 @@ public class CaseInsensitiveHashSet extends HashSet<String> {
 
 	/** {@inheritDoc} */
 	@Override
-	public boolean add(String key) {
+	public V get(Object key) {
+		Object realKey = lowerCaseMap.get(key.toString().toLowerCase(
+				Locale.ENGLISH));
+		return super.get(realKey);
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public V put(String key, V value) {
 		/*
 		 * In order to keep the map and lowerCaseMap synchronized, we have to
 		 * remove the old mapping before putting the new one. Indeed, oldKey and
@@ -61,13 +54,24 @@ public class CaseInsensitiveHashSet extends HashSet<String> {
 		 * super.remove(oldKey) and not just super.put(key, value))
 		 */
 		Object oldKey = lowerCaseMap.put(key.toLowerCase(Locale.ENGLISH), key);
-		super.remove(oldKey);
-		return super.add(key);
+		super.remove(oldKey);		//Object oldValue = 
+		return super.put(key, value);
 	}
 
 	/** {@inheritDoc} */
+//	@Override
+//	public void putAll(Map<? extends String, ? extends V> m) {
+//		for (Map.Entry<? extends String, ? extends V> entry : m.entrySet()) {
+//			//String key = entry.getKey();
+//			//Object value = entry.getValue();
+//			this.put(entry.getKey(), entry.getValue());
+//		}
+//		super.putAll(m);
+//	}
+
+	/** {@inheritDoc} */
 	@Override
-	public boolean remove(Object key) {
+	public V remove(Object key) {
 		Object realKey = lowerCaseMap.remove(key.toString().toLowerCase(
 				Locale.ENGLISH));
 		return super.remove(realKey);

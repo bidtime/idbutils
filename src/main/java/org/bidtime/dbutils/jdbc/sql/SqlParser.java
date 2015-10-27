@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -13,8 +14,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
-import org.bidtime.utils.comm.SimpleHashMap;
-import org.bidtime.utils.comm.SimpleHashSet;
+import org.bidtime.utils.comm.CaseInsensitiveHashSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,8 +84,8 @@ public class SqlParser {
 //	}
 
 	public static Map<String, Object> getMapOfFieldPK(String nameSql,
-			Set<String> fieldPk) throws SQLException {
-		Map<String, Object> map = new SimpleHashMap<Object>();
+			CaseInsensitiveHashSet fieldPk) throws SQLException {
+		Map<String, Object> map = new HashMap<String, Object>();
 		StringBuilder result = new StringBuilder(nameSql.length());
 		for (Matcher matcher = PRIMARY_KEY_PATT.matcher(nameSql); matcher.find();
 				matcher = PRIMARY_KEY_PATT.matcher(nameSql)) {
@@ -93,7 +93,7 @@ public class SqlParser {
 			String group = matcher.group();
 			String name = getPatternName(group, PARAM_PATT);
 			String[] arGroup = group.split("=");
-			if (fieldPk.contains(arGroup[0])) {
+			if (fieldPk.contains(arGroup[0].trim())) {
 				map.put(name, null);
 			}
 			nameSql = nameSql.substring(matcher.end());

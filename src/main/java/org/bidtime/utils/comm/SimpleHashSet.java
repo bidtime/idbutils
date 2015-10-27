@@ -15,9 +15,16 @@ public class SimpleHashSet extends HashSet<String> {
 	public SimpleHashSet() {
 	}
 	
+//	public SimpleHashSet(Collection<? extends String> c) {
+//		super(c);
+//	}
+	
 	public SimpleHashSet(Collection<? extends String> c) {
-		super(c);
+		for (String s : c) {
+			this.add(s);
+		}
 	}
+
 
 	/**
 	 * Required for serialization support.

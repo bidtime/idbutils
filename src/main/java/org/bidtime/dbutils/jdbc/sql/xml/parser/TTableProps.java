@@ -19,6 +19,7 @@ import org.bidtime.dbutils.gson.dataset.GsonRow;
 import org.bidtime.dbutils.gson.dataset.GsonRows;
 import org.bidtime.dbutils.jdbc.sql.ArrayUtils;
 import org.bidtime.dbutils.jdbc.sql.SqlUtils;
+import org.bidtime.utils.comm.CaseInsensitiveHashSet;
 import org.bidtime.utils.comm.SimpleHashMap;
 import org.bidtime.utils.comm.SimpleHashSet;
 import org.slf4j.Logger;
@@ -31,13 +32,13 @@ public class TTableProps {
 
 	private String className;
 	private String tableName;
-	private Set<String> setPk;
+	private CaseInsensitiveHashSet setPk;
 	
-	public void setSetPk(Set<String> setPk) {
+	public void setSetPk(CaseInsensitiveHashSet setPk) {
 		this.setPk = setPk;
 	}
 	
-	public Set<String> getSetPk() {
+	public CaseInsensitiveHashSet getSetPk() {
 		return this.setPk;
 	}
 
@@ -148,7 +149,7 @@ public class TTableProps {
 
 	public void setFieldPK(String[] fieldPK) {
 		List<String> list = Arrays.asList(fieldPK);
-		this.setPk = new SimpleHashSet(list);
+		this.setPk = new CaseInsensitiveHashSet(list);
 	}
 	
 	public String getInsertSql(GsonRow g, boolean setDefault) {
