@@ -3,6 +3,8 @@ package org.bidtime.dbutils.gson;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
@@ -28,8 +30,19 @@ public class ResultDTO<T> implements Serializable {
 		this.type = type;
 	}
 
-	public Map<String, Set<String>> getColMapProps() {
-		return colMapProps;
+//	public Map<String, Set<String>> getColMapProps() {
+//		return colMapProps;
+//	}
+	
+	public Map<String, ?> dataToMap() {
+		return JSONHelper.clazzToMap(data, colMapProps);
+	}
+
+	private Set<String> getColMapPropsSet() {
+		if (colMapProps == null || type == null) {
+			return null;
+		}
+		return colMapProps.get(type.getName());
 	}
 
 	public void setColMapProps(Map<String, Set<String>> setPro) {
@@ -39,30 +52,44 @@ public class ResultDTO<T> implements Serializable {
 //	public Set<String> getColSetProps() {
 //		return (colMapProps != null && type != null) ? colMapProps.get(type.getName()) : null;
 //	}
+	
+	public void delColSetProps(String col) {
+		Set<String> setColPro = getColMapPropsSet();
+		if (setColPro != null && !setColPro.isEmpty()) {
+			if (setColPro.remove(col)) {
+				colMapProps.put(type.getName(), setColPro);
+			}
+		}
+	}
+	
+	public void delColSetProps(Set<String> colSetProps) {
+		Set<String> setColPro = getColMapPropsSet();
+		if (setColPro != null && !setColPro.isEmpty()) {
+			if (setColPro.removeAll(colSetProps)) {
+				colMapProps.put(type.getName(), setColPro);
+			}
+		}
+	}
 
-//	public void setColSetProps(Set<String> setPro) throws Exception {
-//		if (data == null) {
-//			throw new Exception("data is not null.");
-//		}
-//		if (colMapProps != null) {
-//			colMapProps.put(data.getClass().getName(), setPro);
-//		} else {
-//			colMapProps = new HashMap<String ,Set<String>>();
-//			colMapProps.put(data.getClass().getName(), setPro);
-//		}
-//	}
+	public void delColSetProps(String[] arStrs) {
+		if (colMapProps == null || type == null) {
+			return;
+		}
+		Set<String> set = new HashSet<String>(Arrays.asList(arStrs));
+		delColSetProps(set);
+	}
 	
 	public void addColSetProps(String col) {
 		if (colMapProps == null || type == null) {
 			return;
 		}
-		
 		Set<String> setColPro = colMapProps.get(type.getName());
 		if (setColPro == null) {
 			setColPro = new CaseInsensitiveHashSet();
 		}
-		setColPro.add(col);
-		colMapProps.put(type.getName(), setColPro);
+		if (setColPro.add(col)) {
+			colMapProps.put(type.getName(), setColPro);
+		}
 	}
 	
 	public void addColSetProps(Set<String> colSetProps) {
@@ -75,6 +102,14 @@ public class ResultDTO<T> implements Serializable {
 		}
 		setColPro.addAll(colSetProps);
 		colMapProps.put(type.getName(), setColPro);
+	}
+
+	public void addColSetProps(String[] arStrs) {
+		if (colMapProps == null || type == null) {
+			return;
+		}
+		Set<String> set = new HashSet<String>(Arrays.asList(arStrs));
+		addColSetProps(set);
 	}
 
 	/**
