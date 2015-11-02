@@ -2,11 +2,11 @@ package org.bidtime.dbutils.jdbc.rs.handle.ext;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 import org.bidtime.dbutils.gson.ResultDTO;
+import org.bidtime.utils.comm.CaseInsensitiveHashMap;
 import org.bidtime.utils.comm.CaseInsensitiveHashSet;
 
 /**
@@ -18,7 +18,7 @@ import org.bidtime.utils.comm.CaseInsensitiveHashSet;
 public class ResultSetDTOHandler<T> extends ResultSetExHandler<ResultDTO<T>> {
 	
 	protected Map<String, String> mapBeanPropColumns = null;
-	protected Set<String> setColumns = null;
+	protected CaseInsensitiveHashSet setColumns = null;
 
 	@Override
 	public ResultDTO<T> handle(ResultSet rs) throws SQLException {
@@ -28,13 +28,13 @@ public class ResultSetDTOHandler<T> extends ResultSetExHandler<ResultDTO<T>> {
    			t.setData(doDTO(rs));
    			if (type != null) {
    	   			t.setType(type);   			
-   				Map<String, Set<String>> mapColPro = new HashMap<String, Set<String>>();
+   				Map<String, Set<String>> mapColPro = new CaseInsensitiveHashMap<Set<String>>();
    				mapColPro.put(type.getName(), setColumns);
    				t.setColMapProps(mapColPro);
    			}
    		} else {
    			t.setData(doDTO(rs));
-   			t.setType(type);   			
+   			t.setType(type);
    		}
     	return t;
 	}

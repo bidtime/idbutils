@@ -14,7 +14,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
-import org.bidtime.utils.comm.CaseInsensitiveHashSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,6 +63,32 @@ public class SqlParser {
 	}
 
 //	public static void main(String[] args) {
+//		//doit1();
+//		doit2();
+//	}
+//	
+//	public static void doit1() {
+//		StringBuilder sb = new StringBuilder();
+//		sb.append("select "); 
+//		sb.append("id, ");
+//		sb.append("code, ");
+//		sb.append("name  ");
+//		sb.append("from t_duty ");
+//		sb.append("{order by createTime=#timeOrder#, ");
+//		sb.append("\n");
+//		sb.append("SalePrice=#priceOrder#, ");
+//		sb.append("\n");
+//		sb.append("drivingMile=#mailOrder#} ");
+//		
+//		String sql = sb.toString();
+//		sql = sql.replace('\r', ' ').replace('\n', ' ').replaceAll(" {2,}", " ");
+//		
+//		Map<String, Object> map = new HashMap<String, Object>();
+//		String sqlF = SqlParser.replaceOrderBy(sql, map);
+//		System.out.println(sqlF);
+//	}
+//	
+//	public static void doit2() {
 //		String sql = "select " + 
 //	  			"id, " +
 //	  			"code, " +
@@ -73,8 +98,9 @@ public class SqlParser {
 //	  		"<<and code=#code#>> " +
 //	  		"<<and name like #name#>> "
 //			;
+//		sql = sql.replace('\r', ' ').replace('\n', ' ').replaceAll(" {2,}", " ");
 //		Set<String> set = new SimpleHashSet();
-//		set.add("id");
+//		set.add("ID");
 //		try {
 //			Map<String, Object> map = getMapOfFieldPK(sql, set);
 //			System.out.println(map);
@@ -84,7 +110,7 @@ public class SqlParser {
 //	}
 
 	public static Map<String, Object> getMapOfFieldPK(String nameSql,
-			CaseInsensitiveHashSet fieldPk) throws SQLException {
+			Set<String> fieldPk) throws SQLException {
 		Map<String, Object> map = new HashMap<String, Object>();
 		StringBuilder result = new StringBuilder(nameSql.length());
 		for (Matcher matcher = PRIMARY_KEY_PATT.matcher(nameSql); matcher.find();
@@ -116,18 +142,18 @@ public class SqlParser {
 //			logger.debug("\nconfig sql :" + configSql);
 //			logger.debug("\nparams map :\n" + inputParams);
 //		}
+		
+		if (compareKey && !containsAllParams(configSql, inputParams)) {
+			SQLException e = new SQLException("sql params is not match.");
+			logger.error("parse", e);
+			throw e;
+		}
 
 		// 替换 order by
 		String repl = SqlParser.replaceOrderBy(configSql, inputParams);
 		
 		// 替换SQL语句
 		String replaceSql = replace(repl, inputParams);
-		
-		if (compareKey && !containsAllParams(replaceSql, inputParams)) {
-			SQLException e = new SQLException("sql params is not match.");
-			logger.error("parse", e);
-			throw e;
-		}
 
 		// 根据参数 处理 动态SQL语句,得到带#name#的SQL
 		String nameSql = handleDynamic(replaceSql, inputParams);

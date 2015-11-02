@@ -35,6 +35,10 @@ public class JSONHelper {
 		return df.format(date);
 	}
 	
+	private static Date yyyyMMddToDate(String sDate) {
+		return StringToDate(sDate, "yyyy-MM-dd");
+	}
+	
 	private static Date yyyyMMddHHmmssToDate(String sDate) {
 		return StringToDate(sDate, "yyyy-MM-dd HH:mm:ss");
 	}
@@ -315,7 +319,11 @@ public class JSONHelper {
 				if (o instanceof Date) {
 					return o;
 				} else if (o instanceof String) {
-					return yyyyMMddHHmmssToDate(o.toString());
+					if ( ((String)o).length()<=10) {	//用此简单方法判断，年月日的转换
+						return yyyyMMddToDate(o.toString());
+					} else {
+						return yyyyMMddHHmmssToDate(o.toString());
+					}
 				} else {
 					return o;
 				}
