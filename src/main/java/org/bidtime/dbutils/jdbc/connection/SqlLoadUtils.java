@@ -14,6 +14,7 @@ import org.apache.commons.dbutils.handlers.ScalarHandler;
 import org.apache.commons.lang.StringUtils;
 import org.bidtime.dbutils.gson.dataset.GsonRow;
 import org.bidtime.dbutils.gson.dataset.GsonRows;
+import org.bidtime.dbutils.jdbc.dao.PKCallback;
 import org.bidtime.dbutils.jdbc.rs.handle.ext.ResultSetDTOHandler;
 import org.bidtime.dbutils.jdbc.sql.ArrayUtils;
 import org.bidtime.dbutils.jdbc.sql.SqlParser;
@@ -333,6 +334,18 @@ public class SqlLoadUtils {
 		} finally {
 			g = null;
 		}
+	}	
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public static <T> T insertForPK(DataSource ds, Class clazz,
+			Object o, PKCallback cb) throws SQLException {
+		T t = insertForPK(ds, clazz, o);
+		if (t != null) {
+			Object u = cb.getIt(t);
+			int n = SqlLoadUtils.update(ds, clazz, u);
+			cb.setResult(n);
+		}
+		return t;
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -398,7 +411,7 @@ public class SqlLoadUtils {
 		}
 		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
 		List<String> listPkJson = new ArrayList<String>();
-		String sql = tp.getUpdateSqlPk(tp.getTableName(), g.getHead(), listPkJson);
+		String sql = tp.getUpdateSqlOfHead(tp.getTableName(), g.getHead(), listPkJson);
 		if (!listPkJson.isEmpty()) {
 			g.moveToEnd(ArrayUtils.listToStringArray(listPkJson));
 		}
@@ -432,7 +445,7 @@ public class SqlLoadUtils {
 			} else {
 				g = tp.clazzToRow(o);
 			}
-			String sql = tp.getUpdateSqlPk(tp.getTableName(), g.getHead(), listPkJson);
+			String sql = tp.getUpdateSqlOfHead(tp.getTableName(), g.getHead(), listPkJson);
 			if (!listPkJson.isEmpty()) {
 				g.moveToEnd(ArrayUtils.listToStringArray(listPkJson));
 			}
@@ -477,7 +490,7 @@ public class SqlLoadUtils {
 				g = tp.clazzToRows(list);
 			}
 			List<String> listPkJson = new ArrayList<String>();
-			String sql = tp.getUpdateSqlPk(tp.getTableName(), g.getHead(), listPkJson);
+			String sql = tp.getUpdateSqlOfHead(tp.getTableName(), g.getHead(), listPkJson);
 			if (!listPkJson.isEmpty()) {
 				g.moveToEnd(ArrayUtils.listToStringArray(listPkJson));
 			}
@@ -513,7 +526,7 @@ public class SqlLoadUtils {
 		}
 		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
 		List<String> listPkJson = new ArrayList<String>();
-		String sql = tp.getUpdateSqlPk(tp.getTableName(), g.getHead(), listPkJson);
+		String sql = tp.getUpdateSqlOfHead(tp.getTableName(), g.getHead(), listPkJson);
 		if (!listPkJson.isEmpty()) {
 			g.moveToEnd(ArrayUtils.listToStringArray(listPkJson));
 		}
@@ -621,7 +634,7 @@ public class SqlLoadUtils {
 			String countSql = null;
 			if (StringUtils.isNotEmpty(h.getCountSql()) ) {
 				countSql = SqlParser
-					.parse(h.getCountSql(), params, null);
+					.parseCount(h.getCountSql(), params);
 			} else {
 				countSql = SqlUtils.getCountSql(h.getSql());
 			}

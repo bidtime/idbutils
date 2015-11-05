@@ -120,6 +120,12 @@ public class BasicDAO {
 				this.getClass(), object);
 	}
 
+	@SuppressWarnings("rawtypes")
+	public <T> T insertForPK(Object o, PKCallback cb) throws SQLException {
+		return SqlLoadUtils.insertForPK(getCurrentDataSource(),
+				this.getClass(), o, cb);
+	}
+
 	public int insertForPK(GsonRows r, String pk) throws SQLException {
 		return SqlLoadUtils.insertForPK(getCurrentDataSource(),
 				this.getClass(), r, pk);

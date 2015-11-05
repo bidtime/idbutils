@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Date;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,7 +43,11 @@ public class ObjectComm {
 			} else if (o instanceof Byte) {
 				return ((Byte) o).doubleValue();
 			} else if (o instanceof String) {
-				return Double.valueOf((String)o);
+				if (StringUtils.isNotEmpty((String)o)) {
+					return Double.parseDouble((String)o);
+				} else {
+					return null;
+				}
 			} else if (o instanceof BigInteger) {
 				return ((BigInteger) o).doubleValue();
 			} else {
@@ -70,7 +75,11 @@ public class ObjectComm {
 			} else if (o instanceof Byte) {
 				return ((Byte) o).floatValue();
 			} else if (o instanceof String) {
-				return Float.valueOf((String)o);
+				if (StringUtils.isNotEmpty((String)o)) {
+					return Float.parseFloat((String)o);
+				} else {
+					return null;
+				}
 			} else if (o instanceof BigInteger) {
 				return ((BigInteger) o).floatValue();
 			} else {
@@ -98,7 +107,11 @@ public class ObjectComm {
 			} else if (o instanceof Byte) {
 				return ((Byte) o).shortValue();
 			} else if (o instanceof String) {
-				return Short.valueOf((String)o);
+				if (StringUtils.isNotEmpty((String)o)) {
+					return Short.parseShort((String)o);
+				} else {
+					return null;
+				}
 			} else if (o instanceof BigInteger) {
 				return ((BigInteger) o).shortValue();
 			} else {
@@ -126,7 +139,11 @@ public class ObjectComm {
 			} else if (o instanceof Long) {
 				return ((Long) o).byteValue();
 			} else if (o instanceof String) {
-				return Byte.valueOf((String)o);
+				if (StringUtils.isNotEmpty((String)o)) {
+					return Byte.parseByte((String)o);
+				} else {
+					return null;
+				}
 			} else if (o instanceof BigInteger) {
 				return ((BigInteger) o).byteValue();
 			} else {
@@ -164,7 +181,11 @@ public class ObjectComm {
 			} else if (o instanceof Byte) {
 				return ((Byte) o).longValue();
 			} else if (o instanceof String) {
-				return Long.valueOf((String)o);
+				if (StringUtils.isNotEmpty((String)o)) {
+					return Long.parseLong((String)o);
+				} else {
+					return null;
+				}
 			} else if (o instanceof BigDecimal) {
 				return ((BigDecimal) o).longValue();
 			} else if (o instanceof BigInteger) {
@@ -206,7 +227,11 @@ public class ObjectComm {
 			} else if (o instanceof Byte) {
 				return ((Byte) o).intValue();
 			} else if (o instanceof String) {
-				return Integer.valueOf((String)o);
+				if (StringUtils.isNotEmpty((String)o)) {
+					return Integer.parseInt((String)o);
+				} else {
+					return null;
+				}
 			} else if (o instanceof BigInteger) {
 				return ((BigInteger) o).intValue();
 			} else {
@@ -246,7 +271,11 @@ public class ObjectComm {
 			} else if (o instanceof Byte) {
 				return BigInteger.valueOf(((Byte) o).byteValue());
 			} else if (o instanceof String) {
-				return new BigInteger((String)o);
+				if (StringUtils.isNotEmpty((String)o)) {
+					return new BigInteger((String)o);
+				} else {
+					return null;
+				}
 			} else if (o instanceof BigInteger) {
 				return (BigInteger) o;
 			} else {
@@ -286,7 +315,11 @@ public class ObjectComm {
 			} else if (o instanceof Byte) {
 				return BigDecimal.valueOf(((Byte) o).byteValue());
 			} else if (o instanceof String) {
-				return new BigDecimal((String)o);
+				if (StringUtils.isNotEmpty((String)o)) {
+					return new BigDecimal((String)o);
+				} else {
+					return null;
+				}
 			} else if (o instanceof BigInteger) {
 				return new BigDecimal((BigInteger) o);
 			} else {
@@ -326,7 +359,16 @@ public class ObjectComm {
 			} else if (o instanceof BigDecimal) {
 				return ((BigDecimal) o).byteValue() == byte_one ? true : false;
 			} else if (o instanceof String) {
-				return ( (String) o).equals("1") ? true : false;
+				String s = (String)o;
+				if (StringUtils.isNotEmpty(s)) {
+					if (StringUtils.equals(s, "1") || StringUtils.equals(s, "0")) {
+						return s.equals("1") ? true : false;
+					} else {
+						return Boolean.parseBoolean(s);
+					}
+				} else {
+					return null;
+				}
 			} else if (o instanceof BigInteger) {
 				return ((BigInteger) o).byteValue() == byte_one ? true : false;
 			} else {
@@ -361,7 +403,6 @@ public class ObjectComm {
 			return (String) obj;
 		} else {
 			return objectToString(objDefault);
-			//return objDefault == null ? null : objectToBoolean(objDefault);
 		}
 	}
 	

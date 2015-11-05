@@ -57,9 +57,13 @@ public class SqlParser {
 	//private static final Pattern REPL_PATT = Pattern.compile("\\[[\\s|\\w]*\\]");
 	private static final Pattern REPL_PATT = Pattern.compile("\\{.*?\\}");
 	
-	public static String parse(String configSql, Map<String, ?> inputParams
+	public static String parse(String configSql, Map<String, ?> inParams
 			, List<Object> opParamList) throws SQLException {
-		return parse(configSql, inputParams, opParamList, true);
+		return parse(configSql, inParams, opParamList, true, true);
+	}
+
+	public static String parseCount(String configSql, Map<String, ?> inParams) throws SQLException {
+		return parse(configSql, inParams, null, false, false);
 	}
 
 //	public static void main(String[] args) {
@@ -109,8 +113,11 @@ public class SqlParser {
 //		}
 //	}
 
-	public static Map<String, Object> getMapOfFieldPK(String nameSql,
+	public static Map<String, Object> getMapOfFieldPK(String cfgSql,
 			Set<String> fieldPk) throws SQLException {
+		//String cfgSql2 = cfgSql.replace('\r', ' ').replace('\n', ' ')
+		//		.replaceAll(" {2,}", " ");
+		String nameSql = SqlParser.replaceOrderBy(cfgSql, null);	//remove orderby
 		Map<String, Object> map = new HashMap<String, Object>();
 		StringBuilder result = new StringBuilder(nameSql.length());
 		for (Matcher matcher = PRIMARY_KEY_PATT.matcher(nameSql); matcher.find();
@@ -134,8 +141,8 @@ public class SqlParser {
 	 * @param inputParams
 	 * @return
 	 */
-	public static String parse(String configSql, Map<String, ?> inputParams
-			, List<Object> opParamList, boolean compareKey) throws SQLException {
+	private static String parse(String cfgSql, Map<String, ?> inParams
+			, List<Object> outParamList, boolean compareKey, boolean orderBy) throws SQLException {
 		// 配置在XML中的SQL语句
 //		boolean debug = logger.isDebugEnabled();
 //		if (debug) {
@@ -143,25 +150,28 @@ public class SqlParser {
 //			logger.debug("\nparams map :\n" + inputParams);
 //		}
 		
-		if (compareKey && !containsAllParams(configSql, inputParams)) {
+		//去除回车换行，空格
+		//String cfgSql2 = cfgSql.replace('\r', ' ').replace('\n', ' ')
+		//		.replaceAll(" {2,}", " ");
+		if (compareKey && !containsAllParams(cfgSql, inParams)) {
 			SQLException e = new SQLException("sql params is not match.");
 			logger.error("parse", e);
 			throw e;
 		}
 
 		// 替换 order by
-		String repl = SqlParser.replaceOrderBy(configSql, inputParams);
+		String replOrderBy = SqlParser.replaceOrderBy(cfgSql, orderBy ? inParams : null);
 		
 		// 替换SQL语句
-		String replaceSql = replace(repl, inputParams);
+		String replaceSql = replace(replOrderBy, inParams);
 
 		// 根据参数 处理 动态SQL语句,得到带#name#的SQL
-		String nameSql = handleDynamic(replaceSql, inputParams);
+		String nameSql = handleDynamic(replaceSql, inParams);
 
 		List<Object> opList = new ArrayList<Object>();
 
 		// 处理#name# 参数,得到最终可执行的SQL
-		String finalSql = getFinalSql(nameSql, inputParams, opList);
+		String finalSql = getFinalSql(nameSql, inParams, opList);
 //		if (debug) {
 //			logger.debug("\nfinal sql :" + finalSql);
 //			logger.debug("\nparam List:\n" + outputParamList);
@@ -171,8 +181,8 @@ public class SqlParser {
 		//holder.setSql(finalSql);
 		//holder.setParamList(opList);
 		//return holder;
-		if (opParamList != null) {
-			opParamList.addAll(opList);
+		if (outParamList != null) {
+			outParamList.addAll(opList);
 		}
 		return finalSql;
 	}
@@ -213,7 +223,7 @@ public class SqlParser {
 	}
 
 	private static String replaceOrderByFinalSql(String nameSql,
-			Map<String, ?> inputParams) {
+			Map<String, ?> inParams) {
 		StringBuilder result = new StringBuilder(nameSql.length());
 		for (Matcher matcher = PARAM_PATT.matcher(nameSql); matcher.find(); matcher = PARAM_PATT
 				.matcher(nameSql)) {
@@ -221,9 +231,11 @@ public class SqlParser {
 			result.append(sPreview);
 			String group = matcher.group();
 			String name = getPatternName(group, PARAM_PATT);
-			Object value = inputParams.get(name);
-			if (value != null) {
-				result.append(value);
+			if (inParams != null && !inParams.isEmpty()) {
+				Object value = inParams.get(name);
+				if (value != null) {
+					result.append(value);
+				}
 			}
 			nameSql = nameSql.substring(matcher.end());
 		}
@@ -323,8 +335,8 @@ public class SqlParser {
 	}
 
 	private static boolean containsAllParams(String nameSql,
-			Map<String, ?> inputParams) throws SQLException {
-		if (inputParams == null || inputParams.isEmpty()) {
+			Map<String, ?> inParams) throws SQLException {
+		if (inParams == null || inParams.isEmpty()) {
 			return true;
 		}
 		Set<String> set = new HashSet<String>();
@@ -337,13 +349,13 @@ public class SqlParser {
 			set.add(name);
 			nameSql = nameSql.substring(matcher.end());
 		}
-		boolean b = set.containsAll(inputParams.keySet());
+		boolean b = set.containsAll(inParams.keySet());
 		if (logger.isDebugEnabled()) {
 			StringBuilder sb = new StringBuilder();
 			sb.append("contains->");
 			sb.append(b);
 			sb.append(" inp:");
-			sb.append(inputParams);
+			sb.append(inParams);
 			sb.append("alp:");
 			sb.append(set);
 			logger.debug(sb.toString());
@@ -445,9 +457,9 @@ public class SqlParser {
 		return true;
 	}
 
-//	private static String getParaName(String input) {
-//		return getParaName(input, PARAM_PATT);
-//		Matcher m = PARAM_PATT.matcher(input);
+//	private static String getParaName(String in) {
+//		return getParaName(in, PARAM_PATT);
+//		Matcher m = PARAM_PATT.matcher(in);
 //		if (m.find()) {
 //			String p = m.group();
 //			return p.substring(1, p.length() - 1).trim();
@@ -456,8 +468,8 @@ public class SqlParser {
 //		}
 //	}
 
-	private static String getPatternName(String input, Pattern pattern) {
-		Matcher m = pattern.matcher(input);
+	private static String getPatternName(String in, Pattern pattern) {
+		Matcher m = pattern.matcher(in);
 		if (m.find()) {
 			String p = m.group();
 			return p.substring(1, p.length() - 1).trim();

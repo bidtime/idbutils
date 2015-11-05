@@ -52,7 +52,6 @@ public class TTableProps {
 		this.nonePkInc = nonePkInc;
 	}
 
-	private boolean encry=false;
 	private boolean existDefault=false;
 	private List<String> listDefault=null;
 
@@ -133,14 +132,6 @@ public class TTableProps {
 	public void setTableName(String tableName) {
 		this.tableName = tableName;
 	}
-
-	public boolean isEncry() {
-		return encry;
-	}
-
-	public void setEncry(boolean encry) {
-		this.encry = encry;
-	}
 	
 	public String[] getFieldPK() {
 		List<String> list = new ArrayList<String>(this.setPk);
@@ -180,34 +171,38 @@ public class TTableProps {
 	}
 
 	public String getUpdateSqlHead(String tblName, String[] jsonAllHead, String[] jsonPkHead) {
-		Set<String> setJsonPkHead = new SimpleHashSet(Arrays.asList(jsonPkHead));
+		Set<String> set = new SimpleHashSet(Arrays.asList(jsonPkHead));
 		try {
-			List<String> listCols = new ArrayList<String>();
-			List<String> listPks = new ArrayList<String>();
-			for (int i = 0; i < jsonAllHead.length; i++) {
-				String sIdx = jsonAllHead[i];
-				ColumnPro p = this.mapPropertyColumn.get(sIdx);
-				if (p != null) {
-					if (setJsonPkHead.contains(sIdx)) {
-						listPks.add(p.getColumn());
-					} else {
-						listCols.add(p.getColumn());
-					}
-				} else {
-					listCols.add(sIdx);						
-				}
-			}
-			return SqlUtils.getUpdateSql(tblName, ArrayUtils.listToStringArray(listCols),
-					ArrayUtils.listToStringArray(listPks));
+			return getUpdateSqlHead(tblName, jsonAllHead, set);
 		} finally {
-			setJsonPkHead.clear();
-			setJsonPkHead = null;
+			set.clear();
+			set = null;
 		}
+	}
+	
+	public String getUpdateSqlHead(String tblName, String[] jsonAllHead,
+			Set<String> setJsonPkHead) {
+		List<String> listCols = new ArrayList<String>();
+		List<String> listPks = new ArrayList<String>();
+		for (int i = 0; i < jsonAllHead.length; i++) {
+			String sIdx = jsonAllHead[i];
+			ColumnPro p = this.mapPropertyColumn.get(sIdx);
+			if (p != null) {
+				if (setJsonPkHead.contains(sIdx)) {
+					listPks.add(p.getColumn());
+				} else {
+					listCols.add(p.getColumn());
+				}
+			} else {
+				listCols.add(sIdx);						
+			}
+		}
+		return SqlUtils.getUpdateSql(tblName, ArrayUtils.listToStringArray(listCols),
+				ArrayUtils.listToStringArray(listPks));
 	}
 
 	public String getSelectSql(String tblName) {
-		String sql = SqlUtils.getSelectSql(tblName, mapPropertyColumn);
-		return sql;
+		return SqlUtils.getSelectSql(tblName, mapPropertyColumn);
 	}
 
 	public String getSelectSql() {
@@ -217,7 +212,7 @@ public class TTableProps {
 	/*
 	 * 通过json名称,获取可以执行的update sql
 	 */	
-	public String getUpdateSqlPk(String tblName, String[] jsonHead, List<String> listPkJson) {
+	public String getUpdateSqlOfHead(String tblName, String[] jsonHead, List<String> outPkJson) {
 		List<String> listColumn=new ArrayList<String>();
 		List<String> listPk=new ArrayList<String>();
 		try {
@@ -227,7 +222,9 @@ public class TTableProps {
 				if (p != null) {
 					if (p.getPk()) {
 						listPk.add(p.getColumn());
-						listPkJson.add(sIdx);
+						if (outPkJson != null) {
+							outPkJson.add(sIdx);
+						}
 					} else {
 						listColumn.add(p.getColumn());
 					}
@@ -243,6 +240,26 @@ public class TTableProps {
 			listPk.clear();
 			listPk = null;
 		}
+	}
+
+	public List<String> getJsonPk() {
+		return new ArrayList<String>(getJsonPkSet());
+	}
+	
+	public String[] getJsonPks() {
+		Set<String> set = getJsonPkSet();
+		String[] array2 = set.toArray(new String[set.size()]);
+		return array2;
+	}
+	
+	public Set<String> getJsonPkSet() {
+		Set<String> set = new CaseInsensitiveHashSet();
+		for (Map.Entry<String, ColumnPro> entry : mapPropertyColumn.entrySet()) {
+			if (entry.getValue().getPk()) {
+				set.add(entry.getKey());
+			}
+		}
+		return set;
 	}
 	
 	/*
@@ -275,7 +292,9 @@ public class TTableProps {
 			ColumnPro p = this.mapPropertyColumn.get(sIdx);
 			if (p != null && p.getPk()) {
 				listPk.add(p.getColumn());
-				listJsonPk.add(sIdx);
+				if (listJsonPk != null) {
+					listJsonPk.add(sIdx);
+				}
 			}
 		}
 		return SqlUtils.getDeleteSql(tblName, ArrayUtils.listToStringArray(listPk));	

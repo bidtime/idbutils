@@ -15,6 +15,7 @@ import java.util.Map.Entry;
 import java.util.Queue;
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
 import org.bidtime.dbutils.gson.dataset.JsonData;
 import org.bidtime.utils.basic.ObjectComm;
 import org.bidtime.utils.comm.CaseInsensitiveHashMap;
@@ -319,7 +320,9 @@ public class JSONHelper {
 				if (o instanceof Date) {
 					return o;
 				} else if (o instanceof String) {
-					if ( ((String)o).length()<=10) {	//用此简单方法判断，年月日的转换
+					if ( StringUtils.isEmpty( (String)o ) ) {
+						return (Object)null;
+					} else if ( ((String)o).length()<=10) {	//用此简单方法判断，年月日的转换
 						return yyyyMMddToDate(o.toString());
 					} else {
 						return yyyyMMddHHmmssToDate(o.toString());

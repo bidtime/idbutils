@@ -330,7 +330,8 @@ public class DbConnection {
 	private static <T> T queryConn(Connection conn, HeadSqlArray ha,
 			Object[] params, Integer nPageIdx, Integer nPageSize,
 				ResultSetHandler<T> rsh) throws SQLException {
-		return queryConn(conn, ha.getSql(), ha.getCountSql(), params, nPageIdx, nPageSize, rsh);
+		return queryConn(conn, ha.getSql(), ha.getCountSql(), params, 
+				nPageIdx, nPageSize, rsh);
 	}
 	
 	/**
