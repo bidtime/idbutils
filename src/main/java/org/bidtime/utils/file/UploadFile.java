@@ -24,7 +24,6 @@ public class UploadFile {
 	private static final Logger logger = LoggerFactory
 			.getLogger(UploadFile.class);
 
-	@SuppressWarnings("unchecked")
 	public static boolean uploadFileToUUID(String rootFile, String urlFile,
 			HttpServletRequest request, Map<String, String> mapFile)
 			throws Exception {
@@ -83,7 +82,7 @@ public class UploadFile {
 			sb.setLength(0);
 			sb = null;
 		}
-		return result>0?true:false;
+		return result > 0 ? true : false;
 	}
 
 }

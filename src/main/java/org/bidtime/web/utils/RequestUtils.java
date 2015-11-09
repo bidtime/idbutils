@@ -198,15 +198,15 @@ public class RequestUtils {
 			Integer nDefault) {
 		String s = request.getParameter(sParam);
 		if (logger.isDebugEnabled()) {
-			logger.debug(sParam + ":" + s);
+			logger.debug(sParam + ":" + sParam + " -> " + s);
 		}
 		if (StringUtils.isEmpty(s)) {
 			return nDefault;
 		} else {
 			try {
-				return Integer.valueOf(s);
+				return Integer.parseInt(s);
 			} catch (Exception e) {
-				logger.warn("getInt:", e);
+				logger.warn("getInt:" + sParam + " -> " + s, e);
 				return nDefault;
 			}
 		}
@@ -226,9 +226,9 @@ public class RequestUtils {
 			return lDefault;
 		} else {
 			try {
-				return Long.valueOf(s);
+				return Long.parseLong(s);
 			} catch (Exception e) {
-				logger.warn("getLong:", e);
+				logger.warn("getLong:" + sParam + " -> " + s, e);
 				return lDefault;
 			}
 		}
@@ -248,9 +248,9 @@ public class RequestUtils {
 			return nDefault;
 		} else {
 			try {
-				return Short.valueOf(s);
+				return Short.parseShort(s);
 			} catch (Exception e) {
-				logger.warn("getShort:", e);
+				logger.warn("getShort:" + sParam + " -> " + s, e);
 				return nDefault;
 			}
 		}
@@ -270,9 +270,9 @@ public class RequestUtils {
 			return nDefault;
 		} else {
 			try {
-				return Byte.valueOf(s);
+				return Byte.parseByte(s);
 			} catch (Exception e) {
-				logger.warn("getByte:", e);
+				logger.warn("getByte:" + sParam + " -> " + s, e);
 				return nDefault;
 			}
 		}
@@ -292,9 +292,9 @@ public class RequestUtils {
 			return dDefault;
 		} else {
 			try {
-				return Double.valueOf(s);
+				return Double.parseDouble(s);
 			} catch (Exception e) {
-				logger.warn("getDouble:", e);
+				logger.warn("getDouble:" + sParam + " -> " + s, e);
 				return dDefault;
 			}
 		}
@@ -314,9 +314,9 @@ public class RequestUtils {
 			return fDefault;
 		} else {
 			try {
-				return Float.valueOf(s);
+				return Float.parseFloat(s);
 			} catch (Exception e) {
-				logger.warn("getFloat:", e);
+				logger.warn("getFloat:" + sParam + " -> " + s, e);
 				return fDefault;
 			}
 		}
