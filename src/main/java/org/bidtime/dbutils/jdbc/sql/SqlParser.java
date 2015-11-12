@@ -350,15 +350,19 @@ public class SqlParser {
 			nameSql = nameSql.substring(matcher.end());
 		}
 		boolean b = set.containsAll(inParams.keySet());
-		if (logger.isDebugEnabled()) {
+		if (logger.isDebugEnabled() || !b) {
 			StringBuilder sb = new StringBuilder();
 			sb.append("contains->");
 			sb.append(b);
-			sb.append(" inp:");
+			sb.append(" inParams:");
 			sb.append(inParams);
-			sb.append("alp:");
+			sb.append(" allParams:");
 			sb.append(set);
-			logger.debug(sb.toString());
+			if (logger.isDebugEnabled()) {
+				logger.debug(sb.toString());
+			} else if (!b) {
+				logger.error(sb.toString());
+			}
 		}
 		return b;
 	}
