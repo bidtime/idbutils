@@ -26,7 +26,7 @@ public class DateTimeComm {
 			if (o instanceof Date) {
 				return ((Date) o);
 			} else if (o instanceof String) {
-				return StringToDate((String) o, sFmt);
+				return stringToDate((String) o, sFmt);
 			} else {
 				return null;
 			}
@@ -36,14 +36,14 @@ public class DateTimeComm {
 	}
 
 	public static Date yymmddToDate(String sDate) {
-		return StringToDate(sDate, "yyyy-MM-dd");
+		return stringToDate(sDate, "yyyy-MM-dd");
 	}
 
 	public static Date yymmddIntToDate(String sDate) {
-		return StringToDate(sDate, "yyyyMMdd");
+		return stringToDate(sDate, "yyyyMMdd");
 	}
 
-	public static Date StringToDate(String sDate, String fmt) {
+	public static Date stringToDate(String sDate, String fmt) {
 		java.text.DateFormat df2 = new java.text.SimpleDateFormat(fmt);
 		try {
 			Date date2 = df2.parse(sDate);

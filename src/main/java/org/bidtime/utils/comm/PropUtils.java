@@ -262,11 +262,11 @@ public class PropUtils extends Properties {
 	}
 
 	public void clazzToMap(Object object) {
-		clazzToMap(object, true);
+		clazzToMap(object, false);
 	}
 
     private static void writeComments(BufferedWriter bw, String comments)
-        throws IOException {
+    		throws IOException {
         bw.write("#");
         int len = comments.length();
         int current = 0;
@@ -350,7 +350,6 @@ public class PropUtils extends Properties {
 				} else {
 					valRet = ObjectComm.objectToString(get(key));
 				}
-				//String val = ObjectComm.objectToString(get(key));
 				key = saveConvert(key, true, escUnicode);
 				logger.info("key:" + valRet);
 				val = saveConvert(valRet, false, escUnicode);

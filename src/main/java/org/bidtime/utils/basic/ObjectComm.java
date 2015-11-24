@@ -506,7 +506,7 @@ public class ObjectComm {
 			if (o instanceof Date) {
 				return ((Date) o);
 			} else if (o instanceof String) {
-				return DateTimeComm.StringToDate((String) o, sFmt);
+				return DateTimeComm.stringToDate((String) o, sFmt);
 			} else {
 				return null;
 			}
