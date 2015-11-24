@@ -19,6 +19,8 @@ import org.apache.commons.lang.StringUtils;
 import org.bidtime.dbutils.gson.dataset.JsonData;
 import org.bidtime.utils.basic.ObjectComm;
 import org.bidtime.utils.comm.CaseInsensitiveHashMap;
+import org.bidtime.utils.comm.HideHashMap;
+import org.bidtime.utils.comm.HideLinkedHashMap;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -37,14 +39,19 @@ public class JSONHelper {
 	}
 	
 	private static Date yyyyMMddToDate(String sDate) {
-		return StringToDate(sDate, "yyyy-MM-dd");
+		return stringToDate(sDate, "yyyy-MM-dd");
 	}
 	
 	private static Date yyyyMMddHHmmssToDate(String sDate) {
-		return StringToDate(sDate, "yyyy-MM-dd HH:mm:ss");
+		return stringToDate(sDate, "yyyy-MM-dd HH:mm:ss");
 	}
 
-	private static Date StringToDate(String sDate, String fmt) {
+	
+	private static Date yyyyMMddHHmmssZZZToDate(String sDate) {
+		return stringToDate(sDate, "yyyy-MM-dd HH:mm:ss zzz");
+	}
+
+	private static Date stringToDate(String sDate, String fmt) {
 		java.text.DateFormat df2 = new java.text.SimpleDateFormat(fmt);
 		try {
 			Date date2 = df2.parse(sDate);
@@ -293,8 +300,9 @@ public class JSONHelper {
 		}
 	}
 	
-	protected static Object processObject(Object o, String key, Class<?> propType)
-			throws Exception {	
+	@SuppressWarnings({ "deprecation" })
+	protected static Object processObject(Object o, String key, Class<?> propType
+			, String fmt) throws Exception {	
 		if (o == null) {
 			return (Object)null;
 		}
@@ -320,12 +328,21 @@ public class JSONHelper {
 				if (o instanceof Date) {
 					return o;
 				} else if (o instanceof String) {
-					if ( StringUtils.isEmpty( (String)o ) ) {
-						return (Object)null;
-					} else if ( ((String)o).length()<=10) {	//用此简单方法判断，年月日的转换
-						return yyyyMMddToDate(o.toString());
+					if (StringUtils.isEmpty(fmt)) {
+						int len = ((String)o).length();
+						if ( StringUtils.isEmpty( (String)o ) ) {
+							return (Object)null;
+						} else if (len <= 10) {	//用此简单方法判断，年月日的转换
+							return yyyyMMddToDate((String)o);
+						} else if (len > 10 && len <= 19) {	//
+							return yyyyMMddHHmmssToDate((String)o);
+						} else if (len > 19 && len <= 23) {	//with ms
+							return yyyyMMddHHmmssZZZToDate((String)o);
+						} else {							//中文，西文的时间格式
+							return Date.parse((String)o);
+						}
 					} else {
-						return yyyyMMddHHmmssToDate(o.toString());
+						return stringToDate((String)o, fmt);
 					}
 				} else {
 					return o;
@@ -421,9 +438,15 @@ public class JSONHelper {
 //		User uu = mapToClazz(map, User.class);
 //		System.out.println(uu);
 //	}
-
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	
+	@SuppressWarnings({ "rawtypes" })
 	public static <T> T mapToClazz(Map map, Class<T> type)
+			throws Exception {
+		return mapToClazz(map, type, null);
+	}
+	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public static <T> T mapToClazz(Map map, Class<T> type, String fmt)
 			throws Exception {
         T bean = type.newInstance();
 		PropertyDescriptor[] props = null;
@@ -471,7 +494,7 @@ public class JSONHelper {
 				
 	            Object objValue = null;
 	            if (propType != null) {
-	            	objValue = processObject(entry.getValue(), key, propType);
+	            	objValue = processObject(entry.getValue(), key, propType, fmt);
 	            } else {
 	            	objValue = entry.getValue();
 	            }
@@ -528,10 +551,16 @@ public class JSONHelper {
 		return jsonArray;
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public static JSONObject mapToJson(Map<String, Object> map,
 			Map<String, Set<String>> mapColPros) {
-		JSONObject jsonObject = new JSONObject();
+		JSONObject json = new JSONObject();
+		writeMapToJson(map, mapColPros, json);
+		return json;
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	private static void writeMapToJson(Map<String, Object> map,
+			Map<String, Set<String>> mapColPros, JSONObject jsonObject) {
 		for (Entry<String, Object> entry: map.entrySet()) {
 			Object objData = entry.getValue();
 			if (objData instanceof List) {
@@ -543,7 +572,6 @@ public class JSONHelper {
 						JSONHelper.objToJsonObj(objData, mapColPros));
 			}
 		}
-		return jsonObject;
 	}
 	
 	@SuppressWarnings("rawtypes")
@@ -597,6 +625,8 @@ public class JSONHelper {
 			}
 			if (retVal instanceof List) {
 				jsonObject.put(key, listToJsonArray((List)retVal, mapHead));
+			} else if (retVal instanceof HideHashMap || retVal instanceof HideLinkedHashMap) {
+				writeMapToJson((Map)retVal, mapHead, jsonObject);
 			} else if (retVal instanceof Map) {
 				jsonObject.put(key, mapToJson((Map)retVal, mapHead));
 			} else {
@@ -610,6 +640,7 @@ public class JSONHelper {
 		return clazzToMap(object,  null);
 	}
 	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public static Map<String, Object> clazzToMap(Object object, Map<String, Set<String>> mapHead) {
 		Map<String, Object> map = new LinkedHashMap<String, Object>();
 		PropertyDescriptor[] propDescripts = null;
@@ -640,7 +671,15 @@ public class JSONHelper {
 			} catch (Exception e) {
 				logger.error("class to map", e);
 			}
-			map.put(key, retVal);
+			if (retVal instanceof HideHashMap || retVal instanceof HideLinkedHashMap) {
+				map.putAll((Map)retVal);
+//				for (Entry<String, Object> entry: map.entrySet()) {
+//					Object objData = entry.getValue();
+//					map.put(entry.getKey(), entry.getValue());
+//				}
+			} else { 
+				map.put(key, retVal);
+			}
 		}
 		return map;
 	}

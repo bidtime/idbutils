@@ -7,9 +7,7 @@ import java.io.IOException;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.bidtime.dbutils.gson.GsonEbParams;
 import org.bidtime.dbutils.gson.ResultDTO;
-import org.bidtime.utils.http.SessionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,96 +22,82 @@ public class ResponseUtils {
 	private static final Logger logger = LoggerFactory
 			.getLogger(ResponseUtils.class);
 
-	private static short getStateOfSqlUpdate(int nResults) {
-		if (nResults > 0) {
-			return GsonEbParams.STATE_SUCCESS;
+	public static void setSqlResultResponse(int applies, String msg,
+			HttpServletResponse r) {
+		short state = (applies > 0) ? UserHeadState.SUCCESS : UserHeadState.ERROR;
+		if (state == UserHeadState.SUCCESS) {
+			setStateMsgResponse(state, "", r);
 		} else {
-			return GsonEbParams.STATE_FAILURE;
+			setStateMsgResponse(state, msg, r);
 		}
-	}
-
-	public static void setSqlResultResponse(int nUpdates, String msg,
-			HttpServletResponse response) {
-		ResultDTO<Object> gsonEbRst = null;
-		short nState = getStateOfSqlUpdate(nUpdates);
-		if (nState == GsonEbParams.STATE_SUCCESS) {
-			gsonEbRst = new ResultDTO<Object>(nState, "");
-		} else {
-			gsonEbRst = new ResultDTO<Object>(nState, msg);
-		}
-		setResponseResult(gsonEbRst, response);
 	}
 
 	public static void setSuccessResponse(String msg,
-			HttpServletResponse response) {
-		ResultDTO<Object> gsonEbRst = new ResultDTO<Object>(GsonEbParams.STATE_SUCCESS, msg);
-		setResponseResult(gsonEbRst, response);
+			HttpServletResponse r) {
+		setStateMsgResponse(UserHeadState.SUCCESS, msg, r);
 	}
 
-	public static void setSuccessResponse(HttpServletResponse response) {
-		setSuccessResponse("", response);
+	public static void setSuccessResponse(HttpServletResponse r) {
+		setStateMsgResponse(UserHeadState.SUCCESS, "", r);
 	}
 
 	public static void setErrorMsgResponse(String msg,
-			HttpServletResponse response) {
-		setStateMsgResponse(GsonEbParams.STATE_FAILURE, msg, response);
+			HttpServletResponse r) {
+		setStateMsgResponse(UserHeadState.ERROR, msg, r);
 	}
 
 	public static void setFrequentMsgResponse(String msg,
-			HttpServletResponse response) {
-		ResultDTO<Object> gsonEbRst = new ResultDTO<Object>(GsonEbParams.STATE_USER_IS_FREQUENT, msg);
-		setResponseResult(gsonEbRst, response);
+			HttpServletResponse r) {
+		setStateMsgResponse(UserHeadState.USER_IS_FREQUENT, msg, r);
 	}
 
 	public static void setErrorMsgResponse(String msg, Exception e,
-			HttpServletResponse response) {
-		setErrorMsgResponse(msg	+ ":" + e.getMessage(), response);
+			HttpServletResponse r) {
+		setErrorMsgResponse(msg	+ ":" + e.getMessage(), r);
 	}
 
 	public static void setErrorMsgResponse(Exception e,
-			HttpServletResponse response) {
-		setStateMsgResponse(GsonEbParams.STATE_FAILURE, e.getMessage(), response);
+			HttpServletResponse r) {
+		setStateMsgResponse(UserHeadState.ERROR, e.getMessage(), r);
 	}
 
 	public static void setStateMsgResponse(int n, String msg,
-			HttpServletResponse response) {
-		ResultDTO<Object> gsonEbRst = new ResultDTO<Object>(n, msg);
-		setResponseResult(gsonEbRst, response);
+			HttpServletResponse r) {
+		ResultDTO<Object> d = new ResultDTO<Object>(n, msg);
+		setResponseResultString(d.toJsonMsg().toString(), r);
 	}
 
 	@SuppressWarnings("rawtypes")
-	public static void setResponseResult(ResultDTO r, HttpServletResponse response) {
-		if (r == null) {
+	public static void setResponseResult(ResultDTO d, HttpServletResponse r) {
+		if (d == null) {
 			return;
 		}
-		setResponseResultObject(r.toJson(), response);
+		setResponseResultObject(d.toJson(), r);
 	}
 
-	public static void setResponseResultObject(Object o,
-			HttpServletResponse response) {
+	public static void setResponseResultObject(Object o, HttpServletResponse r) {
 		if (o == null) {
 			return;
 		}
-		setResponseResultString(o.toString(), response);
+		setResponseResultString(o.toString(), r);
 	}
 
 	/**
 	 * @param sReturn
-	 * @param response
+	 * @param r
 	 */
-	public static void setResponseResultString(String sReturn,
-			HttpServletResponse response) {
+	public static void setResponseResultString(String s,
+			HttpServletResponse r) {
 		try {
-			response.setHeader("Cache-Control", "no-cache"); // HTTP 1.1
-			response.setHeader("Pragma", "no-cache"); // HTTP 1.0
-			response.setDateHeader("Expires", 0); // prevents caching at the
-													// proxy server
-			response.setCharacterEncoding("UTF-8");
-			response.setContentType("text/html;charset=UTF-8");
-			response.getWriter().write(sReturn);
-			response.flushBuffer();
+			r.setHeader("Cache-Control", "no-cache"); // HTTP 1.1
+			r.setHeader("Pragma", "no-cache"); // HTTP 1.0
+			r.setDateHeader("Expires", 0); // prevents caching at the proxy server
+			r.setCharacterEncoding("UTF-8");
+			r.setContentType("text/html;charset=UTF-8");
+			r.getWriter().write(s);
+			r.flushBuffer();
 			if (logger.isDebugEnabled()) {
-				logger.debug(sReturn);
+				logger.debug(s);
 			}
 		} catch (IOException e) {
 			logger.error(e.getMessage());
@@ -123,71 +107,77 @@ public class ResponseUtils {
 	/**
 	 * 无权限
 	 * 
-	 * @param response
+	 * @param r
 	 */
-	public static void setResponseHeadNotPower(HttpServletResponse response,
+	public static void setResponseHeadNoPower(HttpServletResponse r,
 			String msg) {
-		setResponseHeadIntMsg(response, SessionUtils.USER_NOT_POWER,
-				GsonEbParams.STATE_USER_NOT_POWER, msg);
+		setResponseHeadIntMsg(r, UserHeadState.USER_NO_POWER, msg);
 	}
 
 	/**
 	 * 未登陆
 	 * 
-	 * @param response
+	 * @param r
 	 */
-	public static void setResponseHeadNotLogin(HttpServletResponse response,
+	public static void setResponseHeadNoLogin(HttpServletResponse r,
 			String msg) {
-		setResponseHeadIntMsg(response, SessionUtils.USER_NOT_LOGIN,
-				GsonEbParams.STATE_USER_NOT_LOGIN, msg);
+		setResponseHeadIntMsg(r, UserHeadState.USER_NO_LOGIN, msg);
 	}
 
 	/**
 	 * 帐号别处登陆
 	 * 
-	 * @param response
+	 * @param r
 	 */
-	public static void setResponseHeadNotOnLine(HttpServletResponse response,
+	public static void setResponseHeadNoOnLine(HttpServletResponse r,
 			String msg) {
-		setResponseHeadIntMsg(response, SessionUtils.USER_NOT_ONLINE,
-				GsonEbParams.STATE_USER_NOT_ONLINE, msg);
+		setResponseHeadIntMsg(r, UserHeadState.USER_NO_ONLINE, msg);
 	}
+	
+	/**
+	 * 帐号未激活
+	 * @param r
+	 * @param msg
+	 */
+	public static void setResponseHeadNoActive(HttpServletResponse r,
+			String msg) {
+		setResponseHeadIntMsg(r, UserHeadState.USER_NO_ACTIVE, msg);
+	}
+	
 
 	/**
 	 * 设置state以及GsonEbRst消息
 	 * 
-	 * @param response
+	 * @param r
 	 * @param nLoginHeadState
 	 * @param nUserState
 	 * @param msg
 	 */
-	public static void setResponseHeadIntMsg(HttpServletResponse response,
-			int nLoginHeadState, int nUserState, String msg) {
-		ResultDTO<Object> r = new ResultDTO<Object>(nLoginHeadState, msg);
-		setResponseHeadIntMsgRaw(response, nLoginHeadState, r.toJson().toString());
+	public static void setResponseHeadIntMsg(HttpServletResponse r,
+			int nLoginHeadState, String msg) {
+		ResultDTO<Object> d = new ResultDTO<Object>(nLoginHeadState, msg);
+		setResponseHeadIntMsgRaw(r, nLoginHeadState, d.toJsonMsg().toString());
 	}
 
 	/**
-	 * @param response
+	 * @param r
 	 * @param n
 	 */
-	private static void setResponseHeadIntMsgRaw(HttpServletResponse response,
+	private static void setResponseHeadIntMsgRaw(HttpServletResponse r,
 			int n, String msg) {
 		try {
-			response.setCharacterEncoding("UTF-8");
-			response.setHeader("Cache-Control", "no-cache"); // HTTP 1.1
-			response.setHeader("Pragma", "no-cache"); // HTTP 1.0
-			response.setDateHeader("Expires", 0); // prevents caching at the
-													// proxy
-													// server
-			response.setContentType("text/html;charset=UTF-8");
+			r.setCharacterEncoding("UTF-8");
+			r.setHeader("Cache-Control", "no-cache"); // HTTP 1.1
+			r.setHeader("Pragma", "no-cache"); // HTTP 1.0
+			r.setDateHeader("Expires", 0); // prevents caching at the proxy server
+			r.setContentType("text/html;charset=UTF-8");
 			// set notLogin value
-			response.addIntHeader(SessionUtils.NOT_LOGIN_IN, n);
+			r.addIntHeader(UserHeadState.NOT_LOGININ, n);
 			// write msg
-			response.getWriter().write(msg);
-			response.flushBuffer();
+			r.getWriter().write(msg);
+			r.flushBuffer();
 			if (logger.isDebugEnabled()) {
-				logger.debug(SessionUtils.NOT_LOGIN_IN + ":" + n);
+				logger.debug(UserHeadState.NOT_LOGININ + ":" + n);
 				logger.debug(msg);
 			}
 		} catch (IOException e) {
@@ -196,42 +186,47 @@ public class ResponseUtils {
 	}
 
 	/**
-	 * @param response
+	 * @param r
 	 */
-	public static void setResponseHeadNotLogin(HttpServletResponse response) {
-		setResponseHeadInt(response, SessionUtils.USER_NOT_LOGIN); // -1,未登陆
+	public static void setResponseHeadNoLogin(HttpServletResponse r) {
+		setResponseHeadInt(r, UserHeadState.USER_NO_LOGIN); // -1,未登陆
 	}
 
 	/**
-	 * @param response
+	 * @param r
 	 */
-	public static void setResponseHeadNotOnLine(HttpServletResponse response) {
-		setResponseHeadInt(response, SessionUtils.USER_NOT_ONLINE);	//帐号已经登陆
+	public static void setResponseHeadNoOnLine(HttpServletResponse r) {
+		setResponseHeadInt(r, UserHeadState.USER_NO_ONLINE);	//帐号已经登陆
 	}
 
 	/**
-	 * @param response
+	 * @param r
 	 */
-	public static void setResponseHeadNotOnPower(HttpServletResponse response) {
-		setResponseHeadInt(response, SessionUtils.USER_NOT_POWER);//用户无此权限
-		// setStateMsgResponse(0, "无权限", response); 
+	public static void setResponseHeadNoOnPower(HttpServletResponse r) {
+		setResponseHeadInt(r, UserHeadState.USER_NO_POWER);//用户无此权限
 	}
 
 	/**
-	 * @param response
+	 * @param r
+	 */
+	public static void setResponseHeadNoCheck(HttpServletResponse r) {
+		setResponseHeadInt(r, UserHeadState.USER_NO_CHECK);//用户无此权限
+	}
+
+	/**
+	 * @param r
 	 * @param n
 	 */
-	private static void setResponseHeadInt(HttpServletResponse response, int n) {
-		response.setHeader("Cache-Control", "no-cache"); // HTTP 1.1
-		response.setHeader("Pragma", "no-cache"); // HTTP 1.0
-		response.setDateHeader("Expires", 0); // prevents caching at the proxy
-												// server
-		response.setCharacterEncoding("UTF-8");
-		response.setContentType("text/html;charset=UTF-8");
+	private static void setResponseHeadInt(HttpServletResponse r, int n) {
+		r.setHeader("Cache-Control", "no-cache"); // HTTP 1.1
+		r.setHeader("Pragma", "no-cache"); // HTTP 1.0
+		r.setDateHeader("Expires", 0); // prevents caching at the proxy server
+		r.setCharacterEncoding("UTF-8");
+		r.setContentType("text/html;charset=UTF-8");
 		// set notLogin value
-		response.addIntHeader(SessionUtils.NOT_LOGIN_IN, n);
+		r.addIntHeader(UserHeadState.NOT_LOGININ, n);
 		if (logger.isDebugEnabled()) {
-			logger.debug(SessionUtils.NOT_LOGIN_IN + ":" + n);
+			logger.debug(UserHeadState.NOT_LOGININ + ":" + n);
 		}
 	}
 

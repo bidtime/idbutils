@@ -4,7 +4,9 @@ import java.net.HttpURLConnection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.apache.commons.lang.StringUtils;
+import org.bidtime.web.utils.UserHeadState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,12 +14,6 @@ public class SessionUtils {
 
 	private static final Logger logger = LoggerFactory
 			.getLogger(SessionUtils.class);
-	
-	public static final Integer USER_NOT_CONNECT = -2;		//no connect.
-	public static final Integer USER_NOT_LOGIN = -1;		//no login, user does not login.
-	public static final Integer USER_NOT_POWER = 0;			//no power, user has no power at current url.
-	public static final Integer USER_NOT_ONLINE = 1;		//no online, user login at others.
-	public static final String NOT_LOGIN_IN = "notLogin";	//not login
 	
 	private static Map<String,String> listHostPath = new HashMap<String,String>();
 	
@@ -95,7 +91,7 @@ public class SessionUtils {
 	}
 	
 	public static Integer getNotLoginOfHead(HttpURLConnection conn) {
-		List<String> vs = conn.getHeaderFields().get(NOT_LOGIN_IN);
+		List<String> vs = conn.getHeaderFields().get(UserHeadState.NOT_LOGININ);
 		if (vs != null && vs.size()>0) {
 			return Integer.valueOf(vs.get(0));
 		} else {

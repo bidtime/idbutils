@@ -91,6 +91,14 @@ public class FileUtils {
 			return true;
 		}
 	}
+	
+	public static boolean isAbsolute(String propFile) {
+		if (File.pathSeparatorChar == '/') {
+			return propFile.startsWith("/");
+		} else {
+			return propFile.indexOf(":") > 0;			
+		}	
+	}
 
 	public static String getFileRealPath(String path) throws IOException {
 		String sPath = FileUtils.class.getClassLoader().getResource(".").getPath();

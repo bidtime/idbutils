@@ -4,9 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
-import org.bidtime.dbutils.gson.GsonEbParams;
 import org.bidtime.dbutils.gson.ResultDTO;
-import org.bidtime.utils.http.SessionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 public class ResponseJsonp {
@@ -36,20 +34,12 @@ public class ResponseJsonp {
 		}
 	}
 
-	private static short getStateOfSqlUpdate(int nResults) {
-		if (nResults > SQL_ZERO) {
-			return GsonEbParams.STATE_SUCCESS;
-		} else {
-			return GsonEbParams.STATE_FAILURE;
-		}
-	}
-
 	@SuppressWarnings("rawtypes")
-	public static void setSqlResultResponse(int nUpdates, String msg,
+	public static void setSqlResultResponse(int applies, String msg,
 			HttpServletRequest request, HttpServletResponse response) {
 		ResultDTO gsonEbRst = null;
-		short nState = getStateOfSqlUpdate(nUpdates);
-		if (nState == GsonEbParams.STATE_SUCCESS) {
+		short nState = (applies > SQL_ZERO) ? UserHeadState.SUCCESS : UserHeadState.ERROR;
+		if (nState == UserHeadState.SUCCESS) {
 			gsonEbRst = new ResultDTO(nState, "");
 		} else {
 			gsonEbRst = new ResultDTO(nState, msg);
@@ -65,17 +55,17 @@ public class ResponseJsonp {
 
 	public static void setSuccessResponse(String msg,
 			HttpServletRequest request, HttpServletResponse response) {
-		setStateMsgResponse(GsonEbParams.STATE_SUCCESS, msg, request, response);
+		setStateMsgResponse(UserHeadState.SUCCESS, msg, request, response);
 	}
 
 	public static void setSuccessResponse(HttpServletRequest request, HttpServletResponse response) {
-		ResultDTO<Object> r = new ResultDTO<Object>(GsonEbParams.STATE_SUCCESS, "");
+		ResultDTO<Object> r = new ResultDTO<Object>(UserHeadState.SUCCESS, "");
 		setResponseResult(r, request, response);
 	}
 
 	public static void setErrorMsgResponse(String msg,
 			HttpServletRequest request, HttpServletResponse response) {
-		ResultDTO<Object> r = new ResultDTO<Object>(GsonEbParams.STATE_FAILURE, msg);
+		ResultDTO<Object> r = new ResultDTO<Object>(UserHeadState.ERROR, msg);
 		setResponseResult(r, request, response);
 	}
 
@@ -87,7 +77,7 @@ public class ResponseJsonp {
 	 * @param response
 	 */
 	public static void setResponseHeadNotLogin(HttpServletResponse response) {
-		setResponseHeadInt(response, SessionUtils.USER_NOT_LOGIN); // -1,未登陆
+		setResponseHeadInt(response, UserHeadState.USER_NO_LOGIN); // -1,未登陆
 		// setStateMsgResponse(-1, "未登陆", response); //此为测试时使用的代码,使用客户端显示未登陆消息
 	}
 
@@ -95,7 +85,7 @@ public class ResponseJsonp {
 	 * @param response
 	 */
 	public static void setResponseHeadNotOnLine(HttpServletResponse response) {
-		setResponseHeadInt(response, SessionUtils.USER_NOT_ONLINE);
+		setResponseHeadInt(response, UserHeadState.USER_NO_ONLINE);
 		// setStateMsgResponse(1, "帐号已经登陆", response); //帐号已经登陆
 	}
 
@@ -103,7 +93,7 @@ public class ResponseJsonp {
 	 * @param response
 	 */
 	public static void setResponseHeadNotOnPower(HttpServletResponse response) {
-		setResponseHeadInt(response, SessionUtils.USER_NOT_POWER);
+		setResponseHeadInt(response, UserHeadState.USER_NO_POWER);
 		// setStateMsgResponse(0, "无权限", response); //此为测试时使用的代码,使用客户端显示无权限消息
 	}
 	
@@ -115,9 +105,9 @@ public class ResponseJsonp {
 		response.setCharacterEncoding("UTF-8");
 		response.setContentType("text/html;charset=UTF-8");
 		// set notLogin value
-		response.addIntHeader(SessionUtils.NOT_LOGIN_IN, n);
+		response.addIntHeader(UserHeadState.NOT_LOGININ, n);
 		if (logger.isDebugEnabled()) {
-			logger.debug(SessionUtils.NOT_LOGIN_IN + ":" + n);
+			logger.debug(UserHeadState.NOT_LOGININ + ":" + n);
 		}
 	}
 
@@ -126,7 +116,7 @@ public class ResponseJsonp {
 	 * @param response
 	 */
 	public static void setResponseHeadNotPower(HttpServletRequest request, HttpServletResponse response, String msg) {
-		setResponseHeadIntMsg(request, response, SessionUtils.USER_NOT_POWER, GsonEbParams.STATE_USER_NOT_POWER, msg);
+		setResponseHeadIntMsg(request, response, UserHeadState.USER_NO_POWER, UserHeadState.USER_NO_POWER, msg);
 	}
 
 	/**
@@ -134,7 +124,7 @@ public class ResponseJsonp {
 	 * @param response
 	 */
 	public static void setResponseHeadNotLogin(HttpServletRequest request, HttpServletResponse response, String msg) {
-		setResponseHeadIntMsg(request, response, SessionUtils.USER_NOT_LOGIN, GsonEbParams.STATE_USER_NOT_LOGIN, msg);
+		setResponseHeadIntMsg(request, response, UserHeadState.USER_NO_LOGIN, UserHeadState.USER_NO_LOGIN, msg);
 	}
 
 	/**
@@ -142,7 +132,7 @@ public class ResponseJsonp {
 	 * @param response
 	 */
 	public static void setResponseHeadNotOnLine(HttpServletRequest request, HttpServletResponse response, String msg) {
-		setResponseHeadIntMsg(request, response, SessionUtils.USER_NOT_ONLINE, GsonEbParams.STATE_USER_NOT_ONLINE, msg);
+		setResponseHeadIntMsg(request, response, UserHeadState.USER_NO_ONLINE, UserHeadState.USER_NO_ONLINE, msg);
 	}
 	
 	private static void setResponseHeadIntMsg(HttpServletRequest request, HttpServletResponse response, 
