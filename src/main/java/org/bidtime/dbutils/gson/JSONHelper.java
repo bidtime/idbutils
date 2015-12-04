@@ -45,7 +45,6 @@ public class JSONHelper {
 	private static Date yyyyMMddHHmmssToDate(String sDate) {
 		return stringToDate(sDate, "yyyy-MM-dd HH:mm:ss");
 	}
-
 	
 	private static Date yyyyMMddHHmmssZZZToDate(String sDate) {
 		return stringToDate(sDate, "yyyy-MM-dd HH:mm:ss zzz");
@@ -438,6 +437,15 @@ public class JSONHelper {
 //		User uu = mapToClazz(map, User.class);
 //		System.out.println(uu);
 //	}
+	
+	@SuppressWarnings("rawtypes")
+	public static <T> List<T> listMapToClazz(List<Map> list, Class<T> type) throws Exception {
+		List<T> listRst = new ArrayList<T>();
+		for (Map m: list) {
+			listRst.add(mapToClazz(m, type));
+		}
+		return listRst;
+	}
 	
 	@SuppressWarnings({ "rawtypes" })
 	public static <T> T mapToClazz(Map map, Class<T> type)

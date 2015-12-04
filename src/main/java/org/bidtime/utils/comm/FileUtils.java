@@ -81,23 +81,20 @@ public class FileUtils {
 	}
 
 	public static boolean isLinux() {
-		if ("\\".equals(File.separator)) {
-			return false;
-			// is WINDOWS
-		} else if ("/".equals(File.separator)) {
+		if (File.separatorChar == '/') {
 			// is LINUX
 			return true;
 		} else {
-			return true;
+			return false;
 		}
 	}
 	
 	public static boolean isAbsolute(String propFile) {
-		if (File.pathSeparatorChar == '/') {
+		if (File.separatorChar == '/') {
 			return propFile.startsWith("/");
 		} else {
 			return propFile.indexOf(":") > 0;			
-		}	
+		}
 	}
 
 	public static String getFileRealPath(String path) throws IOException {

@@ -1,6 +1,6 @@
 package org.bidtime.dbutils.params;
 
-import org.bidtime.utils.comm.PropUtils;
+import org.bidtime.utils.comm.PropEx;
 
 public class StmtParams {
 	
@@ -70,15 +70,16 @@ public class StmtParams {
 	}
 
 	public void loadOfSrc(String fileName) {
-		PropUtils propUtils = new PropUtils();
+		PropEx propUtils = new PropEx();
 		try {
-			propUtils.loadOfSrc(fileName);
-			stmtQueryTimeOut = propUtils.getInteger("stmtQueryTimeOut", 300);
-			stmtUpdateTimeOut = propUtils.getInteger("stmtUpdateTimeOut", 300);
-			stmtBatchTimeOut = propUtils.getInteger("stmtBatchTimeOut", 600);
-			spanTimeOut = propUtils.getInteger("spanTimeOut", 30000);
-			fetchSize = propUtils.getInteger("fetchSize", 100);
-			dataSource = propUtils.getString("dataSource", dataSource);
+			if (propUtils.loadOfSrcSlient(fileName)) {
+				stmtQueryTimeOut = propUtils.getInteger("stmtQueryTimeOut", 300);
+				stmtUpdateTimeOut = propUtils.getInteger("stmtUpdateTimeOut", 300);
+				stmtBatchTimeOut = propUtils.getInteger("stmtBatchTimeOut", 600);
+				spanTimeOut = propUtils.getInteger("spanTimeOut", 30000);
+				fetchSize = propUtils.getInteger("fetchSize", 100);
+				dataSource = propUtils.getString("dataSource", dataSource);
+			}
 		} finally {
 			propUtils = null;
 		}

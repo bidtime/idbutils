@@ -1,6 +1,6 @@
 package org.bidtime.utils.spring;
 
-import javax.servlet.ServletContext;
+
 import javax.sql.DataSource;
 
 import org.apache.commons.lang.StringUtils;
@@ -28,7 +28,7 @@ public class SpringContextUtils {
 
 	private ApplicationContext context = null;
 
-	private ServletContext servletContext = null;
+	//private ServletContext servletContext = null;
 
 	private String[] ctxStrArray = null;
 
@@ -75,13 +75,13 @@ public class SpringContextUtils {
 		INSTANCE.context = context;
 	}
 
-	public static void setServletContext(ServletContext context) {
-		INSTANCE.servletContext = context;
-	}
-
-	public static ServletContext getServletContext() {
-		return INSTANCE.servletContext;
-	}
+//	public static void setServletContext(ServletContext context) {
+//		INSTANCE.servletContext = context;
+//	}
+//
+//	public static ServletContext getServletContext() {
+//		return INSTANCE.servletContext;
+//	}
 
 	public static Object getBean(String beanName) {
 		return getContext().getBean(beanName);

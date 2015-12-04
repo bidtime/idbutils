@@ -200,4 +200,31 @@ public class LogSqlUtils {
 		return sb.toString();
 	}
 	
+	public static String getFmtDiffNowMs(long start) {
+		long end = System.currentTimeMillis();
+		return getFmtDiffStartEndMs(start, end);
+	}
+	
+	public static String getFmtDiffStartEndMs(long start, long end) {
+		return getFmtDiffMS(end - start);
+	}
+	
+	public static String getFmtDiffMS(long spanSeconds) {
+		Calendar c = Calendar.getInstance();
+		c.setTimeInMillis(spanSeconds);
+		return getFmtCalendar(c);
+	}
+	
+	public static String getFmtCalendar(Calendar c) {
+		StringBuilder sb = new StringBuilder("");
+		sb.append(c.get(Calendar.MINUTE));
+		sb.append("m:");
+		sb.append(c.get(Calendar.SECOND));
+		sb.append("s:");
+		sb.append(c.get(Calendar.MILLISECOND));
+		sb.append("ms");
+		sb.append(".");
+		return sb.toString();
+	}
+
 }

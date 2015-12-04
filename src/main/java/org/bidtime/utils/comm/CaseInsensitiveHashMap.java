@@ -1,7 +1,6 @@
 package org.bidtime.utils.comm;
 
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 
@@ -11,9 +10,10 @@ import java.util.Map;
  *         提供对从ResultSet中取出数据,封装成ListMap的功能
  * 
  */
+@SuppressWarnings("serial")
 public class CaseInsensitiveHashMap<V> extends HashMap<String, V> {
 
-	private final Map<String, String> lowerCaseMap = new LinkedHashMap<String, String>();
+	private final Map<String, String> lowerCaseMap = new HashMap<String, String>();
 	
 	public CaseInsensitiveHashMap() {
 	}
@@ -23,7 +23,6 @@ public class CaseInsensitiveHashMap<V> extends HashMap<String, V> {
 	 * 
 	 * @see java.io.Serializable
 	 */
-	private static final long serialVersionUID = -2848100435296897392L;
 
 	/** {@inheritDoc} */
 	@Override
@@ -46,6 +45,7 @@ public class CaseInsensitiveHashMap<V> extends HashMap<String, V> {
 	}
 
 	/** {@inheritDoc} */
+	@SuppressWarnings("unchecked")
 	@Override
 	public V put(String key, V value) {
 		/*
@@ -54,21 +54,21 @@ public class CaseInsensitiveHashMap<V> extends HashMap<String, V> {
 		 * key are not necessaliry equals. (That's why we call
 		 * super.remove(oldKey) and not just super.put(key, value))
 		 */
-		Object oldKey = lowerCaseMap.put(key.toLowerCase(Locale.ENGLISH), key);
-		super.remove(oldKey);		//Object oldValue = 
-		return super.put(key, value);
+        Object oldKey = lowerCaseMap.put(key.toLowerCase(Locale.ENGLISH), key);
+        Object oldValue = super.remove(oldKey);
+        super.put(key, value);
+        return (V)oldValue;
 	}
 
 	/** {@inheritDoc} */
-//	@Override
-//	public void putAll(Map<? extends String, ? extends V> m) {
-//		for (Map.Entry<? extends String, ? extends V> entry : m.entrySet()) {
-//			//String key = entry.getKey();
-//			//Object value = entry.getValue();
-//			this.put(entry.getKey(), entry.getValue());
-//		}
-//		super.putAll(m);
-//	}
+	@Override
+	public void putAll(Map<? extends String, ? extends V> m) {
+		for (Map.Entry<? extends String, ? extends V> entry : m.entrySet()) {
+			//String key = entry.getKey();
+			//Object value = entry.getValue();
+			this.put(entry.getKey(), entry.getValue());
+		}
+	}
 
 	/** {@inheritDoc} */
 	@Override

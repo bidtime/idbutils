@@ -12,6 +12,7 @@ import javax.sql.DataSource;
 import org.apache.commons.dbutils.ResultSetHandler;
 import org.apache.commons.dbutils.handlers.ScalarHandler;
 import org.apache.commons.lang.StringUtils;
+import org.bidtime.dbutils.gson.PropAdapt;
 import org.bidtime.dbutils.gson.dataset.GsonRow;
 import org.bidtime.dbutils.gson.dataset.GsonRows;
 import org.bidtime.dbutils.jdbc.dao.PKCallback;
@@ -128,7 +129,7 @@ public class SqlLoadUtils {
 			if (object instanceof Map) {
 				g = tp.mapToRow((Map)object);
 			} else {
-				g = tp.clazzToRow(object);
+				g = tp.clazzToRow(object, PropAdapt.NOTNULL);
 			}
 			String sql = tp.getDeleteSqlOfHead(tp.getTableName(), g.getHead(), listJsonPk);
 			g.remain(ArrayComm.listToStringArray(listJsonPk));
@@ -151,7 +152,7 @@ public class SqlLoadUtils {
 			if (object instanceof Map) {
 				g = tp.mapToRow((Map)object);
 			} else {
-				g = tp.clazzToRow(object);
+				g = tp.clazzToRow(object, PropAdapt.NOTNULL);
 			}
 			g.remain(heads);
 			String sql = tp.getDeleteSqlOfHead(tp.getTableName(), heads);
@@ -173,7 +174,7 @@ public class SqlLoadUtils {
 			if (list.get(0) instanceof Map) {
 				g = tp.mapsToRows((List<Map<String, Object>>)list);
 			} else {
-				g = tp.clazzToRows(list);
+				g = tp.clazzToRows(list, PropAdapt.NOTNULL);
 			}
 			String sql = tp.getDeleteSqlOfHead(tp.getTableName(), g.getHead(), listJsonPk);
 			g.remain(ArrayComm.listToStringArray(listJsonPk));
@@ -196,7 +197,7 @@ public class SqlLoadUtils {
 			if (list.get(0) instanceof Map) {
 				g = tp.mapsToRows((List<Map<String, Object>>)list);
 			} else {
-				g = tp.clazzToRows(list);
+				g = tp.clazzToRows(list, PropAdapt.NOTNULL);
 			}
 			g.remain(tp.getFieldPK());
 			String sql = tp.getDeleteSqlOfHead(tp.getTableName(), g.getHead());
@@ -234,9 +235,14 @@ public class SqlLoadUtils {
 		String sql = tp.getInsertSql(g, true);
 		return DbConnection.updateBatch(ds, sql, g.getData());
 	}
-		
-	@SuppressWarnings({ "rawtypes", "unchecked"})
+	
+	@SuppressWarnings({ "rawtypes"})
 	public static int insert(DataSource ds, Class clazz, Object object) throws SQLException {
+		return insert(ds, clazz, object, PropAdapt.NOTNULL);
+	}
+
+	@SuppressWarnings({ "rawtypes", "unchecked"})
+	public static int insert(DataSource ds, Class clazz, Object object, PropAdapt pa) throws SQLException {
 		if (object == null) {
 			return 0;
 		}
@@ -246,7 +252,7 @@ public class SqlLoadUtils {
 			if (object instanceof Map) {
 				g = tp.mapToRow((Map)object, true);
 			} else {
-				g = tp.clazzToRow(object, true);
+				g = tp.clazzToRow(object, true, pa);
 			}
 			if (!tp.isNonePkInc()) {
 				g.delHead(tp.getFieldPK());
@@ -258,8 +264,13 @@ public class SqlLoadUtils {
 		}
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked"})
+	@SuppressWarnings({ "rawtypes" })
 	public static int insert(DataSource ds, Class clazz, List list) throws SQLException {
+		return insert(ds, clazz, list, PropAdapt.NOTNULL);
+	}
+	
+	@SuppressWarnings({ "rawtypes", "unchecked"})
+	public static int insert(DataSource ds, Class clazz, List list, PropAdapt pa) throws SQLException {
 		if (list == null || list.isEmpty()) {
 			return 0;
 		}
@@ -269,7 +280,7 @@ public class SqlLoadUtils {
 			if (list.get(0) instanceof Map) {
 				g = tp.mapsToRows((List<Map<String, Object>>)list, true);
 			} else {
-				g = tp.clazzToRows(list, true);
+				g = tp.clazzToRows(list, true, pa);
 			}
 			if (!tp.isNonePkInc()) {
 				g.delHead(tp.getFieldPK());
@@ -314,9 +325,15 @@ public class SqlLoadUtils {
 		return (T)DbConnection.insert(ds, sql, rsh, g.getData());
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings({ "rawtypes" })
 	public static <T> T insertForPK(DataSource ds, Class clazz,
 			Object o) throws SQLException {
+		return insertForPK(ds, clazz, o, PropAdapt.NOTNULL);
+	}
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public static <T> T insertForPK(DataSource ds, Class clazz,
+			Object o, PropAdapt pa) throws SQLException {
 		if (o == null) {
 			return null;
 		}
@@ -326,7 +343,7 @@ public class SqlLoadUtils {
 			if (o instanceof Map) {
 				g = tp.mapToRow((Map)o, true);
 			} else {
-				g = tp.clazzToRow(o, true);
+				g = tp.clazzToRow(o, true, pa);
 			}
 			String sql = tp.getInsertSql(g, true);;
 			return (T) DbConnection.insert(ds, sql, new ScalarHandler<Object>()
@@ -336,10 +353,16 @@ public class SqlLoadUtils {
 		}
 	}	
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings({ "rawtypes" })
 	public static <T> T insertForPK(DataSource ds, Class clazz,
 			Object o, PKCallback cb) throws SQLException {
-		T t = insertForPK(ds, clazz, o);
+		return insertForPK(ds, clazz, o, PropAdapt.NOTNULL, cb);
+	}
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public static <T> T insertForPK(DataSource ds, Class clazz,
+			Object o, PropAdapt pa, PKCallback cb) throws SQLException {
+		T t = insertForPK(ds, clazz, o, pa);
 		if (t != null) {
 			Object u = cb.getIt(t);
 			int n = SqlLoadUtils.update(ds, clazz, u);
@@ -348,9 +371,15 @@ public class SqlLoadUtils {
 		return t;
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings({ "rawtypes" })
 	public static <T> T insertForPK(DataSource ds, Class clazz,
 			List list) throws SQLException {
+		return insertForPK(ds, clazz, list, PropAdapt.NOTNULL);
+	}
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public static <T> T insertForPK(DataSource ds, Class clazz,
+			List list, PropAdapt pa) throws SQLException {
 		if (list == null || list.isEmpty()) {
 			return null;
 		}
@@ -360,7 +389,7 @@ public class SqlLoadUtils {
 			if (list.get(0) instanceof Map) {
 				g = tp.mapsToRows((List<Map<String, Object>>)list, true);
 			} else {
-				g = tp.clazzToRows(list, true);
+				g = tp.clazzToRows(list, true, pa);
 			}
 			String sql = tp.getInsertSql(g, true);
 			return (T) DbConnection.insert(ds, sql, new ScalarHandler<Object>()
@@ -430,9 +459,15 @@ public class SqlLoadUtils {
 		return DbConnection.updateBatch(ds, sql, g.getData());
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings({ "rawtypes" })
 	public static int update(DataSource ds, Class clazz,
 			Object o) throws SQLException {
+		return update(ds, clazz, o, PropAdapt.NOTNULL);
+	}
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public static int update(DataSource ds, Class clazz,
+			Object o, PropAdapt pa) throws SQLException {
 		if (o == null) {
 			return 0;
 		}
@@ -443,7 +478,7 @@ public class SqlLoadUtils {
 			if (o instanceof Map) {
 				g = tp.mapToRow((Map)o);
 			} else {
-				g = tp.clazzToRow(o);
+				g = tp.clazzToRow(o, pa);
 			}
 			String sql = tp.getUpdateSqlOfHead(tp.getTableName(), g.getHead(), listPkJson);
 			if (!listPkJson.isEmpty()) {
@@ -457,9 +492,15 @@ public class SqlLoadUtils {
 		}
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings({ "rawtypes" })
 	public static int update(DataSource ds, Class clazz,
 			Object o, String[] heads) throws SQLException {
+		return update(ds, clazz, o, heads, PropAdapt.FULL);
+	}
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public static int update(DataSource ds, Class clazz,
+			Object o, String[] heads, PropAdapt pa) throws SQLException {
 		if (o == null) {
 			return 0;
 		}
@@ -468,16 +509,22 @@ public class SqlLoadUtils {
 		if (o instanceof Map) {
 			g = tp.mapToRow((Map)o);
 		} else {
-			g = tp.clazzToRow(o);
+			g = tp.clazzToRow(o, pa);
 		}
 		g.moveToEnd(heads);
 		String sql = tp.getUpdateSqlHead(tp.getTableName(), g.getHead(), heads);
 		return DbConnection.update(ds, sql, g.getData());
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings({ "rawtypes" })
 	public static int update(DataSource ds, Class clazz,
 			List list) throws SQLException {
+		return update(ds, clazz, list, PropAdapt.NOTNULL);
+	}
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public static int update(DataSource ds, Class clazz,
+			List list, PropAdapt pa) throws SQLException {
 		if (list == null || list.isEmpty()) {
 			return 0;
 		}
@@ -487,7 +534,7 @@ public class SqlLoadUtils {
 			if (list.get(0) instanceof Map) {
 				g = tp.mapsToRows((List<Map<String, Object>>)list);
 			} else {
-				g = tp.clazzToRows(list);
+				g = tp.clazzToRows(list, pa);
 			}
 			List<String> listPkJson = new ArrayList<String>();
 			String sql = tp.getUpdateSqlOfHead(tp.getTableName(), g.getHead(), listPkJson);
@@ -500,9 +547,15 @@ public class SqlLoadUtils {
 		}
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings({ "rawtypes" })
 	public static int update(DataSource ds, Class clazz,
 			List list, String[] heads) throws SQLException {
+		return update(ds, clazz, list, heads, PropAdapt.NOTNULL);
+	}
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public static int update(DataSource ds, Class clazz,
+			List list, String[] heads, PropAdapt pa) throws SQLException {
 		if (list == null || list.isEmpty()) {
 			return 0;
 		}
@@ -511,7 +564,7 @@ public class SqlLoadUtils {
 		if (list.get(0) instanceof Map) {
 			g = tp.mapsToRows((List<Map<String, Object>>)list);
 		} else {
-			g = tp.clazzToRows(list);
+			g = tp.clazzToRows(list, pa);
 		}
 		g.moveToEnd(heads);
 		String sql = tp.getUpdateSqlHead(tp.getTableName(), g.getHead(), heads);
@@ -682,6 +735,8 @@ public class SqlLoadUtils {
 			Object m = ((List)o).get(0);
 			if (m != null && m instanceof Map) {
 				result = false;
+			} else {
+				result = true;
 			}
 		} else if (o instanceof String || o instanceof Number ||
 			o instanceof StringBuilder || o instanceof StringBuffer ||

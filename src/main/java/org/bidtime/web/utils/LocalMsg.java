@@ -114,6 +114,30 @@ public class LocalMsg extends SpringLocalMsg {
 				request);
 	}
 
+	public static String getUserLogoutError(HttpServletRequest request) {
+		return getUserError("controller.user.logout", request);
+	}
+	
+	public static String getUserLoginError(HttpServletRequest request) {
+		return getUserError("controller.user.login", request);
+	}
+
+	public static String getUserError(String paramId,
+			HttpServletRequest request) {
+		return getMessageLocalId("controller.user.error", paramId,
+				request);
+	}
+
+	public static String getCommonError(String param1, String param2,
+			HttpServletRequest request) {
+		return getMessageLocal("controller.common.error", new Object[]{param1, param2},
+				request);
+	}
+
+	public static String getCommonError(Object[] objs, HttpServletRequest request) {
+		return getMessageLocal("controller.common.error", objs,	request);
+	}
+
 	/**
 	 * 读取错误的格式化信息
 	 * 

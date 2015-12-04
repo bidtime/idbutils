@@ -141,27 +141,27 @@ public class RequestUtils {
 	public static Object[] getSplit(HttpServletRequest request, String sParam,
 			String splitChar) {
 		String sId = getString(request, sParam);
-		if (sId != null) {
-			return sId.split(splitChar);
-		} else {
+		if (StringUtils.isEmpty(sId)) {
 			return null;
+		} else {
+			return sId.split(splitChar);
 		}
 	}
 
 	public static String[] getStrSplit(HttpServletRequest request, String sParam,
 			String splitChar) throws Exception {
 		String sId = getString(request, sParam);
-		if (sId != null) {
-			return sId.split(splitChar);
-		} else {
+		if (StringUtils.isEmpty(sId)) {
 			return null;
+		} else {
+			return sId.split(splitChar);
 		}
 	}
 
 	public static Long[] getLongSplit(HttpServletRequest request, String sParam,
 			String splitChar) throws Exception {
 		String sId = getString(request, sParam);
-		if (sId == null) {
+		if (StringUtils.isEmpty(sId)) {
 			throw new Exception("params is null");
 		} else {
 			return ArrayComm.StringsToLongArray(sId.split(splitChar));
@@ -171,7 +171,7 @@ public class RequestUtils {
 	public static Integer[] getIntegerSplit(HttpServletRequest request, String sParam,
 			String splitChar) throws Exception {
 		String sId = getString(request, sParam);
-		if (sId == null) {
+		if (StringUtils.isEmpty(sId)) {
 			throw new Exception("params is null");
 		} else {
 			return ArrayComm.StringsToIntegerArray(sId.split(splitChar));

@@ -10,7 +10,7 @@ import java.sql.SQLException;
  * Long l = dao.insertForPK(duty, 
 		new PKCallback<Map<String, Object>, Long>(){  
             @Override  
-            public Map<String, Object> doIt(Long l) throws SQLException {
+            public Map<String, Object> getIt(Long l) throws SQLException {
 	        	Map<String, Object> map = new HashMap<String, Object>();
 	        	map.put("code", String.valueOf(l+1000) + "4");
 	        	map.put("id", l);

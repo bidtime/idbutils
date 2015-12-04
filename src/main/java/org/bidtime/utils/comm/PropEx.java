@@ -18,11 +18,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
-public class PropUtils extends Properties {
+@SuppressWarnings("serial")
+public class PropEx extends Properties {
 
-	private static final long serialVersionUID = 8395928557173812664L;
-
-	private static final Logger logger = LoggerFactory.getLogger(PropUtils.class);
+	private static final Logger logger = LoggerFactory.getLogger(PropEx.class);
 
 	protected String propFile = null;
 
@@ -31,12 +30,9 @@ public class PropUtils extends Properties {
 	}
 
 	public void setPropFile(String propFile) {
-		logger.info(propFile);
 		if (FileUtils.isAbsolute(propFile)) {
-			logger.info("isFile");
 			this.propFile = propFile;
 		} else {
-			logger.info("merge");
 			this.propFile = FileUtils.mergeSubPath(FileUtils.getPath(), propFile);
 		}
 	}
@@ -45,11 +41,11 @@ public class PropUtils extends Properties {
 		return this;
 	}
 
-	public PropUtils() {
+	public PropEx() {
 
 	}
 
-	public PropUtils(String fileName) {
+	public PropEx(String fileName) {
 		setPropFile(fileName);
 	}
 
@@ -226,14 +222,16 @@ public class PropUtils extends Properties {
 		}
 	}
 
-	public void loadOfSrc(String fileName) {
+	public boolean loadOfSrc(String fileName) {
+		boolean result = false;
 		InputStream input = null;
 		try {
 			input = FileUtils.getInputStream(fileName);
 			if (input != null) {
 				load(input);
+				result = true;
 			}
-		} catch (IOException e) {
+		} catch (Exception e) {
 			logger.error("loadOfSrc: open(" + fileName + ")", e);
 		} finally {
 			if (input != null) {
@@ -244,6 +242,30 @@ public class PropUtils extends Properties {
 				}
 			}
 		}
+		return result;
+	}
+
+	public boolean loadOfSrcSlient(String fileName) {
+		boolean result = false;
+		InputStream input = null;
+		try {
+			input = FileUtils.getInputStream(fileName);
+			if (input != null) {
+				load(input);
+				result = true;
+			}
+		} catch (Exception e) {
+			logger.warn("loadOfSrc: open(" + fileName + ")");
+		} finally {
+			if (input != null) {
+				try {
+					input.close();
+				} catch (IOException e) {
+					logger.error("loadOfSrc: close(" + fileName + ")", e);
+				}
+			}
+		}
+		return result;
 	}
 
 	public <T> T mapToClazz(Class<T> type) throws Exception {
@@ -256,9 +278,6 @@ public class PropUtils extends Properties {
 			this.clear();
 		}
 		putAll(map);
-		logger.info(map.toString());
-		logger.info("--");
-		logger.info(this.toString());
 	}
 
 	public void clazzToMap(Object object) {
@@ -351,7 +370,6 @@ public class PropUtils extends Properties {
 					valRet = ObjectComm.objectToString(get(key));
 				}
 				key = saveConvert(key, true, escUnicode);
-				logger.info("key:" + valRet);
 				val = saveConvert(valRet, false, escUnicode);
 				bw.write(key + "=" + val);
 				bw.newLine();

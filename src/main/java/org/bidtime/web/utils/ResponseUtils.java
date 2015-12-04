@@ -94,13 +94,15 @@ public class ResponseUtils {
 			r.setDateHeader("Expires", 0); // prevents caching at the proxy server
 			r.setCharacterEncoding("UTF-8");
 			r.setContentType("text/html;charset=UTF-8");
+			// write string
 			r.getWriter().write(s);
+			// flush buffer
 			r.flushBuffer();
 			if (logger.isDebugEnabled()) {
 				logger.debug(s);
 			}
 		} catch (IOException e) {
-			logger.error(e.getMessage());
+			logger.error("setResponse", e);
 		}
 	}
 
@@ -111,7 +113,7 @@ public class ResponseUtils {
 	 */
 	public static void setResponseHeadNoPower(HttpServletResponse r,
 			String msg) {
-		setResponseHeadIntMsg(r, UserHeadState.USER_NO_POWER, msg);
+		setResponseIntHeadString(r, UserHeadState.USER_NO_POWER, msg);
 	}
 
 	/**
@@ -121,7 +123,7 @@ public class ResponseUtils {
 	 */
 	public static void setResponseHeadNoLogin(HttpServletResponse r,
 			String msg) {
-		setResponseHeadIntMsg(r, UserHeadState.USER_NO_LOGIN, msg);
+		setResponseIntHeadString(r, UserHeadState.USER_NO_LOGIN, msg);
 	}
 
 	/**
@@ -131,7 +133,7 @@ public class ResponseUtils {
 	 */
 	public static void setResponseHeadNoOnLine(HttpServletResponse r,
 			String msg) {
-		setResponseHeadIntMsg(r, UserHeadState.USER_NO_ONLINE, msg);
+		setResponseIntHeadString(r, UserHeadState.USER_NO_ONLINE, msg);
 	}
 	
 	/**
@@ -141,10 +143,32 @@ public class ResponseUtils {
 	 */
 	public static void setResponseHeadNoActive(HttpServletResponse r,
 			String msg) {
-		setResponseHeadIntMsg(r, UserHeadState.USER_NO_ACTIVE, msg);
+		setResponseResultObject(UserHeadState.noPassJsonMsg(
+			UserHeadState.CHK_USER_NO_ACTIVE, msg), r);
 	}
 	
-
+	/**
+	 * 帐号来激活
+	 * @param r
+	 * @param msg
+	 */
+	public static void setResponseHeadNoCheck(HttpServletResponse r,
+			String msg) {
+		setResponseResultObject(UserHeadState.noPassJsonMsg(
+			UserHeadState.CHK_USER_NO_CHECK, msg), r);
+	}
+	
+	/**
+	 * 帐号来审核
+	 * @param r
+	 * @param msg
+	 */
+	public static void setResponseHeadNoPass(HttpServletResponse r,
+			String msg) {
+		setResponseResultObject(UserHeadState.noPassJsonMsg(
+			UserHeadState.CHK_USER_NO_PASS, msg), r);
+	}
+	
 	/**
 	 * 设置state以及GsonEbRst消息
 	 * 
@@ -153,18 +177,18 @@ public class ResponseUtils {
 	 * @param nUserState
 	 * @param msg
 	 */
-	public static void setResponseHeadIntMsg(HttpServletResponse r,
-			int nLoginHeadState, String msg) {
-		ResultDTO<Object> d = new ResultDTO<Object>(nLoginHeadState, msg);
-		setResponseHeadIntMsgRaw(r, nLoginHeadState, d.toJsonMsg().toString());
-	}
+//	public static void setResponseHeadIntMsg1(HttpServletResponse r,
+//			int loginHeadState, String msg) {
+//		//ResultDTO<Object> d = new ResultDTO<Object>(loginHeadState, msg);
+//		setResponseIntHeadString(r, loginHeadState, msg);
+//	}
 
 	/**
 	 * @param r
 	 * @param n
 	 */
-	private static void setResponseHeadIntMsgRaw(HttpServletResponse r,
-			int n, String msg) {
+	private static void setResponseIntHeadString(HttpServletResponse r,
+			int intHead, String msg) {
 		try {
 			r.setCharacterEncoding("UTF-8");
 			r.setHeader("Cache-Control", "no-cache"); // HTTP 1.1
@@ -172,62 +196,63 @@ public class ResponseUtils {
 			r.setDateHeader("Expires", 0); // prevents caching at the proxy server
 			r.setContentType("text/html;charset=UTF-8");
 			// set notLogin value
-			r.addIntHeader(UserHeadState.NOT_LOGININ, n);
+			r.addIntHeader(UserHeadState.NOT_LOGININ, intHead);
 			// write msg
 			r.getWriter().write(msg);
+			// flush buffer
 			r.flushBuffer();
 			if (logger.isDebugEnabled()) {
-				logger.debug(UserHeadState.NOT_LOGININ + ":" + n);
+				logger.debug(UserHeadState.NOT_LOGININ + ":" + intHead);
 				logger.debug(msg);
 			}
 		} catch (IOException e) {
-			logger.error(e.getMessage());
+			logger.error("setResponse", e);
 		}
 	}
 
 	/**
 	 * @param r
 	 */
-	public static void setResponseHeadNoLogin(HttpServletResponse r) {
-		setResponseHeadInt(r, UserHeadState.USER_NO_LOGIN); // -1,未登陆
-	}
-
-	/**
-	 * @param r
-	 */
-	public static void setResponseHeadNoOnLine(HttpServletResponse r) {
-		setResponseHeadInt(r, UserHeadState.USER_NO_ONLINE);	//帐号已经登陆
-	}
-
-	/**
-	 * @param r
-	 */
-	public static void setResponseHeadNoOnPower(HttpServletResponse r) {
-		setResponseHeadInt(r, UserHeadState.USER_NO_POWER);//用户无此权限
-	}
-
-	/**
-	 * @param r
-	 */
-	public static void setResponseHeadNoCheck(HttpServletResponse r) {
-		setResponseHeadInt(r, UserHeadState.USER_NO_CHECK);//用户无此权限
-	}
+//	public static void setResponseHeadNoLogin(HttpServletResponse r) {
+//		setResponseHeadInt(r, UserHeadState.USER_NO_LOGIN); // -1,未登陆
+//	}
+//
+//	/**
+//	 * @param r
+//	 */
+//	public static void setResponseHeadNoOnLine(HttpServletResponse r) {
+//		setResponseHeadInt(r, UserHeadState.USER_NO_ONLINE);	//帐号已经登陆
+//	}
+//
+//	/**
+//	 * @param r
+//	 */
+//	public static void setResponseHeadNoOnPower(HttpServletResponse r) {
+//		setResponseHeadInt(r, UserHeadState.USER_NO_POWER);//用户无此权限
+//	}
+//
+//	/**
+//	 * @param r
+//	 */
+//	public static void setResponseHeadNoCheck(HttpServletResponse r) {
+//		setResponseHeadInt(r, UserHeadState.USER_NO_CHECK);//用户无此权限
+//	}
 
 	/**
 	 * @param r
 	 * @param n
 	 */
-	private static void setResponseHeadInt(HttpServletResponse r, int n) {
-		r.setHeader("Cache-Control", "no-cache"); // HTTP 1.1
-		r.setHeader("Pragma", "no-cache"); // HTTP 1.0
-		r.setDateHeader("Expires", 0); // prevents caching at the proxy server
-		r.setCharacterEncoding("UTF-8");
-		r.setContentType("text/html;charset=UTF-8");
-		// set notLogin value
-		r.addIntHeader(UserHeadState.NOT_LOGININ, n);
-		if (logger.isDebugEnabled()) {
-			logger.debug(UserHeadState.NOT_LOGININ + ":" + n);
-		}
-	}
+//	private static void setResponseHeadInt(HttpServletResponse r, int n) {
+//		r.setHeader("Cache-Control", "no-cache"); // HTTP 1.1
+//		r.setHeader("Pragma", "no-cache"); // HTTP 1.0
+//		r.setDateHeader("Expires", 0); // prevents caching at the proxy server
+//		r.setCharacterEncoding("UTF-8");
+//		r.setContentType("text/html;charset=UTF-8");
+//		// set notLogin value
+//		r.addIntHeader(UserHeadState.NOT_LOGININ, n);
+//		if (logger.isDebugEnabled()) {
+//			logger.debug(UserHeadState.NOT_LOGININ + ":" + n);
+//		}
+//	}
 
 }

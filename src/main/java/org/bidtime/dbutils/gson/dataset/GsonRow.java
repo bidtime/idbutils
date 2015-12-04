@@ -683,10 +683,10 @@ public class GsonRow {
 	}
 	
 //	public static void main(String[] args) throws Exception {
-//		String[] heads = new String[]{"id","code","name"};
-//		Object[] datas = new Object[]{1,"x",new Date()};
+//		String[] heads = new String[]{"id", "code", "name", "memo", "mp"};
+//		Object[] datas = new Object[]{1, "code1", "name1", "memo1", "mp1"};
 //		GsonRow row = new GsonRow(heads, datas);
-//		row.moveToEnd(new String[]{"code", "id"});
+//		row.moveToEnd(new String[]{"id", "code"});
 //		System.out.println(row.toString());
 //		//row g = row.parserString(s);
 //		//System.out.println(g.objectToJsonStr());

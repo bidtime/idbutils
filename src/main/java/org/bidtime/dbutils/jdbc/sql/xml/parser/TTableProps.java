@@ -1,9 +1,5 @@
 package org.bidtime.dbutils.jdbc.sql.xml.parser;
 
-import java.beans.IntrospectionException;
-import java.beans.Introspector;
-import java.beans.PropertyDescriptor;
-import java.lang.reflect.Method;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,7 +10,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
+import org.bidtime.dbutils.gson.ClazzMapCallback;
 import org.bidtime.dbutils.gson.GsonEbUtils;
+import org.bidtime.dbutils.gson.PropAdapt;
 import org.bidtime.dbutils.gson.dataset.GsonRow;
 import org.bidtime.dbutils.gson.dataset.GsonRows;
 import org.bidtime.dbutils.jdbc.sql.ArrayUtils;
@@ -322,13 +320,13 @@ public class TTableProps {
 		List<String> listAddHead = null;
 		List<Object> listAddData = null;
 		for (int i = 0; i < this.listDefault.size(); i++) {
-			String s = this.listDefault.get(i);
-			ColumnPro cp = this.mapPropertyColumn.get(s);
+			String head = this.listDefault.get(i);
+			ColumnPro cp = this.mapPropertyColumn.get(head);
 			if (cp == null) {
 				continue;
 			}
 			Object objDefault = cp.getDefaultValue();			
-			int nIdx = r.getPosOfName(s);
+			int nIdx = r.getPosOfName(head);
 			if (nIdx == -1) {
 				if (listAddHead == null) {
 					listAddHead = new ArrayList<String>();
@@ -348,49 +346,50 @@ public class TTableProps {
 	}
 	
 	private void setDefaultValue(GsonRows r) {
-		if (r != null && r.isExistsData() && this.existDefault) {
-			List<String> listAddHead = null;
-			List<Object> listAddData = null;
-			for (int i = 0; i < this.listDefault.size(); i++) {
-				String s = this.listDefault.get(i);
-				ColumnPro cp = this.mapPropertyColumn.get(s);
-				if (cp == null) {
-					continue;
+		if (r == null || !r.isExistsData() || !this.existDefault) {
+			return;
+		}
+		List<String> listAddHead = null;
+		List<Object> listAddData = null;
+		for (int i = 0; i < this.listDefault.size(); i++) {
+			String s = this.listDefault.get(i);
+			ColumnPro cp = this.mapPropertyColumn.get(s);
+			if (cp == null) {
+				continue;
+			}
+			Object objDefault = cp.getDefaultValue();
+			int nIdx = r.getPosOfName(s);
+			if (nIdx == -1) {
+				if (listAddHead == null) {
+					listAddHead = new ArrayList<String>();
+					listAddData = new ArrayList<Object>();
 				}
-				Object objDefault = cp.getDefaultValue();
-				int nIdx = r.getPosOfName(s);
-				if (nIdx == -1) {
+				listAddHead.add(cp.getColumn());
+				listAddData.add(objDefault);
+			} else {
+				Object[] listOld = r.getArrayValueOfIdx(nIdx);
+				if (listOld != null && listOld.length > 0) {
+					for (int nn = 0; nn < listOld.length; nn++) {
+						Object objOld = listOld[nn];
+						if (objOld == null) {
+							listOld[nn] = objDefault;
+						}
+					}
+					r.setArrayValueOfIdx(nIdx, listOld);
+				} else {
 					if (listAddHead == null) {
 						listAddHead = new ArrayList<String>();
 						listAddData = new ArrayList<Object>();
 					}
 					listAddHead.add(cp.getColumn());
 					listAddData.add(objDefault);
-				} else {
-					Object[] listOld = r.getArrayValueOfIdx(nIdx);
-					if (listOld != null && listOld.length > 0) {
-						for (int nn = 0; nn < listOld.length; nn++) {
-							Object objOld = listOld[nn];
-							if (objOld == null) {
-								listOld[nn] = objDefault;
-							}
-						}
-						r.setArrayValueOfIdx(nIdx, listOld);
-					} else {
-						if (listAddHead == null) {
-							listAddHead = new ArrayList<String>();
-							listAddData = new ArrayList<Object>();
-						}
-						listAddHead.add(cp.getColumn());
-						listAddData.add(objDefault);
-					}
 				}
 			}
-			if (listAddHead != null && !listAddHead.isEmpty()) {
-				r.autoInsertHeadData(
-					listAddHead.toArray(new String[listAddHead.size()]),
-					listAddData.toArray(new Object[listAddData.size()]));
-			}
+		}
+		if (listAddHead != null && !listAddHead.isEmpty()) {
+			r.autoInsertHeadData(
+				listAddHead.toArray(new String[listAddHead.size()]),
+				listAddData.toArray(new Object[listAddData.size()]));
 		}
 	}
 
@@ -451,9 +450,9 @@ public class TTableProps {
 		return GsonEbUtils.mapToRow(map);
 	}
 	
-	public GsonRow mapToRow(Map<String, Object> map, boolean bRemovePk) {
+	public GsonRow mapToRow(Map<String, Object> map, boolean removePk) {
 		GsonRow row = GsonEbUtils.mapToRow(map);
-		if (row != null && !isNonePkInc() && bRemovePk) {
+		if (row != null && !isNonePkInc() && removePk) {
 			row.delHead(getFieldPK());
 		}		
 		return row;
@@ -463,20 +462,20 @@ public class TTableProps {
 		return GsonEbUtils.mapsToRows(list);
 	}
 	
-	public GsonRows mapsToRows(List<Map<String, Object>> list, boolean bRemovePk) {
+	public GsonRows mapsToRows(List<Map<String, Object>> list, boolean removePk) {
 		GsonRows rows = GsonEbUtils.mapsToRows(list);
-		if (rows != null && !isNonePkInc() && bRemovePk) {
+		if (rows != null && !isNonePkInc() && removePk) {
 			rows.delHead(getFieldPK());
 		}
 		return rows;
 	}
 	
-	public GsonRow clazzToRow(Object object) throws SQLException {
-		return GsonEbUtils.mapToRow(clazzToMap(object));
+	public GsonRow clazzToRow(Object object, PropAdapt pa) throws SQLException {
+		return GsonEbUtils.mapToRow(clazzToMap(object, pa));
 	}
 	
-	public GsonRow clazzToRow(Object object, boolean bRemovePk) throws SQLException {
-		GsonRow row = GsonEbUtils.mapToRow(clazzToMap(object));
+	public GsonRow clazzToRow(Object object, boolean bRemovePk, PropAdapt pa) throws SQLException {
+		GsonRow row = GsonEbUtils.mapToRow(clazzToMap(object, pa));
 		if (row != null && !isNonePkInc() && bRemovePk) {
 			row.delHead(getFieldPK());
 		}
@@ -484,72 +483,53 @@ public class TTableProps {
 	}
 	
 	@SuppressWarnings("rawtypes")
-	public GsonRows clazzToRows(List list) throws SQLException {
-		return GsonEbUtils.mapsToRows(clazzToMap(list));
+	public GsonRows clazzToRows(List list, PropAdapt pa) throws SQLException {
+		return GsonEbUtils.mapsToRows(clazzToMap(list, pa));
 	}
 	
 	@SuppressWarnings("rawtypes")
-	public GsonRows clazzToRows(List list, boolean bRemovePk) throws SQLException {
-		GsonRows rows = GsonEbUtils.mapsToRows(clazzToMap(list));
-		if (rows != null && !isNonePkInc() && bRemovePk) {
+	public GsonRows clazzToRows(List list, boolean removePk, PropAdapt pa) throws SQLException {
+		GsonRows rows = GsonEbUtils.mapsToRows(clazzToMap(list, pa));
+		if (rows != null && !isNonePkInc() && removePk) {
 			rows.delHead(getFieldPK());
 		}
 		return rows;
 	}
 
-	public static Map<String, Object> clazzToMap(Object object,
-			Map<String, ColumnPro> mapProperty, boolean force) throws SQLException {
-		Map<String, Object> map = new SimpleHashMap<Object>();
-		PropertyDescriptor[] propDescripts = null;
+	public static Map<String, Object> clazzToMap(Object o,
+			final Map<String, ColumnPro> mapProperty, boolean force, PropAdapt pa) throws SQLException {
 		try {
-			propDescripts = Introspector.getBeanInfo(object.getClass()).getPropertyDescriptors();
-		} catch (IntrospectionException e) {
-			logger.error("clazzToMap", e);
-			throw new SQLException("class to map error");
-		}
-		for (int i=0; i<propDescripts.length; i++) {
-			PropertyDescriptor pro = propDescripts[i];
-			//Method setter = pd.getWriteMethod();
-			Method setter = pro.getReadMethod();
-	        if (setter == null) {
-	            continue;
-	        }
-	        if (setter.getName().equals("getClass")) {
-	        	continue;
-	        }
-	        Object retVal = null;	//通过反射把该类对象传递给invoke方法来调用对应的方法  
-			try {
-				retVal = setter.invoke(object);
-			} catch (Exception e) {
-				logger.error("clazzToMap", e);
-				throw new SQLException("class to map error");
-			}
-			String head = pro.getName();
-			if (mapProperty != null && !mapProperty.isEmpty()) {
-				ColumnPro cp = mapProperty.get(head);
-				if (cp != null) {
-					map.put(cp.getColumn(), retVal);
-				} else if (force) {
-					map.put(head, retVal);
+			return GsonEbUtils.clazzToMap(o, new ClazzMapCallback<String, String>() {
+				@Override
+				public String getIt(String s) throws Exception {
+					if (mapProperty != null && !mapProperty.isEmpty()) {
+						ColumnPro cp = mapProperty.get(s);
+						if (cp != null) {
+							return cp.getColumn();
+						} else {
+							return null;
+						}
+					} else {
+						return s;
+					}
 				}
-			} else if (force) {
-				map.put(head, retVal);
-			}
+			}, pa, false);
+		} catch (Exception e) {
+			throw new SQLException(e);
 		}
-		return map;
 	}
 	
-	public Map<String, Object> clazzToMap(Object object) throws SQLException {
-		return clazzToMap(object, this.mapPropertyColumn, false);
+	public Map<String, Object> clazzToMap(Object object, PropAdapt pa) throws SQLException {
+		return clazzToMap(object, this.mapPropertyColumn, false, pa);
 	}
 	
 	@SuppressWarnings("rawtypes")
-	public List<Map<String, Object>> clazzToMap(List list) throws SQLException {
+	public List<Map<String, Object>> clazzToMap(List list, PropAdapt pa) throws SQLException {
 		if (list != null && list.size()>0) {
 			List<Map<String, Object>> listMap = new ArrayList<>();
 			for (int i=0; i<list.size(); i++) {
 				Object object = list.get(i);
-				listMap.add(clazzToMap(object));
+				listMap.add(clazzToMap(object, pa));
 			}
 			return listMap;
 		} else {

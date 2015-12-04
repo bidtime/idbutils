@@ -18,13 +18,6 @@ public class CaseInsensitiveHashSet extends HashSet<String> {
 	
 	public CaseInsensitiveHashSet() {
 	}
-	
-//	public CaseInsensitiveHashSet(String[] heads) {
-//		for (int i=0; i<heads.length; i++) {
-//			String sIdx = heads[i];
-//			this.add(sIdx);
-//		}
-//	}
 
 	public CaseInsensitiveHashSet(Collection<? extends String> c) {
 		for (String s : c) {

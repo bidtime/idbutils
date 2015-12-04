@@ -7,6 +7,7 @@ import java.util.Map;
 import javax.sql.DataSource;
 
 import org.apache.commons.dbutils.ResultSetHandler;
+import org.bidtime.dbutils.gson.PropAdapt;
 import org.bidtime.dbutils.gson.dataset.GsonRow;
 import org.bidtime.dbutils.gson.dataset.GsonRows;
 import org.bidtime.dbutils.jdbc.connection.DbConnection;
@@ -90,11 +91,20 @@ public class BasicDAO {
 
 	// insert
 
+	public int insert(Object object, PropAdapt pa) throws SQLException {
+		return insert(object, pa);
+	}
+	
 	public int insert(Object object) throws SQLException {
 		return SqlLoadUtils.insert(getCurrentDataSource(), this.getClass(),
 				object);
 	}
 
+	@SuppressWarnings("rawtypes")
+	public int insert(List list, PropAdapt pa) throws SQLException {
+		return insert(list, pa);
+	}
+	
 	@SuppressWarnings("rawtypes")
 	public int insert(List list) throws SQLException {
 		return SqlLoadUtils.insert(getCurrentDataSource(),
@@ -115,6 +125,11 @@ public class BasicDAO {
 				this.getClass(), g);
 	}
 
+	public <T> T insertForPK(Object object, PropAdapt pa) throws SQLException {
+		return SqlLoadUtils.insertForPK(getCurrentDataSource(),
+				this.getClass(), object, pa);
+	}
+	
 	public <T> T insertForPK(Object object) throws SQLException {
 		return SqlLoadUtils.insertForPK(getCurrentDataSource(),
 				this.getClass(), object);
@@ -124,6 +139,12 @@ public class BasicDAO {
 	public <T> T insertForPK(Object o, PKCallback cb) throws SQLException {
 		return SqlLoadUtils.insertForPK(getCurrentDataSource(),
 				this.getClass(), o, cb);
+	}
+
+	@SuppressWarnings("rawtypes")
+	public <T> T insertForPK(Object o, PropAdapt pa, PKCallback cb) throws SQLException {
+		return SqlLoadUtils.insertForPK(getCurrentDataSource(),
+				this.getClass(), o, pa, cb);
 	}
 
 	public int insertForPK(GsonRows r, String pk) throws SQLException {
@@ -203,9 +224,20 @@ public class BasicDAO {
 				o);
 	}
 
+	public int update(Object o, PropAdapt pa) throws SQLException {
+		return SqlLoadUtils.update(getCurrentDataSource(), this.getClass(),
+				o, pa);
+	}
+
 	public int update(Object o, String[] heads) throws SQLException {
 		return SqlLoadUtils.update(getCurrentDataSource(), this.getClass(),
 				o, heads);
+	}
+
+	@SuppressWarnings("rawtypes")
+	public int update(List list, PropAdapt pa) throws SQLException {
+		return SqlLoadUtils.update(getCurrentDataSource(),
+				this.getClass(), list, pa);
 	}
 
 	@SuppressWarnings("rawtypes")
@@ -219,6 +251,13 @@ public class BasicDAO {
 			throws SQLException {
 		return SqlLoadUtils.update(getCurrentDataSource(),
 				this.getClass(), list, heads);
+	}
+
+	@SuppressWarnings("rawtypes")
+	public int update(List list, String[] heads, PropAdapt pa)
+			throws SQLException {
+		return SqlLoadUtils.update(getCurrentDataSource(),
+				this.getClass(), list, heads, pa);
 	}
 
 	public int update(GsonRows g) throws SQLException {
