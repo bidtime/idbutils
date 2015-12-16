@@ -4,9 +4,9 @@ package org.bidtime.utils.exception;
  * 定义非检查型错误
  */
 @SuppressWarnings("serial")
-public class CheckMessageException extends RuntimeException {
+public class TipMsgException extends Exception {
 	//此为非检查型错误
-	public CheckMessageException(String message) {
+	public TipMsgException(String message) {
 		super(message);
 	}
 	/*

@@ -12,6 +12,7 @@ import java.util.Set;
 
 import org.bidtime.dbutils.gson.dataset.JsonData;
 import org.bidtime.utils.comm.CaseInsensitiveHashSet;
+import org.bidtime.web.utils.UserHeadState;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -209,6 +210,12 @@ public class ResultDTO<T> implements Serializable {
 		r.setData(data);
 		return r;
 	}
+	
+	@SuppressWarnings({ "rawtypes"})
+	public static ResultDTO success() {
+		ResultDTO r = new ResultDTO();
+		return r;
+	}
 
 	@SuppressWarnings({ "rawtypes" })
 	public static ResultDTO error(int state, String msg) {
@@ -219,11 +226,38 @@ public class ResultDTO<T> implements Serializable {
 	}
 
 	@SuppressWarnings({ "rawtypes" })
+	public static ResultDTO error() {
+		ResultDTO r = new ResultDTO();
+		r.setSuccess(false);
+		return r;
+	}
+
+	@SuppressWarnings({ "rawtypes" })
 	public static ResultDTO error(String msg) {
 		ResultDTO r = new ResultDTO();
 		r.setSuccess(false);
 		r.setMsg(msg);
 		return r;
+	}
+	
+	@SuppressWarnings("rawtypes")
+	public static ResultDTO apply(int applies, String msg) {
+		short state = (applies > 0) ? UserHeadState.SUCCESS : UserHeadState.ERROR;
+		if (state == UserHeadState.SUCCESS) {
+			return ResultDTO.success();
+		} else {
+			return ResultDTO.error(msg);
+		}
+	}
+
+	@SuppressWarnings("rawtypes")
+	public static ResultDTO apply(int applies) {
+		short state = (applies > 0) ? UserHeadState.SUCCESS : UserHeadState.ERROR;
+		if (state == UserHeadState.SUCCESS) {
+			return ResultDTO.success();
+		} else {
+			return ResultDTO.error();
+		}
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })

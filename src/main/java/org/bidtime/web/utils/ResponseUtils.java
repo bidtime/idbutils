@@ -8,6 +8,7 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletResponse;
 
 import org.bidtime.dbutils.gson.ResultDTO;
+import org.bidtime.utils.exception.TipMsgException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,14 +52,24 @@ public class ResponseUtils {
 		setStateMsgResponse(UserHeadState.USER_IS_FREQUENT, msg, r);
 	}
 
-	public static void setErrorMsgResponse(String msg, Exception e,
+	public static void setErrorMsgResponse(Exception e, String msg, 
 			HttpServletResponse r) {
-		setErrorMsgResponse(msg	+ ":" + e.getMessage(), r);
+		if (logger.isErrorEnabled()) {
+			logger.error("setError", e);
+		}
+		if (e instanceof TipMsgException) {
+			setErrorMsgResponse(e.getLocalizedMessage(), r);
+		} else {
+			setErrorMsgResponse(msg, r);
+		}
 	}
 
 	public static void setErrorMsgResponse(Exception e,
 			HttpServletResponse r) {
-		setStateMsgResponse(UserHeadState.ERROR, e.getMessage(), r);
+		if (logger.isErrorEnabled()) {
+			logger.error("setError", e);
+		}
+		setStateMsgResponse(UserHeadState.ERROR, e.getLocalizedMessage(), r);
 	}
 
 	public static void setStateMsgResponse(int n, String msg,

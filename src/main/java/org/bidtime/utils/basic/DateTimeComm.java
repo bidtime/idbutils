@@ -84,6 +84,25 @@ public class DateTimeComm {
 			return null;
 		}
 	}
+	
+	public static long getDateMS() {
+		//处理时间，建议用Calendar
+		Calendar c = Calendar.getInstance();
+		//设置当前时刻的时钟为0
+		c.set(Calendar.HOUR_OF_DAY, 0);
+		//设置当前时刻的分钟为0
+		c.set(Calendar.MINUTE, 0);
+		//设置当前时刻的秒钟为0
+		c.set(Calendar.SECOND, 0);
+		//设置当前的毫秒钟为0
+		c.set(Calendar.MILLISECOND, 0);
+		//获取当前时刻的时间戳
+		return c.getTimeInMillis();
+	}
+	
+	public static Date getDate() {
+		return new Date(getDateMS());
+	}
 
 	public static Date getAddYear(Date d) {
 		return getAddYear(d, 1);
