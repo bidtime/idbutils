@@ -19,7 +19,6 @@ import java.util.Set;
  */
 public class ValidatorUtils {
 
-    @SuppressWarnings("unused")
     @Deprecated
     public static String getErrorMessage(BindingResult result) {
         StringBuffer sb = new StringBuffer();
@@ -38,8 +37,6 @@ public class ValidatorUtils {
 
     }
 
-
-    @SuppressWarnings({"StringConcatenationInsideStringBufferAppend", "unused"})
     public static String getErrorMessage(BindingResult result, HttpServletRequest request) {
         StringBuffer sb = new StringBuffer();
         if (result.hasErrors()) {
@@ -63,8 +60,8 @@ public class ValidatorUtils {
 
     }
 
-    @SuppressWarnings("unused")
-    public static String valid(Object obj, Class... calssT) {
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+	public static String valid(Object obj, Class... calssT) {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         Validator validator = factory.getValidator();
         Set s = validator.validate(obj, calssT);
@@ -79,7 +76,28 @@ public class ValidatorUtils {
         return stringBuffer.toString();
     }
 
-    public static String validateProperty(Object obj, String filed, Class... calssT) {
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    public static ValidatorResult validForRes(Object obj, Class... calssT) {
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        Validator validator = factory.getValidator();
+        Set s = validator.validate(obj, calssT);
+        Iterator<ConstraintViolation<Object>> iter = s
+                .iterator();
+        StringBuffer stringBuffer = new StringBuffer();
+        ValidatorResult result = new ValidatorResult();
+        result.setResult(true);
+        while (iter.hasNext()) {
+            ConstraintViolation<Object> c = iter.next();
+            String message = c.getMessage() + ";";
+            stringBuffer.append(message);
+            result.setResult(false);
+        }
+        result.setMsg(stringBuffer.toString());
+        return result;
+    }
+
+    @SuppressWarnings("rawtypes")
+	public static String validateProperty(Object obj, String filed, Class... calssT) {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         Validator validator = factory.getValidator();
         Set<ConstraintViolation<Object>> s = validator.validateProperty(obj, filed, calssT);

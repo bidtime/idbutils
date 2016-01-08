@@ -94,6 +94,22 @@ public class ResultDTO<T> implements Serializable {
 	}
 	
 	public void addColSetProps(Set<String> colSetProps) {
+		addColSetProps(type, colSetProps);
+	}
+
+	public void addColSetProps(String[] arStrs) {
+		Set<String> set = new HashSet<String>(Arrays.asList(arStrs));
+		addColSetProps(type, set);
+	}
+
+	@SuppressWarnings("rawtypes")
+	private void addColSetProps(Class type, String[] arStrs) {
+		Set<String> set = new HashSet<String>(Arrays.asList(arStrs));
+		addColSetProps(type, set);
+	}
+	
+	@SuppressWarnings("rawtypes")
+	private void addColSetProps(Class type, Set<String> colSetProps) {
 		if (colMapProps == null || type == null) {
 			return;
 		}
@@ -103,14 +119,6 @@ public class ResultDTO<T> implements Serializable {
 		}
 		setColPro.addAll(colSetProps);
 		colMapProps.put(type.getName(), setColPro);
-	}
-
-	public void addColSetProps(String[] arStrs) {
-		if (colMapProps == null || type == null) {
-			return;
-		}
-		Set<String> set = new HashSet<String>(Arrays.asList(arStrs));
-		addColSetProps(set);
 	}
 
 	/**
@@ -154,6 +162,13 @@ public class ResultDTO<T> implements Serializable {
 				colMapProps.putAll(resultDTO.colMapProps);
 			}
 		}		
+	}
+	
+	public void putMapHead(Object o, String[] arStrs) {
+		if (colMapProps == null || type == null || o == null) {
+			return;
+		}
+		addColSetProps(o.getClass(), arStrs);
 	}
 	
 	public boolean isSuccess() {

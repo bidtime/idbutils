@@ -3,8 +3,7 @@ package org.bidtime.utils.spring.validator;
 /**
  * Created by Administrator on 2015/12/7.
  */
-@SuppressWarnings("ALL")
-public class ValidatorGourp {
+public class ValidatorGroup {
 
     public interface always {
     }

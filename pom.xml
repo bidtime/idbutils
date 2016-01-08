@@ -12,7 +12,7 @@
 	<groupId>org.bidtime.utils</groupId>
 	<artifactId>idbutils</artifactId>
 	<packaging>jar</packaging>
-	<version>1.0.13-SNAPSHOT</version>
+	<version>1.0.14-SNAPSHOT</version>
 	<name>idbutils</name>
 
 	<dependencies>
@@ -28,7 +28,12 @@
 			<artifactId>commons-dbutils</artifactId>
 			<version>1.6</version>
 		</dependency>
-		
+        <!--校验-->
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <version>4.3.1.Final</version>
+        </dependency>
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>servlet-api</artifactId>

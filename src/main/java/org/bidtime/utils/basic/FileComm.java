@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
 
+import org.bidtime.utils.file.GlobalParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -186,4 +187,22 @@ public class FileComm {
 		int n = s.lastIndexOf("/");
 		return s.substring(n + 1);
 	}
+
+    public static void copyFileFromTempToRoot(String pic, String fileDirectory) {
+        String fileName = FileComm.getFileNameOfURL(pic);//从临时文件URL获取文件名称
+        String tmpPath = GlobalParams.getGlobalParams().getTmpPath() + fileName;//临时文件的存放位置
+        String actual = GlobalParams.getGlobalParams().getWebRoot() + fileDirectory;//实际保存文件的位置
+        File act = new File(actual);
+        if (!act.exists()) {
+            act.mkdirs();
+        }
+        FileComm.copyFile(tmpPath, actual + fileName);
+
+    }
+
+    //获取图片访问地址
+    public static String getURL(String pics, String fileDirectory) {
+        String fileName = FileComm.getFileNameOfURL(pics);//从临时文件URL获取文件名称
+        return GlobalParams.getGlobalParams().getWebUrl() + fileDirectory + fileName;//生成图片最终访问的URL
+    }
 }
