@@ -72,6 +72,21 @@ public class PropEx extends Properties {
 		return ObjectComm.objectToInteger(o, nDefault);
 	}
 
+	public Boolean getBoolean(Object key) {
+		Object o = get(key);
+		return ObjectComm.objectToBoolean(o);
+	}
+
+	public Boolean getBoolean(Object key, Boolean nDefault) {
+		Object o = get(key);
+		return ObjectComm.objectToBoolean(o, nDefault);
+	}
+
+	public Boolean getBoolean(Object key, Integer nDefault) {
+		Object o = get(key);
+		return ObjectComm.objectToBoolean(o, nDefault);
+	}
+
 	public Long getLong(Object key) {
 		Object o = get(key);
 		return ObjectComm.objectToLong(o);

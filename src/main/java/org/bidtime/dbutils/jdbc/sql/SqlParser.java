@@ -14,6 +14,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
+import org.bidtime.dbutils.params.StmtParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,7 +60,8 @@ public class SqlParser {
 	
 	public static String parse(String configSql, Map<String, ?> inParams
 			, List<Object> opParamList) throws SQLException {
-		return parse(configSql, inParams, opParamList, true, true);
+		return parse(configSql, inParams, opParamList, 
+				StmtParams.getInstance().getDebug(), true);
 	}
 
 	public static String parseCount(String configSql, Map<String, ?> inParams) throws SQLException {

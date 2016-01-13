@@ -16,6 +16,33 @@ public class StmtParams {
 	private int fetchSize = 100;				//100per
 	private int spanTimeOut = 30000;			//30s
 	private String dataSource = "dataSource";
+	private Boolean debug = true;				//是否调试版本
+	private Boolean sqlOutParam = false;		//sqlOutParam -> false: sql里面含有参数; true: sql和参数分别输出
+	private Boolean formatSql = true;			//是否格式化sql
+
+	public Boolean getSqlOutParam() {
+		return sqlOutParam;
+	}
+
+	public void setSqlOutParam(Boolean sqlOutParam) {
+		this.sqlOutParam = sqlOutParam;
+	}
+
+	public Boolean getFormatSql() {
+		return formatSql;
+	}
+
+	public void setFormatSql(Boolean formatSql) {
+		this.formatSql = formatSql;
+	}
+
+	public Boolean getDebug() {
+		return debug;
+	}
+
+	public void setDebug(Boolean debug) {
+		this.debug = debug;
+	}
 
 	public String getDataSource() {
 		return dataSource;
@@ -79,6 +106,10 @@ public class StmtParams {
 				spanTimeOut = propUtils.getInteger("spanTimeOut", 30000);
 				fetchSize = propUtils.getInteger("fetchSize", 100);
 				dataSource = propUtils.getString("dataSource", dataSource);
+				//many boolean prop
+				debug = propUtils.getBoolean("debug", debug);
+				sqlOutParam = propUtils.getBoolean("sqlOutOne", sqlOutParam);
+				formatSql = propUtils.getBoolean("formatSql", formatSql);
 			}
 		} finally {
 			propUtils = null;
