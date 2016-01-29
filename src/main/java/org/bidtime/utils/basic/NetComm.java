@@ -1,5 +1,8 @@
 package org.bidtime.utils.basic;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.util.StringUtils;
 
 public class NetComm {
 
@@ -23,5 +26,39 @@ public class NetComm {
 		ip[3] = Long.parseLong(strIP.substring(position3 + 1));
 		return (ip[0] << 24) + (ip[1] << 16) + (ip[2] << 8) + ip[3];
 	}
+	
+	public static String getFirstClientIP(HttpServletRequest request) {
+		return getClientIP(request, 0);
+	}
+	
+	public static String getClientIP(HttpServletRequest request, int idx) {
+		String s = getClientIP(request);
+		if (StringUtils.isEmpty(s)) {
+			return null;
+		}
+		String[] ar = s.split(",");
+		if (ar.length>0) {
+			if (idx<ar.length) {
+				return ar[idx];
+			} else {
+				return ar[0];
+			}
+		} else {
+			return null;
+		}
+	}	
 
+	public static String getClientIP(HttpServletRequest request) {
+		String ip = request.getHeader("x-forwarded-for");
+		if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+			ip = request.getHeader("Proxy-Client-IP");
+		}
+		if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+			ip = request.getHeader("WL-Proxy-Client-IP");
+		}
+		if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+			ip = request.getRemoteAddr();
+		}
+		return ip;
+	}
 }

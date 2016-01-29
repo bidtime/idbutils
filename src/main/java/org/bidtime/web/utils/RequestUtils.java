@@ -3,9 +3,12 @@ package org.bidtime.web.utils;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.ParseException;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -20,7 +23,7 @@ import org.slf4j.LoggerFactory;
 /**
  * @author jss
  * 
- * 提供对从Request中取出参数的功能
+ *         提供对从Request中取出参数的功能
  *
  */
 public class RequestUtils {
@@ -72,67 +75,119 @@ public class RequestUtils {
 		return getSplit(request, sParam, COMMA);
 	}
 
-	public static Object[] getIdStrSplit(HttpServletRequest request) throws Exception {
+	public static Object[] getIdSplit(HttpServletRequest request)
+			throws Exception {
 		return getSplit(request, ID, COMMA);
 	}
 
-	public static Long[] getIdLongSplit(HttpServletRequest request) throws Exception {
+	public static String[] getIdStrSplit(HttpServletRequest request)
+			throws Exception {
+		return getStrSplit(request, ID, COMMA);
+	}
+
+	public static Long[] getIdLongSplit(HttpServletRequest request)
+			throws Exception {
 		return getLongSplit(request, ID, COMMA);
 	}
 
-	public static Integer[] getIdIntegerSplit(HttpServletRequest request) throws Exception {
+	public static Integer[] getIdIntegerSplit(HttpServletRequest request)
+			throws Exception {
 		return getIntegerSplit(request, ID, COMMA);
 	}
 
-	public static Object[] getStrSplit(HttpServletRequest request, String sParam) throws Exception {
-		return getSplit(request, sParam, COMMA);
+	public static String[] getStrSplit(HttpServletRequest request, String sParam)
+			throws Exception {
+		return getStrSplit(request, sParam, COMMA);
 	}
 
-	public static Long[] getIdLongSplit(HttpServletRequest request, String sParam) throws Exception {
+	public static Long[] getLongSplit(HttpServletRequest request, String sParam)
+			throws Exception {
 		return getLongSplit(request, sParam, COMMA);
 	}
 
-	public static Integer[] getIdIntegerSplit(HttpServletRequest request, String sParam) throws Exception {
+	public static Integer[] getIntegerSplit(HttpServletRequest request,
+			String sParam) throws Exception {
 		return getIntegerSplit(request, sParam, COMMA);
 	}
-	
-//	public static ParserDataSet getPaserDataSetOfRequest(HttpServletRequest request, String sParam) throws Exception {
-//		String data = request.getParameter(sParam);
-//		ParserDataSet g = ParserDataSet.jsonStrToObject(data);
-//		if (g == null) {
-//			throw new Exception("json data is null");
-//		} else {
-//			return g;
-//		}
-//	}
-	
-//	public static Object getPaserJsonOfRequest(HttpServletRequest request, String sParam) throws Exception {
-//		String data = request.getParameter(sParam);
-//		JSONObject jsonObject = new JSONObject(data);
-//		Object o = JSONHelper.jsonToMap(jsonObject);
-//		if (o == null) {
-//			throw new Exception("json data is null");
-//		} else {
-//			return o;
-//		}
-//	}
-//	
-	public static Map<String, Object> jsonStrToMap(HttpServletRequest request, String sParam) throws Exception {
+
+	public static Set<Long> getSetLongSplit(HttpServletRequest request,
+			String sParam) throws Exception {
+		return getSetLongSplit(request, sParam, COMMA);
+	}
+
+	public static Set<Long> getSetLongSplit(HttpServletRequest request,
+			String sParam, String split) throws Exception {
+		Long[] strs = getLongSplit(request, sParam, split);
+		Set<Long> setIds = new HashSet<Long>(Arrays.asList(strs));
+		return setIds;
+	}
+
+	public static Set<Integer> getSetIntegerSplit(HttpServletRequest request,
+			String sParam) throws Exception {
+		return getSetIntegerSplit(request, sParam, COMMA);
+	}
+
+	public static Set<Integer> getSetIntegerSplit(HttpServletRequest request,
+			String sParam, String split) throws Exception {
+		Integer[] strs = getIntegerSplit(request, sParam, split);
+		Set<Integer> setIds = new HashSet<Integer>(Arrays.asList(strs));
+		return setIds;
+	}
+
+	public static Set<String> getSetStringSplit(HttpServletRequest request,
+			String sParam) throws Exception {
+		return getSetStringSplit(request, sParam, COMMA);
+	}
+
+	public static Set<String> getSetStringSplit(HttpServletRequest request,
+			String sParam, String split) throws Exception {
+		String[] strs = getStrSplit(request, sParam, split);
+		Set<String> setIds = new HashSet<String>(Arrays.asList(strs));
+		return setIds;
+	}
+
+	// public static ParserDataSet getPaserDataSetOfRequest(HttpServletRequest
+	// request, String sParam) throws Exception {
+	// String data = request.getParameter(sParam);
+	// ParserDataSet g = ParserDataSet.jsonStrToObject(data);
+	// if (g == null) {
+	// throw new Exception("json data is null");
+	// } else {
+	// return g;
+	// }
+	// }
+
+	// public static Object getPaserJsonOfRequest(HttpServletRequest request,
+	// String sParam) throws Exception {
+	// String data = request.getParameter(sParam);
+	// JSONObject jsonObject = new JSONObject(data);
+	// Object o = JSONHelper.jsonToMap(jsonObject);
+	// if (o == null) {
+	// throw new Exception("json data is null");
+	// } else {
+	// return o;
+	// }
+	// }
+
+	public static Map<String, Object> jsonStrToMap(HttpServletRequest request,
+			String sParam) throws Exception {
 		String jsonObject = RequestUtils.getString(request, sParam);
 		return JSONHelper.jsonStrToMap(jsonObject);
 	}
 
-	public static <T> T jsonStrToClazz(HttpServletRequest request, String sParam, Class<T> type) throws Exception {
+	public static <T> T jsonStrToClazz(HttpServletRequest request,
+			String sParam, Class<T> type) throws Exception {
 		String json = RequestUtils.getString(request, sParam);
 		return JSONHelper.jsonStrToClazz(json, type);
 	}
-	
+
 	@SuppressWarnings("rawtypes")
-	public static <T> T paramsMapToClazz(HttpServletRequest request, Class<T> type) throws Exception {
+	public static <T> T paramsMapToClazz(HttpServletRequest request,
+			Class<T> type) throws Exception {
 		Map map = getMapOfRequest(request);
 		if (map != null) {
-			return (T)JSONHelper.mapToClazz(map, type);
-			//BeanUtils.populate(t, request.getParameterMap());
+			return (T) JSONHelper.mapToClazz(map, type);
+			// BeanUtils.populate(t, request.getParameterMap());
 		} else {
 			return null;
 		}
@@ -148,8 +203,16 @@ public class RequestUtils {
 		}
 	}
 
-	public static String[] getStrSplit(HttpServletRequest request, String sParam,
-			String splitChar) throws Exception {
+	public static Object[] getSplit(String str, String strSplit) {
+		if (StringUtils.isEmpty(str)) {
+			return null;
+		} else {
+			return str.split(strSplit);
+		}
+	}
+
+	public static String[] getStrSplit(HttpServletRequest request,
+			String sParam, String splitChar) throws Exception {
 		String sId = getString(request, sParam);
 		if (StringUtils.isEmpty(sId)) {
 			return null;
@@ -158,8 +221,28 @@ public class RequestUtils {
 		}
 	}
 
-	public static Long[] getLongSplit(HttpServletRequest request, String sParam,
-			String splitChar) throws Exception {
+	@SuppressWarnings("unchecked")
+	public static <T> List<T> asList(T a, HttpServletRequest request,
+			String sParam, String splitChar) {
+		Object[] ars = getSplit(request, sParam, splitChar);
+		return Arrays.asList((T) ars);
+	}
+
+	@SuppressWarnings("unchecked")
+	public static <T> List<T> asList(T a, HttpServletRequest request,
+			String sParam) {
+		Object[] ars = getSplit(request, sParam, COMMA);
+		return Arrays.asList((T) ars);
+	}
+
+	@SuppressWarnings("unchecked")
+	public static <T> List<T> asList(T a, String str, String strSplit) {
+		Object[] ars = getSplit(str, strSplit);
+		return Arrays.asList((T) ars);
+	}
+
+	public static Long[] getLongSplit(HttpServletRequest request,
+			String sParam, String splitChar) throws Exception {
 		String sId = getString(request, sParam);
 		if (StringUtils.isEmpty(sId)) {
 			throw new Exception("params is null");
@@ -168,8 +251,8 @@ public class RequestUtils {
 		}
 	}
 
-	public static Integer[] getIntegerSplit(HttpServletRequest request, String sParam,
-			String splitChar) throws Exception {
+	public static Integer[] getIntegerSplit(HttpServletRequest request,
+			String sParam, String splitChar) throws Exception {
 		String sId = getString(request, sParam);
 		if (StringUtils.isEmpty(sId)) {
 			throw new Exception("params is null");
@@ -348,7 +431,7 @@ public class RequestUtils {
 			return strToDate(s, "yyyy-MM-dd");
 		}
 	}
-	
+
 	public static Date getDateTime(HttpServletRequest request, String sParam) {
 		return getDateTime(request, sParam, null);
 	}
@@ -378,7 +461,7 @@ public class RequestUtils {
 			return null;
 		}
 	}
-	
+
 	public static String getUtf8ParamsOfRequest(HttpServletRequest request) {
 		return getParamsOfRequest(request, true);
 	}
@@ -430,7 +513,7 @@ public class RequestUtils {
 		Set keSet = map.entrySet();
 		for (Iterator itr = keSet.iterator(); itr.hasNext();) {
 			Map.Entry entry = (Map.Entry) itr.next();
-			String key = (String)(entry.getKey());
+			String key = (String) (entry.getKey());
 			Object objectValue = entry.getValue();
 			Object valRtn = null;
 			if (objectValue instanceof Object[]) {
