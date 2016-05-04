@@ -20,6 +20,7 @@ import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
+import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.ResultSet;
@@ -34,7 +35,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.dbutils.BasicRowProcessor;
+import org.bidtime.dbutils.gson.dataset.GsonRow;
+import org.bidtime.dbutils.gson.dataset.GsonRows;
 import org.bidtime.utils.comm.CaseInsensitiveHashMap;
 
 /**
@@ -49,11 +51,12 @@ import org.bidtime.utils.comm.CaseInsensitiveHashMap;
  * This class is thread-safe.
  * </p>
  *
- * @see BasicRowProcessor
+ * @see BasicRowProcessorEx
  *
  * @since DbUtils 1.1
  */
-public class BeanProcessorEx {
+@SuppressWarnings("serial")
+public class BeanProcessorEx implements Serializable {
 
 	/**
      * Special array value used by <code>mapColumnsToProperties</code> that
@@ -552,9 +555,40 @@ public class BeanProcessorEx {
             } else {
                 propertyName = columnName;            	
             }
-            //
             result.put(propertyName, rs.getObject(i));
         }
         return result;
+	}
+	
+	public GsonRows toGsonRows(ResultSet rs) throws SQLException {
+		ResultSetMetaData meta = rs.getMetaData();
+        int nCols = meta.getColumnCount();
+        String[] cols = new String[nCols];
+        for (int i = 0; i < nCols; i++) {
+        	cols[i] = meta.getColumnName(i + 1);
+        }
+        List<Object[]> list = new ArrayList<Object[]>();
+        do {
+        	Object[] val = new Object[nCols];
+	        for (int i = 0; i < nCols; i++) {
+	        	val[i] = rs.getObject(i + 1);
+	        }
+	        list.add(val);
+	    } while (rs.next());
+        return new GsonRows(cols, list);
+	}
+	
+	public GsonRow toGsonRow(ResultSet rs) throws SQLException {
+		ResultSetMetaData meta = rs.getMetaData();
+        int nCols = meta.getColumnCount();
+        String[] cols = new String[nCols];
+        for (int i = 0; i < nCols; i++) {
+        	cols[i] = meta.getColumnName(i + 1);
+        }
+        Object[] vals = new Object[nCols];
+        for (int i = 0; i < nCols; i++) {
+        	vals[i] = rs.getObject(i + 1);
+        }
+		return new GsonRow(cols, vals);
 	}
 }

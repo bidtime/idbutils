@@ -35,20 +35,32 @@ public class UserHeadState {
 //		//}
 //		return jsonObject;
 //	}
+	
+	public static JSONObject stateMsgToJson(int state, String msg) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("state", state);
+		map.put("msg", msg);
+		JSONObject json = JSONHelper.mapToJson(map, null);
+		return json;
+	}
+
+	public static JSONObject noLoginJsonMsg(int state, String msg) {
+		return stateMsgToJson(state, msg);
+	}
 
 	public static JSONObject noPassJsonMsg(int chkstate, String msg) {
-		return stateMsgToJson(chkstate, msg);
+		return chkStateMsgToJson(chkstate, msg);
 	}
 
 	public static JSONObject noCheckJsonMsg(int chkstate, String msg) {
-		return stateMsgToJson(chkstate, msg);
+		return chkStateMsgToJson(chkstate, msg);
 	}
 
 	public static JSONObject noActiveJsonMsg(int chkstate, String msg) {
-		return stateMsgToJson(chkstate, msg);
+		return chkStateMsgToJson(chkstate, msg);
 	}
 	
-	public static JSONObject stateMsgToJson(int chkstate, String msg) {
+	public static JSONObject chkStateMsgToJson(int chkstate, String msg) {
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put(CHK_USER, chkstate);
 		map.put("msg", msg);

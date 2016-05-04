@@ -4,6 +4,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
 
+import org.bidtime.dbutils.gson.dataset.GsonRows;
 import org.bidtime.dbutils.jdbc.rs.BeanProcessorEx;
 import org.bidtime.dbutils.jdbc.rs.handle.ext.ResultSetDTOHandler;
 
@@ -14,23 +15,27 @@ import org.bidtime.dbutils.jdbc.rs.handle.ext.ResultSetDTOHandler;
  *
  */
 @SuppressWarnings("serial")
-public class MapDTOHandler extends ResultSetDTOHandler<Map<String, Object>> {
+public class GsonRowsDTOHandler extends ResultSetDTOHandler<GsonRows> {
 
-	public MapDTOHandler() {
+	public GsonRowsDTOHandler() {
 		this(false);
 	}
 
-	public MapDTOHandler(boolean countSql) {
+	public GsonRowsDTOHandler(boolean countSql) {
 		this(new BeanProcessorEx(), false);
 	}
 
-	public MapDTOHandler(BeanProcessorEx convert, boolean countSql) {
+	public GsonRowsDTOHandler(BeanProcessorEx convert, boolean countSql) {
 		super.setProp(Map.class, convert, countSql);
 	}
 
 	@Override
-	public Map<String, Object> doDTO(ResultSet rs) throws SQLException {
-		return rs.next() ? this.convert.toMap(rs, this.mapBeanPropColumns) : null;
+	public GsonRows doDTO(ResultSet rs) throws SQLException {
+		if (rs.next()) {
+			return convert.toGsonRows(rs);
+		} else {
+			return null;
+		}
 	}
 
 }

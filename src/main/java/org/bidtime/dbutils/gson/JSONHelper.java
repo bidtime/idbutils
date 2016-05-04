@@ -685,7 +685,7 @@ public class JSONHelper {
 //					Object objData = entry.getValue();
 //					map.put(entry.getKey(), entry.getValue());
 //				}
-			} else { 
+			} else {
 				map.put(key, retVal);
 			}
 		}

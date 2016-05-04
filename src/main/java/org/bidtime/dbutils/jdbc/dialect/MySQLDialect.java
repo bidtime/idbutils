@@ -12,10 +12,10 @@ public class MySQLDialect implements Dialect {
 		return INSTANCE;
 	}
 
-	@Override
-	public String getIdSql() {
-		return "select last_insert_id()";
-	}
+//	@Override
+//	public String getIdSql() {
+//		return "select last_insert_id()";
+//	}
 
 	@Override
 	public String getSubSqlOfPage(String sql) {

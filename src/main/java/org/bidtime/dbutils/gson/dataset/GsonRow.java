@@ -6,22 +6,19 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 
 import org.bidtime.dbutils.gson.JSONHelper;
 import org.bidtime.utils.basic.ArrayComm;
 import org.bidtime.utils.basic.ObjectComm;
 import org.json.JSONArray;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class GsonRow {
+public class GsonRow extends GsonData {
+	
 	private static final Logger logger = LoggerFactory
 			.getLogger(GsonRow.class);
-
-	HashMap<String, Integer> mapHead = new HashMap<String, Integer>();
 
 	public GsonRow() {
 	}
@@ -35,12 +32,10 @@ public class GsonRow {
 			if (logger.isDebugEnabled()) {
 				logger.debug("head is null");
 			}
-			// throw new Exception("xml head is null ");
 		} else if (list == null) {
 			if (logger.isDebugEnabled()) {
 				logger.debug("data is null");
 			}
-			// throw new Exception("data is null ");
 		} else {
 			if (head.length != list.length) {			
 				StringBuilder sb = new StringBuilder();
@@ -51,25 +46,14 @@ public class GsonRow {
 				sb.append(list.length);
 				sb.append(" ) isn't mismatch.");
 				logger.error(sb.toString());
-				// throw new Exception("xml head and date  mismatching ");
 			}
 		}
-		this.setHead(head);
-		this.setData(list);
+		setHead(head);
+		setData(list);
 		clearIndex();
 	}
-
-	String[] head;
 	
 	Object[] data;
-
-	public String[] getHead() {
-		return head;
-	}
-
-	public void setHead(String[] head) {
-		this.head = head;
-	}
 
 	public Object[] getData() {
 		return data;
@@ -79,7 +63,7 @@ public class GsonRow {
 		this.data = data;
 	}
 	
-	private JSONArray dataToJson() {
+	protected JSONArray dataToJson() {
 		JSONArray ar1 = new JSONArray();
 		for (int j = 0; j < head.length; j++) {
 			Object obj;
@@ -92,82 +76,6 @@ public class GsonRow {
 		}
 		return ar1;
 	}
-
-	public JSONObject toJson() {
-		JSONObject jsonObject = new JSONObject();
-		if (head != null && head.length>0) {
-			jsonObject.put("head", this.head);			
-		}
-		if (this.data != null && this.data.length>0) {
-			jsonObject.put("data", dataToJson());
-		} else {
-			jsonObject.putOpt("data", JSONObject.NULL);
-		}
-		return jsonObject;
-	}
-
-	@Override
-	public String toString() {
-		JSONObject jsonObject1 = toJson();
-		return jsonObject1.toString();
-	}
-	
-//	public GsonRow(String json) {
-//		fromString(json);
-//	}
-//	
-//	public GsonRow(JSONObject jsonObject) {
-//		fromJson(jsonObject);
-//	}
-//	
-//	public static GsonRow parserString(String json) {
-//		return parserString(json, false);
-//	}
-//	
-//	public static GsonRow parserString(String json, boolean bNew) {
-//		if (StringUtils.isNotEmpty(json)) {
-//			JSONObject jsonobj = new JSONObject(json);
-//			if (jsonobj.length() > 0 || bNew) {
-//				GsonRow row = new GsonRow();
-//				row.fromJson(jsonobj);
-//				return row;
-//			} else {
-//				return null;
-//			}
-//		} else {
-//			return null;
-//		}
-//	}
-	
-//	public void fromString(String json) {
-//		JSONObject jsonobj = new JSONObject(json);
-//		fromJson(jsonobj);
-//	}
-//	
-//	public void fromJson(JSONObject jsonObject) {
-//		JSONArray headArray = jsonObject.optJSONArray("head");
-//		if (headArray != null && headArray.length()>0) {
-//			head = new String[headArray.length()];
-//			for (int i = 0; i < headArray.length(); i++) {
-//				Object object = headArray.get(i);
-//				head[i] = (String)object;
-//			}
-//		}
-//		//
-//		if (jsonObject.has("data") && !jsonObject.isNull("data")) {
-//			JSONArray dataArray = jsonObject.getJSONArray("data");
-//			if (dataArray.length() > 0) {
-//				this.data = new Object[dataArray.length()];
-//				for (int n = 0; n < dataArray.length(); n++) {
-//					data[n] = JSONHelper.jsonObjToObj(dataArray.get(n));
-//				}
-//			} else {
-//				CArrayComm.clearArray(data);
-//			}
-//		} else {
-//			CArrayComm.clearArray(data);
-//		}
-//	}
 
 	public boolean renameHead(String newName, String oldName) {
 		int nPos = this.getPosOfName(oldName);
@@ -222,7 +130,7 @@ public class GsonRow {
 		if (nIdx < 0) {
 			addHeadData(headName, value);
 		} else {
-			this.setValueOfIdx(nIdx, value);
+			this.setValue(nIdx, value);
 		}
 	}
 
@@ -237,7 +145,7 @@ public class GsonRow {
 		if (nIdx < 0) {
 			insertHeadData(headName, value);
 		} else {
-			this.setValueOfIdx(nIdx, value);
+			this.setValue(nIdx, value);
 		}
 	}
 
@@ -355,19 +263,8 @@ public class GsonRow {
 			clearIndex();
 		} */
 	}
-	
-	private void clearIndex() {
-		mapHead.clear();
-	}
-	
-	private void initIndex() {
-		mapHead.clear();
-		for (int i = 0; i < head.length; i++) {
-			mapHead.put(head[i].toLowerCase(), i);
-		}
-	}
 
-	public GsonRow remain(Integer[] nIdxs) {
+	private GsonRow remain(Integer[] nIdxs) {
 		GsonRow g = new GsonRow();
 		g.head = new String[nIdxs.length];
 		g.data = new Object[nIdxs.length];
@@ -385,32 +282,6 @@ public class GsonRow {
 	public GsonRow remain(String[] arHead) {
 		Integer[] listCols=getHeadPosArrayOfName(arHead);
 		return remain(listCols);
-	}
-	
-	public int getPosOfName(String headName) {
-		int n = -1;
-		try {
-			if (mapHead.size()<=0) {
-				initIndex();
-			}
-			n = mapHead.get(headName.toLowerCase());
-		} catch (Exception e) {
-
-		}
-		return n;
-	}
-	
-	public String getHeadValueOfIdx(int nIdx) {
-		try {
-			return head[nIdx];
-		} catch (Exception e) {
-			return null;
-		}
-	}
-
-	@Deprecated
-	public Object getValueOfName(String colName) {
-		return getValue(colName, null);
 	}
 	
 	public Object getValue(String colName) {
@@ -484,11 +355,6 @@ public class GsonRow {
 	public Date getDateFmt(int colNo, String fmtDate, Date dateValue) {
 		return ObjectComm.objectToDateFmt(getValue(colNo), fmtDate, dateValue);
 	}
-
-	@Deprecated
-	public void setValueOfName(String colName, Object value) {
-		setValue(colName, value);
-	}
 	
 	public void setValue(String colName, Object value) {
 		int colNo = getPosOfName(colName);
@@ -496,20 +362,14 @@ public class GsonRow {
 			data[colNo] = value;
 		}
 	}
-
-	@Deprecated
-	public Object getValueOfIdx(int nIdx) {
-		return getValue(nIdx, null);
-	}
 	
 	public Object getValue(int nIdx) {
 		return getValue(nIdx, null);
 	}
 	
 	public Object getValue(int nIdx, Object value) {
-		int nPos = nIdx;
-		if (nPos > -1) {
-			Object obj = data[nPos];
+		if (nIdx > -1) {
+			Object obj = data[nIdx];
 			if (obj == null) {
 				return value;
 			} else {
@@ -518,11 +378,6 @@ public class GsonRow {
 		} else {
 			return value;
 		}
-	}
-	
-	@Deprecated
-	public void setValueOfIdx(int idx, Object value) {
-		setValue(idx, value);
 	}
 	
 	public void setValue(int idx, Object value) {
@@ -642,16 +497,13 @@ public class GsonRow {
 		return ObjectComm.objectToBoolean(getValue(colName), value);
 	}
 	
-	public int getDataLength() {
-		if (this.data!=null) {
+	@Override
+	public int getDataLen() {
+		if (this.data != null) {
 			return this.data.length;
 		} else {
 			return 0;
 		}
-	}
-
-	public boolean isExistsData() {
-		return getDataLength() > 0 ? true:false;
 	}
 	
 	public boolean moveToEnd(String moveHead) {

@@ -1,5 +1,7 @@
 package org.bidtime.dbutils.jdbc.rs;
 
-public enum BeanAdapt {
+import java.io.Serializable;
+
+public enum BeanAdapt implements Serializable {
 	AUTO, FULL
 }

@@ -11,10 +11,10 @@ public class SqlServerDialect implements Dialect {
 		return INSTANCE;
 	}
 
-	@Override
-	public String getIdSql() {
-		return "select @@identity";
-	}
+//	@Override
+//	public String getIdSql() {
+//		return "select @@identity";
+//	}
 
 	@Override
 	public String getSubSqlOfPage(String sql) {

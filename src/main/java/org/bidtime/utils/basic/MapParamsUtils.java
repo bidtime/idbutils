@@ -19,7 +19,9 @@ public class MapParamsUtils {
 			.getLogger(MapParamsUtils.class);
 
 	public static void addToMap(Map<String, Object> map, String key, Object o) {
-		logger.debug(key+":"+o);
+		if (logger.isDebugEnabled()) {
+			logger.debug(key + ":" + String.valueOf(o));
+		}
 		if (o != null) {
 			if (o instanceof String) {
 				if (StringUtils.isEmpty((String)o)) {
@@ -41,10 +43,12 @@ public class MapParamsUtils {
 	public static void addRightPercentToMap(Map<String, Object> map, String key, Object o) {
 		addToMap(map, key, null, o, "%");
 	}
-
+	
 	public static void addToMap(Map<String, Object> map, String key, String sBef,
 			Object o, String sAft) {
-		logger.debug(key+":"+o);
+		if (logger.isDebugEnabled()) {
+			logger.debug(key + ":" + String.valueOf(o));
+		}
 		if (o != null) {
 			if (o instanceof String) {
 				if (StringUtils.isEmpty((String)o)) {

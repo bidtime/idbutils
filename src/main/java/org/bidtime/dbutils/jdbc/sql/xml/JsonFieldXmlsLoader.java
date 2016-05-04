@@ -68,13 +68,44 @@ public class JsonFieldXmlsLoader extends TableFieldXmlsParser {
 		return instance.get(cls);
 	}
 	
+//	@SuppressWarnings("rawtypes")
+//	public static String getSqlOfId(Class clazz, String id) throws SQLException {
+//		TTableProps tp = getTableProps(clazz);
+//		if (tp != null) {
+//			String sql = tp.getSqlOfId(id);
+//			if (sql == null) {
+//				throw new SQLException("clz:" + clazz.getSimpleName()
+//						+ ",id:" + id + ", is none sql xml.");
+//			} else {
+//				return sql;
+//			}
+//		} else {
+//			throw new SQLException("clz:" + clazz.getSimpleName() + " is none sql xml.");
+//		}
+//	}
+	
 	@SuppressWarnings("rawtypes")
-	public static String getSqlOfId(Class clazz, String id) throws SQLException {
+	public static String getSqlOfId(Class clazz, String id, String colId) throws SQLException {
 		TTableProps tp = getTableProps(clazz);
 		if (tp != null) {
-			return tp.getSqlOfId(id);
+			String sql = null;
+			if (colId == null) {
+				sql = tp.getSqlOfId(id);
+				if (sql == null) {
+					throw new SQLException("clz:" + clazz.getSimpleName()
+							+ ",id:" + id + ", is none sql cols.");
+				}
+			} else {
+				sql = tp.getSqlOfId(id, colId);
+			}
+			if (sql == null) {
+				throw new SQLException("clz:" + clazz.getSimpleName()
+						+ ",id/colId:" + id + "/" + colId + ", is none sql cols.");
+			} else {
+				return sql;
+			}
 		} else {
-			return null;
+			throw new SQLException("clz:" + clazz.getSimpleName() + " is none sql xml.");
 		}
 	}
 

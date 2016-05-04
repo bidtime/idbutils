@@ -9,9 +9,10 @@ import org.bidtime.dbutils.jdbc.rs.BeanProcessorEx;
 /**
  * @author jss
  * 
- * 提供对从ResultSet进行预处理的功能,继承AbstractGsonListHandler类
+ * 提供对从ResultSet进行预处理的功能,继承AbstractListDTOHandler类
  *
  */
+@SuppressWarnings("serial")
 public class MapListDTOHandler extends AbstractListDTOHandler<Map<String, Object>> {
 
 	public MapListDTOHandler() {

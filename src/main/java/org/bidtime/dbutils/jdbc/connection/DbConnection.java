@@ -13,12 +13,12 @@ import org.bidtime.dbutils.QueryRunnerEx;
 import org.bidtime.dbutils.gson.ResultDTO;
 import org.bidtime.dbutils.jdbc.connection.ds.DataSourceTransactionHolder;
 import org.bidtime.dbutils.jdbc.connection.log.LogInsertSql;
-import org.bidtime.dbutils.jdbc.connection.log.LogSeleteSql;
+import org.bidtime.dbutils.jdbc.connection.log.LogSelectSql;
 import org.bidtime.dbutils.jdbc.connection.log.LogSpSql;
 import org.bidtime.dbutils.jdbc.connection.log.LogUpdateSql;
 import org.bidtime.dbutils.jdbc.dialect.CAutoFitSql;
+import org.bidtime.dbutils.jdbc.rs.handle.ext.ResultSetDTOHandler;
 import org.bidtime.dbutils.jdbc.sql.SqlUtils;
-import org.bidtime.dbutils.jdbc.sql.xml.parser.HeadSqlArray;
 import org.bidtime.utils.basic.ArrayComm;
 import org.bidtime.utils.basic.ObjectComm;
 import org.springframework.jdbc.datasource.ConnectionHolder;
@@ -165,13 +165,13 @@ public class DbConnection {
 		if (conn == null) {
 			conn = DataSourceUtils.getConnection(ds);
 			try {
-				return insertBatchConn(conn, sql,  rsh, params);
+				return insertBatchConn(conn, sql, rsh, params);
 			} finally {
 				DataSourceUtils.releaseConnection(conn, ds);
 				conn = null;
 			}
 		} else {
-			return insertBatchConn(conn, sql,  rsh, params);
+			return insertBatchConn(conn, sql, rsh, params);
 		}
 	}
 	
@@ -241,7 +241,7 @@ public class DbConnection {
 		}
 		if (LogUpdateSql.logInfoOrDebug()) {
 			LogUpdateSql.logFormatTimeNow(startTime, sql, params,
-					(affectedRows != null  ? affectedRows.length : 0));
+					(affectedRows != null ? affectedRows.length : 0));
 		}
 		return nResult;
 	}
@@ -310,27 +310,33 @@ public class DbConnection {
 		return bReturn;
 	}
 	
-	public static <T> T query(DataSource ds, HeadSqlArray ha,
+	public static <T> T query(DataSource ds, String sql,
 			Object[] params, Integer nPageIdx, Integer nPageSize,
 		ResultSetHandler<T> rsh) throws SQLException {
 		Connection conn = getConnOfSpringCtx(ds);
 		if (conn == null) {
 			conn = DataSourceUtils.getConnection(ds);
 			try {
-				return queryConn(conn, ha, params, nPageIdx, nPageSize, rsh);
+				return queryConn(conn, sql, params, nPageIdx, nPageSize, rsh);
 			} finally {
 				DataSourceUtils.releaseConnection(conn, ds);
 				conn = null;
 			}
 		} else {
-			return queryConn(conn, ha, params, nPageIdx, nPageSize, rsh);
+			return queryConn(conn, sql, params, nPageIdx, nPageSize, rsh);
 		}
 	}
 	
-	private static <T> T queryConn(Connection conn, HeadSqlArray ha,
+	@SuppressWarnings("rawtypes")
+	private static <T> T queryConn(Connection conn, String sql,
 			Object[] params, Integer nPageIdx, Integer nPageSize,
 				ResultSetHandler<T> rsh) throws SQLException {
-		return queryConn(conn, ha.getSql(), ha.getCountSql(), params, 
+		String sqlCount = null;
+		if (rsh instanceof ResultSetDTOHandler 
+				&& ((ResultSetDTOHandler) rsh).isCountSql()) {
+			sqlCount = SqlUtils.getCountSql(sql);
+		}
+		return queryConn(conn, sql, sqlCount, params, 
 				nPageIdx, nPageSize, rsh);
 	}
 	
@@ -345,11 +351,10 @@ public class DbConnection {
 	 * @throws SQLException
 	 */
 	@SuppressWarnings("rawtypes")
-	private static <T> T queryConn(Connection conn, String s, String sqlCount,
+	private static <T> T queryConn(Connection conn, String sql, String sqlCount,
 			Object[] params, Integer nPageIdx, Integer nPageSize,
 				ResultSetHandler<T> rsh) throws SQLException {
 		boolean bCountSql = false;
-		String sql = null;
 		Long nTotalRows = null;
 		T t = null;
 		Long startTime_count = null;
@@ -360,7 +365,6 @@ public class DbConnection {
 		QueryRunnerEx qr = new QueryRunnerEx();
 		try {
 			if (nPageSize == null) {
-				sql = s;
 				paramAll = params;
 			} else {
 				if (nPageIdx != null) {
@@ -368,36 +372,33 @@ public class DbConnection {
 						nPageSize);
 				} else {
 					paramAll = ArrayComm.mergeArray(params, 0 * nPageSize,
-							nPageSize);					
+							nPageSize);
 				}
 			}
 			startTime = System.currentTimeMillis();
-			if (nPageSize != null && nPageSize > 0) {
-				sql = CAutoFitSql.getSubSqlOfPage(conn, s);
+			if (nPageSize != null) {
+				sql = CAutoFitSql.getSubSqlOfPage(conn, sql);
 			}
 			t = qr.query(conn, sql, rsh, paramAll);
 			endTime = System.currentTimeMillis();
 			if (StringUtils.isNotEmpty(sqlCount)) { // total rows
-				//if (rsh instanceof GsonBeanHandler
-					// &&((GsonBeanHandler<T>) rsh).getEnableCountSql()) {
-					bCountSql = true;
-					startTime_count = System.currentTimeMillis();
-					nTotalRows = ObjectComm.objectToLong(qr.query(conn,
-							sqlCount, new ScalarHandler<Long>(1),
-							params));
-					endTime_count = System.currentTimeMillis();
-				//}
+				bCountSql = true;
+				startTime_count = System.currentTimeMillis();
+				nTotalRows = ObjectComm.objectToLong(qr.query(conn,
+						sqlCount, new ScalarHandler<Long>(1),
+						params));
+				endTime_count = System.currentTimeMillis();
 			}
 		} finally {
 			qr = null;
 			if (bCountSql) {
-				if (LogSeleteSql.logInfoOrDebug()) {
-					LogSeleteSql.logFormatEndTimeNow(startTime_count, endTime_count,
+				if (LogSelectSql.logInfoOrDebug()) {
+					LogSelectSql.logFormatEndTimeNow(startTime_count, endTime_count,
 							sqlCount, params);
 				}
 			}
-			if (LogSeleteSql.logInfoOrDebug()) {
-				LogSeleteSql.logFormatEndTimeNow(startTime, endTime, sql, paramAll);				
+			if (LogSelectSql.logInfoOrDebug()) {
+				LogSelectSql.logFormatEndTimeNow(startTime, endTime, sql, paramAll);
 			}
 			if (t != null) {
 				if (t instanceof ResultDTO && bCountSql) {

@@ -12,10 +12,10 @@ public class DerbyDialect implements Dialect {
 		return INSTANCE;
 	}
 
-	@Override
-	public String getIdSql() {
-		return "values IDENTITY_VAL_LOCAL()";
-	}
+//	@Override
+//	public String getIdSql() {
+//		return "values IDENTITY_VAL_LOCAL()";
+//	}
 
 	@Override
 	public String getSubSqlOfPage(String sql) {

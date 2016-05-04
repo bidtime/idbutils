@@ -6,22 +6,18 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 
 import org.bidtime.dbutils.gson.JSONHelper;
 import org.bidtime.utils.basic.ArrayComm;
 import org.bidtime.utils.basic.ObjectComm;
 import org.json.JSONArray;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class GsonRows {
+public class GsonRows extends GsonData {
 	private static final Logger logger = LoggerFactory
 			.getLogger(GsonRows.class);
-
-	HashMap<String, Integer> mapHead = new HashMap<String, Integer>();
 
 	public GsonRows() {
 	}
@@ -32,26 +28,17 @@ public class GsonRows {
 
 	public void setHeadList(String[] head, Object[][] array2) {
 		if (head == null) {
-			if (logger.isDebugEnabled()) {
-				logger.debug("head is null");
-			}
-			// throw new Exception("xml head is null ");
+			logger.warn("head is null");
 		} else if (array2 == null) {
-			if (logger.isDebugEnabled()) {
-				logger.debug("data is null");
-			}
-			// throw new Exception("xml data is null ");
+			logger.warn("data is null");
 		} else if (array2.length < 1) {
-			if (logger.isDebugEnabled()) {
-				logger.debug("data < 0");
-			}
-			// throw new Exception("xml data is null ");
+			logger.warn("data size < 0");
 		} else {
 			Object[] oo = array2[0];
 			if (oo == null) {
-				// logger.info("xml data is null");
+				logger.error("data is null");
 			} else if (oo.length < 1) {
-				// logger.info("xml data length is 0");
+				logger.info("data length is 0");
 			} else {
 				if (head.length != oo.length) {
 					StringBuilder sb = new StringBuilder();
@@ -61,7 +48,6 @@ public class GsonRows {
 					sb.append(" and data( ");
 					sb.append(oo.length);
 					sb.append(" ) isn't mismatch.");
-					//logger.error(sb.toString());
 					Exception e = new Exception(sb.toString());
 					logger.error("setHeadList:", e);
 				}
@@ -75,13 +61,10 @@ public class GsonRows {
 	public void setHeadList(String[] head, List<Object[]> list) {
 		if (head == null) {
 			logger.error("head is null");
-			// throw new Exception("xml head is null ");
 		} else if (list == null) {
 			logger.error("data is null");
-			// throw new Exception("xml data is null ");
 		} else if (list.size() < 1) {
 			logger.error("data size < 0");
-			// throw new Exception("xml data is null ");
 		} else {
 			Object[] oo = list.get(0);
 			if (oo == null) {
@@ -97,7 +80,6 @@ public class GsonRows {
 					sb.append(" and data( ");
 					sb.append(oo.length);
 					sb.append(" ) isn't mismatch.");
-					//logger.error(sb.toString());
 					Exception e = new Exception(sb.toString());
 					logger.error("setHeadList:", e);
 				}
@@ -167,8 +149,6 @@ public class GsonRows {
 		this.clearIndex();
 	}
 
-	protected String[] head;
-
 	protected Object[][] data;
 
 	public boolean renameHead(String newName, String oldName) {
@@ -228,7 +208,7 @@ public class GsonRows {
 
 	public void autoInsertHeadArray(String headName, Object[] arData) {
 		if (this.getPosOfName(headName) < 0) {
-			insertHeadArray(headName, (Object[])arData, true);
+			insertArray(headName, (Object[])arData, true);
 		}
 	}
 
@@ -371,11 +351,11 @@ public class GsonRows {
 		insertHeadData(arHead, (Object)null, true);
 	}
 	
-	public void insertHeadArray(String arHead, Object[] arObject) {
-		insertHeadArray(arHead, arObject, true);
+	public void insertArray(String arHead, Object[] arObject) {
+		insertArray(arHead, arObject, true);
 	}
 	
-	private void insertHeadArray(String arHead, Object[] arObject, boolean bInitIndex) {
+	private void insertArray(String arHead, Object[] arObject, boolean bInitIndex) {
 		head = ArrayComm.mergeStringArray(arHead, head);
 		Object[][] objReturn = new Object[data.length][head.length];
 		for (int i = 0; i < data.length; i++) {
@@ -413,14 +393,6 @@ public class GsonRows {
 			}
 		}
 		clearIndex();
-	}
-
-	public String[] getHead() {
-		return head;
-	}
-
-	public void setHead(String[] head) {
-		this.head = head;
 	}
 
 	public Object[][] getData() {
@@ -461,7 +433,7 @@ public class GsonRows {
 		for (String head : arHead) {
 			int idx = getPosOfName(head);
 			if (idx > -1) {
-				for (int i = 0; i < this.getDataLength(); i++) {
+				for (int i = 0; i < this.getDataLen(); i++) {
 					this.setValue(i, idx, o);
 				}
 			}
@@ -544,38 +516,6 @@ public class GsonRows {
 			if (bInitIndex) {
 				clearIndex();
 			}
-		}
-	}
-
-	private void clearIndex() {
-		mapHead.clear();
-	}
-
-	public void initIndex() {
-		mapHead.clear();
-		for (int i = 0; i < head.length; i++) {
-			mapHead.put(head[i].toLowerCase(), i);
-		}
-	}
-
-	public int getPosOfName(String headName) {
-		int n = -1;
-		try {
-			if (mapHead.size() <= 0) {
-				initIndex();
-			}
-			n = mapHead.get(headName.toLowerCase());
-		} catch (Exception e) {
-		}
-		return n;
-	}
-
-	public String getHeadValueOfIdx(int nIdx) {
-		try {
-			return head[nIdx];
-		} catch (Exception e) {
-			logger.info(e.getMessage());
-			return null;
 		}
 	}
 
@@ -791,12 +731,12 @@ public class GsonRows {
 		data[rowNo][colNo] = newValue;
 	}
 
-	public Object[] getArrayValueOfName(String headName) {
+	public Object[] getArray(String headName) {
 		int nIdx = getPosOfName(headName);
-		return getArrayValueOfIdx(nIdx);
+		return getArray(nIdx);
 	}
 
-	public Object[] getArrayValueOfIdx(int nIdx) {
+	public Object[] getArray(int nIdx) {
 		if (nIdx > -1) {
 			Object[] obj = new Object[data.length];
 			for (int i = 0; i < data.length; i++) {
@@ -808,27 +748,24 @@ public class GsonRows {
 		}
 	}
 
-	public void setArrayValueOfIdx(int nIdx, Object[] value) {
+	public void setArray(int nIdx, Object[] value) {
 		if (nIdx > -1) {
 			data[nIdx] = value;
 		}
 	}
 
-	public void setArrayValueOfName(String headName, Object[] value) {
+	public void setArray(String headName, Object[] value) {
 		int nIdx = getPosOfName(headName);
-		setArrayValueOfIdx(nIdx, value);
+		setArray(nIdx, value);
 	}
 
-	public int getDataLength() {
+	@Override
+	public int getDataLen() {
 		if (this.data != null) {
 			return this.data.length;
 		} else {
 			return 0;
 		}
-	}
-
-	public boolean isExistsData() {
-		return getDataLength() > 0 ? true : false;
 	}
 
 	public void sortASC(String headName) {
@@ -863,7 +800,7 @@ public class GsonRows {
 			if (idx == this.head.length-1) {
 				return true;
 			} else {
-				Object[] arObj = this.getArrayValueOfIdx(idx);
+				Object[] arObj = this.getArray(idx);
 				this.delHead(idx, true);
 				this.addHeadArray(moveHead, arObj);
 				return true;
@@ -885,7 +822,8 @@ public class GsonRows {
 		return bReturn;
 	}
 	
-	private JSONArray dataToJson() {
+	@Override
+	protected JSONArray dataToJson() {
 		JSONArray jsonArray = new JSONArray();
 		for (int i = 0; i < data.length; i++) {
 			JSONArray ar1 = new JSONArray();
@@ -903,87 +841,6 @@ public class GsonRows {
 		}
 		return jsonArray;
 	}
-
-	public JSONObject toJson() {
-		JSONObject jsonObject = new JSONObject();
-		if (head != null && head.length>0) {
-			jsonObject.put("head", this.head);
-		}
-		if (this.data != null && this.data.length>0) {
-			jsonObject.put("data", dataToJson());
-		} else {
-			jsonObject.put("data", JSONObject.NULL);
-		}
-		return jsonObject;
-	}
-
-	@Override
-	public String toString() {
-		JSONObject jsonObject1 = toJson();
-		return jsonObject1.toString();
-	}
-	
-//	public GsonRows(String json) {
-//		fromString(json);
-//	}
-//	
-//	public GsonRows(JSONObject jsonObject) {
-//		fromJson(jsonObject);
-//	}
-//
-//	public static GsonRows parserString(String json) {
-//		return parserString(json, false);
-//	}
-//
-//	public static GsonRows parserString(String json, boolean bNew) {
-//		if (StringUtils.isNotEmpty(json)) {
-//			JSONObject jsonobj = new JSONObject(json);
-//			if (jsonobj.length() > 0 || bNew) {
-//				GsonRows rows = new GsonRows();
-//				rows.fromJson(jsonobj);
-//				return rows;
-//			} else {
-//				return null;
-//			}
-//		} else {
-//			return null;
-//		}
-//	}
-	
-//	public void fromString(String json) {
-//		JSONObject jsonobj = new JSONObject(json);
-//		fromJson(jsonobj);
-//	}
-//	
-//	public void fromJson(JSONObject jsonObject) {
-//		JSONArray headArray = jsonObject.optJSONArray("head");
-//		if (headArray != null && headArray.length()>0) {
-//			head = new String[headArray.length()];
-//			for (int i = 0; i < headArray.length(); i++) {
-//				Object object = headArray.get(i);
-//				head[i] = (String)object;
-//			}
-//		}
-//		//data
-//		if (jsonObject.has("data") && !jsonObject.isNull("data")) {
-//			JSONArray dataArray = jsonObject.getJSONArray("data");
-//			if (dataArray != null) {
-//				this.data = new Object[dataArray.length()][];
-//				for (int i = 0; i < dataArray.length(); i++) {
-//					JSONArray arrayPerRow = (JSONArray)dataArray.get(i);
-//					Object[] objRow = new Object[arrayPerRow.length()];
-//					for (int j = 0; j < arrayPerRow.length(); j++) {
-//						objRow[j] = JSONHelper.jsonObjToObj(arrayPerRow.get(j));
-//					}
-//					data[i] = objRow;
-//				}
-//			} else {
-//				CArrayComm.clearArray(data);
-//			}
-//		} else {
-//			CArrayComm.clearArray(data);
-//		}
-//	}
 	
 //	private static String getJson() {
 //		return "{\"head\":[\"code\",\"name\",\"id\"],\"data\":[[\"1\",\"1\",2],[\"1\",\"1\",3]]}";

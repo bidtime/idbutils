@@ -8,7 +8,7 @@ public interface Dialect {
 	 * 
 	 * @return
 	 */
-	public String getIdSql();
+//	public String getIdSql();
 
 	/*
 	 * 构建分页查询

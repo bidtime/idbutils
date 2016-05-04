@@ -10,9 +10,10 @@ import org.bidtime.dbutils.jdbc.rs.handle.ext.ResultSetDTOHandler;
 /**
  * @author jss
  * 
- *         提供对从ResultSet进行预处理的功能,继承GsonBeanHandler类
+ *         提供对从ResultSet进行预处理的功能,继承ResultSetDTOHandler类
  *
  */
+@SuppressWarnings("serial")
 public abstract class AbstractListDTOHandler<T> extends
 	ResultSetDTOHandler<List<T>> {
 

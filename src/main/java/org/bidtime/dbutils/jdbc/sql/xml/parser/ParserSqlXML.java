@@ -7,8 +7,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
 import org.bidtime.dbutils.jdbc.sql.ArrayUtils;
@@ -121,17 +119,17 @@ public class ParserSqlXML {
 		tp.setFieldPK(ArrayUtils.listToStringArray(listPkField));
 	}
 
-	private static String trimAll(String str) {
-		StringBuilder sb = new StringBuilder();
-		char c = ' ';
-		for (int i = 0; i < str.length(); i++) {
-			char s = str.charAt(i);
-			if (s != c) {
-				sb.append(s);
-			}
-		}
-		return sb.toString();
-	}
+//	private static String trimAll(String str) {
+//		StringBuilder sb = new StringBuilder();
+//		char c = ' ';
+//		for (int i = 0; i < str.length(); i++) {
+//			char s = str.charAt(i);
+//			if (s != c) {
+//				sb.append(s);
+//			}
+//		}
+//		return sb.toString();
+//	}
 
 //	private static String removeDoubleSpace(String str) {
 //		StringBuilder sb = new StringBuilder();
@@ -161,21 +159,21 @@ public class ParserSqlXML {
 		return t;
 	}
 	
-	private static final Pattern SQL_STANDARD_PATN = Pattern.compile(
-			"^*(insert|delete|update|if exists|select|call)\\s", Pattern.CASE_INSENSITIVE);
-
-	private static boolean isExistsSql(String sql) {
-		Matcher matcher = SQL_STANDARD_PATN.matcher(sql);
-		return matcher.find();
-	}
-	
-	private static final Pattern COMMA_CHAR_PATN = Pattern.compile(
-			",", Pattern.CASE_INSENSITIVE);
-
-	private static boolean isExistsComma(String s) {
-		Matcher matcher = COMMA_CHAR_PATN.matcher(s);
-		return matcher.find();
-	}
+//	private static final Pattern SQL_STANDARD_PATN = Pattern.compile(
+//			"^*(insert|delete|update|if exists|select|call)\\s", Pattern.CASE_INSENSITIVE);
+//
+//	private static boolean isExistsSql(String sql) {
+//		Matcher matcher = SQL_STANDARD_PATN.matcher(sql);
+//		return matcher.find();
+//	}
+//	
+//	private static final Pattern COMMA_CHAR_PATN = Pattern.compile(
+//			",", Pattern.CASE_INSENSITIVE);
+//
+//	private static boolean isExistsComma(String s) {
+//		Matcher matcher = COMMA_CHAR_PATN.matcher(s);
+//		return matcher.find();
+//	}
 	
 //	public static void main(String[] args) {
 //		//String sSql = "\\n\\t  \\t\\n\\t  \\t\\tselect \\n\\t  \\t\\t\\tca.ActID,\\n\\t  \\t\\t\\tca.ActSmallID,\\n\\t  \\t\\t\\tst.ActSmallName,\\n\\t  \\t\\t\\tca.ActName,\\n\\t  \\t\\t\\tca.ActContent,\\n\\t  \\t\\t\\tca.ShopID,\\n\\t  \\t\\t\\tca.ShopName,\\n\\t  \\t\\t\\tca.Longitude,\\n\\t\\t\\t\\tca.Latitude,\\n\\t\\t\\t\\tca.SubmitMan,\\n\\t\\t\\t\\tca.SubmitDate,\\n\\t\\t\\t\\tca.Auditor,\\n\\t\\t\\t\\tca.AuditDate,\\n\\t\\t\\t\\tca.CancelDate,\\n\\t\\t\\t\\tca.CancelMan,\\n\\t\\t\\t\\tca.Status,\\n\\t\\t\\t\\t(case \\n\\t\\t             when ca.Status =0 then\\n\\t\\t             '未审'\\n\\t\\t             when ca.Status = 1 then\\n\\t\\t             '已审'\\n\\t\\t             when ca.Status = 2 then\\n\\t\\t             '取消'\\n\\t\\t             when ca.Status = 3 then\\n\\t\\t             '完成'\\n\\t\\t         end) staName,\\n\\t\\t\\t\\tca.ActBeginDate,\\n\\t\\t\\t\\tca.ActEndDate,\\n\\t\\t\\t\\tca.RptBeginDate,\\n\\t\\t\\t\\tca.RptEndDate,\\n\\t\\t\\t\\tca.IndexURL,\\n\\t\\t\\t\\tca.ItemType,\\n\\t\\t\\t\\tca.ItemPath,\\n\\t\\t\\t\\tca.OldPriceDes,\\n\\t\\t\\t\\tca.PriceDes,\\n\\t\\t\\t\\tca.OffDes,\\n\\t\\t\\t\\tca.ImageURL,\\n\\t\\t\\t\\tca.Type,\\n\\t\\t\\t\\t(case \\n\\t\\t             when ca.Type =0 then\\n\\t\\t             '报名'\\n\\t\\t             when ca.Type = 1 then\\n\\t\\t             '购买'\\n\\t\\t         end) typeName,\\n\\t\\t         ca.Price\\n\\t\\t\\tfrom crm_activity ca\\n\\t\\t\\tleft join crm_actsmalltype st on st.ActSmallID=ca.ActSmallID\\n\\t\\t\\t<<where ca.Status=#Status#>>\\n\\t\\t\\t<<and ca.ActName like #name#>>\\n\\t\\t\\t<<and ca.ActId =#id#>>\\n\\t\\t\\t<<and ca.ShopId = #shopId#>>\\n\\t\\t\\t<<and ca.ShopId in (select suser.ShopId from crm_shop_user suser where suser.CustomerID=#customerID#)>>\\n\\t\\t\\t<<and ca.SubmitDate between #dtOrderStart# and #dtOrderEnd#>>\\n\\t\\t\\t\\n\\t\\t\\torder by ca.SubmitDate desc\\n\\t  \\t\\n\\t\\t";
@@ -185,11 +183,33 @@ public class ParserSqlXML {
 //		b = isExistsComma(sSql);
 //		System.out.println(b);
 //	}
+	
+	@SuppressWarnings({ "rawtypes" })
+	private static void visitSqlIdCol(Element pele, SqlHeadCountPro p) {
+		for (Iterator it1 = pele.elementIterator(); it1.hasNext();) {
+			Element pe = (Element) it1.next();
+			if (pe.getName().equalsIgnoreCase("cols")) {
+				for (Iterator iter1 = pe.elementIterator(); iter1.hasNext();) {
+					Element e = (Element) iter1.next();
+					if (e.getName().equalsIgnoreCase("col")) {
+						Attribute atName = e.attribute("name");
+						if (atName != null) {
+							Attribute atProp = e.attribute("prop");
+							String prop = null;
+							if (atProp != null) {
+								prop = atProp.getText();
+							}
+							p.setCol(atName.getValue(), e.getText(), prop);
+						}
+					}
+				}
+			}
+		}
+	}
 
 	@SuppressWarnings("rawtypes")
 	private static void visitSqlElementChild_tp(Element pElement, TTableProps tp)
 			throws DocumentException {
-		try {
 		for (Iterator iter1 = pElement.elementIterator(); iter1.hasNext();) {
 			Element e = (Element) iter1.next();
 			if (StringUtils.equalsIgnoreCase(e.getName(), "id")) {
@@ -202,54 +222,31 @@ public class ParserSqlXML {
 				if (StringUtils.isEmpty(e.getText())) {
 					throw new DocumentException("sql context is null");
 				}
-				String sSql = e.getText();
+				String id = attrClassName.getValue();
+				String sql = e.getText();
+				SqlHeadCountPro p = new SqlHeadCountPro();
+				p.setId(id);
+				p.setSql(sql);
 				// attribute type
 				Attribute attrTypeName = e.attribute("type");
-				String typeNameTag = null;
 				if (attrTypeName != null) {
-					typeNameTag = attrTypeName.getValue();
-				} else {
-					if (!isExistsSql(sSql) && isExistsComma(sSql)) {
-						typeNameTag = "head";
-					}
+					p.setType(attrTypeName.getValue());
 				}
-				if (StringUtils.equalsIgnoreCase(typeNameTag, "head")) {
-					sSql = sSql.replaceAll("\t", "");
-					sSql = sSql.replaceAll("\r\n", " ");
-					sSql = sSql.replaceAll("\r", " ");
-					sSql = sSql.replaceAll("\n", " ");
-					sSql = sSql.trim();
-					sSql = trimAll(sSql);
-					JsonHeadPro p = new JsonHeadPro();
-					p.setId(attrClassName.getValue());
-					p.setType(typeNameTag);
-					p.setHeadFlds(sSql);
-					Attribute attrDeryFlds = e.attribute("decryFlds");
-					if (attrDeryFlds != null) {
-						p.setDecryFlds(attrDeryFlds.getValue());
-					}
-					tp.addJsonHeadPro(p);
-				} else {
-					// sSql = removeDoubleSpace(sSql);
-					SqlHeadCountPro p = new SqlHeadCountPro();
-					p.setId(attrClassName.getValue());
-					p.setType(typeNameTag);
-					p.setSql(sSql);
-
-					Attribute attrCountIdSql = e.attribute("countSqlId");
-					if (attrCountIdSql != null) {
-						p.setCountSqlId(attrCountIdSql.getValue());
-					} else {
-						p.setCountSqlId(null);
-					}
-					Attribute attrHeadId = e.attribute("headId");
-					if (attrHeadId != null) {
-						p.setHeadId(attrHeadId.getValue());
-					} else {
-						p.setHeadId(null);
-					}
-					tp.addSqlHeadPro(p);
-				}
+				// sSql = removeDoubleSpace(sSql);
+//				Attribute attrCountIdSql = e.attribute("countSqlId");
+//				if (attrCountIdSql != null) {
+//					p.setCountSqlId(attrCountIdSql.getValue());
+//				} else {
+//					p.setCountSqlId(null);
+//				}
+//				Attribute attrHeadId = e.attribute("headId");
+//				if (attrHeadId != null) {
+//					p.setHeadId(attrHeadId.getValue());
+//				} else {
+//					p.setHeadId(null);
+//				}
+				visitSqlIdCol(e, p);
+				tp.addSqlHeadPro(p);
 				// String sSqlLower = sSql.toLowerCase();
 				// if (sSqlLower.indexOf("select ") == 0
 				// || sSqlLower.indexOf("delete ") == 0
@@ -266,9 +263,6 @@ public class ParserSqlXML {
 				//logger.info(attrClassName.getValue() + ": " + sSql);
 			}
 		}
-		} catch (Exception e) {
-			logger.error("visitSqlElementChild_tp:", e);
-		}
 	}
 
 	@SuppressWarnings("rawtypes")
@@ -281,26 +275,17 @@ public class ParserSqlXML {
 	public static TTableProps parserTables(Class cls, String path)
 			throws DocumentException, IOException {
 		SAXReader saxReader = new SAXReader();
-		//logger.info("");
-		//logger.info("table cols:" + path);
 		URL url = Thread.currentThread().getContextClassLoader()
 				.getResource(path);
 		InputStream is = null;
 		//InputStream is = cls.getResourceAsStream(path);
 		TTableProps tp = null;
 		try {
-			is = url.openStream();		
-//			String[] arClassName = path.split("/");
-//			if (arClassName != null && arClassName.length > 0) {
-//				String sClassName = arClassName[arClassName.length-1];
-//				if (StringUtils.equalsIgnoreCase(sClassName,
-//						"CountryDAO.xml")) {
-//					logger.info(path);
-//				}
-//			}
+			is = url.openStream();
 			Document document = saxReader.read(is);
 			Element root = document.getRootElement();
 			tp = new TTableProps();
+			//class
 			Element elementClass = root.element("class");
 			if (elementClass != null) {
 				Attribute attrClassName = elementClass.attribute("name");
@@ -317,11 +302,11 @@ public class ParserSqlXML {
 				tp.setClassName(attrClassName.getValue());
 				visitClassElementChild(elementClass, tp);
 			}
+			//sql
 			Element elementSql = root.element("sql");
 			if (elementSql != null) {
 				visitSqlElementChild_tp(elementSql, tp);
 			}
-			tp.finished();
 		} finally {
 			try {
 				if (is != null) {
@@ -331,8 +316,6 @@ public class ParserSqlXML {
 				logger.error("parserTables->" + path + ":", e);
 			}				
 		}
-		//logger.info("parserTables: end");
-		//logger.info("");
 		return tp;
 	}
 }

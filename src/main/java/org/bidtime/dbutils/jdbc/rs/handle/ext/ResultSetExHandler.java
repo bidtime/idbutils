@@ -1,5 +1,6 @@
 package org.bidtime.dbutils.jdbc.rs.handle.ext;
 
+import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -13,9 +14,10 @@ import org.bidtime.dbutils.jdbc.rs.BeanProcessorEx;
  *         提供对从ResultSet进行预处理的功能,继承自dbutils的ResultSetHandler类
  *
  */
-public class ResultSetExHandler<T> implements ResultSetHandler<T> {
+@SuppressWarnings("serial")
+public class ResultSetExHandler<T> implements ResultSetHandler<T>, Serializable {
 
-	private BeanAdapt beanAdapt = null;
+	protected BeanAdapt beanAdapt = null;
 
 	public boolean isBeanAdapt() {
 		return ( beanAdapt != null && beanAdapt == BeanAdapt.AUTO ) ? true : false;

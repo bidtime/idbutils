@@ -11,25 +11,26 @@ import javax.sql.DataSource;
 
 import org.apache.commons.dbutils.ResultSetHandler;
 import org.apache.commons.dbutils.handlers.ScalarHandler;
-import org.apache.commons.lang.StringUtils;
 import org.bidtime.dbutils.gson.PropAdapt;
 import org.bidtime.dbutils.gson.dataset.GsonRow;
 import org.bidtime.dbutils.gson.dataset.GsonRows;
 import org.bidtime.dbutils.jdbc.dao.PKCallback;
-import org.bidtime.dbutils.jdbc.rs.handle.ext.ResultSetDTOHandler;
 import org.bidtime.dbutils.jdbc.sql.ArrayUtils;
 import org.bidtime.dbutils.jdbc.sql.SqlParser;
-import org.bidtime.dbutils.jdbc.sql.SqlUtils;
 import org.bidtime.dbutils.jdbc.sql.xml.JsonFieldXmlsLoader;
-import org.bidtime.dbutils.jdbc.sql.xml.parser.HeadSqlArray;
 import org.bidtime.dbutils.jdbc.sql.xml.parser.TTableProps;
 import org.bidtime.utils.basic.ArrayComm;
 
 public class SqlLoadUtils {
 
+//	@SuppressWarnings("rawtypes")
+//	private static String getSqlOfId(Class clazz, String id) throws SQLException {
+//		return JsonFieldXmlsLoader.getSqlOfId(clazz, id);
+//	}
+
 	@SuppressWarnings("rawtypes")
-	private static String getSqlOfId(Class clazz, String id) throws SQLException {
-		return JsonFieldXmlsLoader.getSqlOfId(clazz, id);
+	private static String getSqlOfId(Class clazz, String id, String colId) throws SQLException {
+		return JsonFieldXmlsLoader.getSqlOfId(clazz, id, colId);
 	}
 
 	//delete
@@ -132,8 +133,8 @@ public class SqlLoadUtils {
 				g = tp.clazzToRow(object, PropAdapt.NOTNULL);
 			}
 			String sql = tp.getDeleteSqlOfHead(tp.getTableName(), g.getHead(), listJsonPk);
-			g.remain(ArrayComm.listToStringArray(listJsonPk));
-			return DbConnection.update(ds, sql, g.getData());
+			GsonRow r = g.remain(ArrayComm.listToStringArray(listJsonPk));
+			return DbConnection.update(ds, sql, r.getData());
 		} finally {
 			g = null;
 			listJsonPk.clear();
@@ -154,9 +155,9 @@ public class SqlLoadUtils {
 			} else {
 				g = tp.clazzToRow(object, PropAdapt.NOTNULL);
 			}
-			g.remain(heads);
+			GsonRow r = g.remain(heads);
 			String sql = tp.getDeleteSqlOfHead(tp.getTableName(), heads);
-			return DbConnection.update(ds, sql, g.getData());
+			return DbConnection.update(ds, sql, r.getData());
 		} finally {
 			g = null;
 		}
@@ -601,14 +602,14 @@ public class SqlLoadUtils {
 	@SuppressWarnings("rawtypes")
 	public static int update(DataSource ds, Class clazz, String sqlId,
 			Object[] params) throws SQLException {
-		String sql = getSqlOfId(clazz, sqlId);
+		String sql = getSqlOfId(clazz, sqlId, null);
 		return DbConnection.update(ds, sql, params);
 	}
 
 	@SuppressWarnings("rawtypes")
 	public static int update(DataSource ds, Class clazz, String sqlId,
 			Map<String, ?> params) throws SQLException {
-		String sql = getSqlOfId(clazz, sqlId);
+		String sql = getSqlOfId(clazz, sqlId, null);
 		List<Object> paramList = new ArrayList<Object>();
 		String finalSql = SqlParser.parse(sql, params, paramList);
 		return DbConnection.update(ds, finalSql,
@@ -619,7 +620,7 @@ public class SqlLoadUtils {
 	@SuppressWarnings("rawtypes")
 	public static int updateBatch(DataSource ds, Class clazz, String sqlId,
 			Object[][] params) throws SQLException {
-		String sql = getSqlOfId(clazz, sqlId);
+		String sql = getSqlOfId(clazz, sqlId, null);
 		return DbConnection.updateBatch(ds, sql, params);
 	}
 
@@ -656,72 +657,83 @@ public class SqlLoadUtils {
 	@SuppressWarnings("rawtypes")
 	public static boolean callSP(DataSource ds, Class clazz, String sqlId,
 			Object[] in, Object[] out) throws SQLException {
-		String sProc = getSqlOfId(clazz, sqlId);
+		String sProc = getSqlOfId(clazz, sqlId, null);
 		return DbConnection.callSP(ds, sProc, in, out);
 	}
 
 	@SuppressWarnings("rawtypes")
 	public static boolean callSpIn(DataSource ds, Class clazz, String sqlId,
 			Object[] in) throws SQLException {
-		String sProc = getSqlOfId(clazz, sqlId);
+		String sProc = getSqlOfId(clazz, sqlId, null);
 		return DbConnection.callSP(ds, sProc, in, null);
 	}
 
 	@SuppressWarnings("rawtypes")
 	public static boolean callSpOut(DataSource ds, Class clazz,
 			String sqlId, Object[] out) throws SQLException {
-		String sProc = getSqlOfId(clazz, sqlId);
+		String sProc = getSqlOfId(clazz, sqlId, null);
 		return DbConnection.callSP(ds, sProc, null, out);
 	}
 
 	//query
+	
+	public static <T> T querySql(DataSource ds, String sql, ResultSetHandler<T> rsh,
+			Map<String, ?> params) throws SQLException {
+		return querySql(ds, sql, rsh, params, null, null);
+	}
 
-	@SuppressWarnings("rawtypes")
-	private static <T> T query(DataSource ds, HeadSqlArray h,
-			Map<String, ?> params, Integer nPageIdx, Integer nPageSize,
-			ResultSetHandler<T> rsh) throws SQLException {
+	public static <T> T querySql(DataSource ds, String sql, ResultSetHandler<T> rsh,
+			Map<String, ?> params, Integer pageIdx, Integer pageSize) throws SQLException {
 		List<Object> paramList = new ArrayList<Object>();
-		h.setSql(SqlParser.parse(h.getSql(), params, paramList));
-		if (rsh instanceof ResultSetDTOHandler 
-				&& ((ResultSetDTOHandler) rsh).isCountSql()) {
-			String countSql = null;
-			if (StringUtils.isNotEmpty(h.getCountSql()) ) {
-				countSql = SqlParser
-					.parseCount(h.getCountSql(), params);
-			} else {
-				countSql = SqlUtils.getCountSql(h.getSql());
-			}
-			h.setCountSql(countSql);
-		}
-		return DbConnection.query(ds, h, paramList.toArray(),
-				nPageIdx, nPageSize, rsh);
+		sql = SqlParser.parse(sql, params, paramList);
+		return DbConnection.query(ds, sql, paramList.toArray(),
+				pageIdx, pageSize, rsh);
 	}
 	
-	public static <T> T query(DataSource ds, String sql, ResultSetHandler<T> rsh,
+	public static <T> T querySqlOne(DataSource ds, String sql, ResultSetHandler<T> rsh,
 			Map<String, ?> params) throws SQLException {
-		return query(ds, sql, rsh, params, null, null);
-	}
-
-	public static <T> T query(DataSource ds, String sql, ResultSetHandler<T> rsh,
-			Map<String, ?> params, Integer nPageIdx, Integer nPageSize) throws SQLException {
-		HeadSqlArray ha = new HeadSqlArray(sql, null);
-		return query(ds, ha, params, nPageIdx, nPageSize, rsh);
+		return querySql(ds, sql, rsh, params, 0, 1);
 	}
 	
-	public static <T> T queryOne(DataSource ds, String sql, ResultSetHandler<T> rsh,
-			Map<String, ?> params) throws SQLException {
-		return query(ds, sql, rsh, params, 0, 1);
-	}
-	
-	// queryEx
+	// query
 
 	@SuppressWarnings("rawtypes")
-	public static <T> T queryEx(DataSource ds, Class clazz, String sqlId,
-			Map<String, ?> params, Integer nPageIdx, Integer nPageSize,
+	public static <T> T query(DataSource ds, Class clazz, String sqlId, String colId,
+			Map<String, ?> params, Integer pageIdx, Integer pageSize, 
 			ResultSetHandler<T> rsh) throws SQLException {
-		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
-		HeadSqlArray h = tp.getHeadSqlArrayOfId(sqlId);
-		return query(ds, h, params, nPageIdx, nPageSize, rsh);
+		String sql = getSqlOfId(clazz, sqlId, colId);
+		return querySql(ds, sql, rsh, params, pageIdx, pageSize);
+	}
+
+	@SuppressWarnings("rawtypes")
+	public static <T> T query(DataSource ds, Class clazz, String sqlId, String colId,
+			ResultSetHandler<T> rsh, Map<String, ?> params) throws SQLException {
+		return query(ds, clazz, sqlId, colId, params, null, null, rsh);
+	}
+
+	@SuppressWarnings("rawtypes")
+	public static <T> T queryOne(DataSource ds, Class clazz, String sqlId, String colId,
+			ResultSetHandler<T> rsh, Map<String, ?> params) throws SQLException {
+		return query(ds, clazz, sqlId, colId, params, 0, 1, rsh);
+	}
+	
+	@SuppressWarnings("rawtypes")
+	public static <T> T query(DataSource ds, Class clazz, String sqlId, 
+			Map<String, ?> params, Integer pageIdx, Integer pageSize, 
+			ResultSetHandler<T> rsh) throws SQLException {
+		return query(ds, clazz, sqlId, null, params, pageIdx, pageSize, rsh);
+	}
+
+	@SuppressWarnings("rawtypes")
+	public static <T> T query(DataSource ds, Class clazz, String sqlId, ResultSetHandler<T> rsh,
+			Map<String, ?> params) throws SQLException {
+		return query(ds, clazz, sqlId, params, null, null, rsh);
+	}
+
+	@SuppressWarnings("rawtypes")
+	public static <T> T queryOne(DataSource ds, Class clazz, String sqlId, ResultSetHandler<T> rsh,
+			Map<String, ?> params) throws SQLException {
+		return query(ds, clazz, sqlId, params, 0, 1, rsh);
 	}
 	
 	@SuppressWarnings("rawtypes")
@@ -756,16 +768,18 @@ public class SqlLoadUtils {
 		return result;
 	}
 
+	// queryByPK
+	
 	@SuppressWarnings({ "rawtypes" })
-	public static <T> T queryExByPK(DataSource ds, Class clazz, String sqlId,
-			Object o, Integer nPageIdx, Integer nPageSize,
+	public static <T> T queryByPK(DataSource ds, Class clazz, String sqlId, String colId,
+			Object o, Integer pageIdx, Integer pageSize,
 			ResultSetHandler<T> rsh) throws SQLException {
 		if ( !isJavaSimpleClazz(o) ) {
 			throw new SQLException("primary key type is error");
 		}
 		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
-		HeadSqlArray h = tp.getHeadSqlArrayOfId(sqlId);
-		Map<String, Object> params = SqlParser.getMapOfFieldPK(h.getSql(), tp.getSetPk());
+		String sql = getSqlOfId(clazz, sqlId, colId);
+		Map<String, Object> params = SqlParser.getMapOfFieldPK(sql, tp.getSetPk());
 		if (params == null || params.isEmpty()) {
 			throw new SQLException("primary key error");
 		} else if (params.size() == 1) {
@@ -805,52 +819,38 @@ public class SqlLoadUtils {
 					+ o.getClass().getSimpleName());
 			}
 		}
-		return query(ds, h, params, nPageIdx, nPageSize, rsh);
+		return querySql(ds, sql, rsh, params, pageIdx, pageSize);
+	}
+
+	@SuppressWarnings("rawtypes")
+	public static <T> T queryByPK(DataSource ds, Class clazz, String sqlId, String colId, ResultSetHandler<T> rsh,
+			Object o) throws SQLException {
+		return queryByPK(ds, clazz, sqlId, colId, o, null, null, rsh);
+	}
+
+	@SuppressWarnings("rawtypes")
+	public static <T> T queryByPKOne(DataSource ds, Class clazz, String sqlId, String colId, ResultSetHandler<T> rsh,
+			Object o) throws SQLException {
+		return queryByPK(ds, clazz, sqlId, colId, o, 0, 1, rsh);
 	}
 	
-//	@SuppressWarnings("rawtypes")
-//	public static <T> T queryEx(DataSource ds, Class clazz,
-//			Map<String, ?> params, Integer nPageIdx, Integer nPageSize,
-//			ResultSetHandler<T> rsh) throws SQLException {
-//		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
-//		String sql = tp.getSelectSql();
-//		return query(ds, sql, rsh, params, nPageIdx, nPageSize);
-//	}
-
-	@SuppressWarnings("rawtypes")
-	public static <T> T queryEx(DataSource ds, Class clazz, String sqlId, ResultSetHandler<T> rsh,
-			Map<String, ?> params) throws SQLException {
-		return queryEx(ds, clazz, sqlId, params, null, null, rsh);
+	@SuppressWarnings({ "rawtypes" })
+	public static <T> T queryByPK(DataSource ds, Class clazz, String sqlId,
+			Object o, Integer pageIdx, Integer pageSize,
+			ResultSetHandler<T> rsh) throws SQLException {
+		return queryByPK(ds, clazz, sqlId, null, o, pageIdx, pageSize, rsh);
 	}
-
+	
 	@SuppressWarnings("rawtypes")
-	public static <T> T queryExByPK(DataSource ds, Class clazz, String sqlId, ResultSetHandler<T> rsh,
+	public static <T> T queryByPK(DataSource ds, Class clazz, String sqlId, ResultSetHandler<T> rsh,
 			Object o) throws SQLException {
-		return queryExByPK(ds, clazz, sqlId, o, null, null, rsh);
-	}
-
-//	@SuppressWarnings("rawtypes")
-//	public static <T> T queryEx(DataSource ds, Class clazz, ResultSetHandler<T> rsh,
-//			Map<String, ?> params) throws SQLException {
-//		return queryEx(ds, clazz, params, null, null, rsh);
-//	}
-
-	@SuppressWarnings("rawtypes")
-	public static <T> T queryExOne(DataSource ds, Class clazz, String sqlId, ResultSetHandler<T> rsh,
-			Map<String, ?> params) throws SQLException {
-		return queryEx(ds, clazz, sqlId, params, 0, 1, rsh);
+		return queryByPK(ds, clazz, sqlId, o, null, null, rsh);
 	}
 
 	@SuppressWarnings("rawtypes")
-	public static <T> T queryExOneByPK(DataSource ds, Class clazz, String sqlId, ResultSetHandler<T> rsh,
+	public static <T> T queryByPKOne(DataSource ds, Class clazz, String sqlId, ResultSetHandler<T> rsh,
 			Object o) throws SQLException {
-		return queryExByPK(ds, clazz, sqlId, o, 0, 1, rsh);
+		return queryByPK(ds, clazz, sqlId, o, 0, 1, rsh);
 	}
-
-//	@SuppressWarnings("rawtypes")
-//	public static <T> T queryExOne(DataSource ds, Class clazz, ResultSetHandler<T> rsh,
-//			Map<String, ?> params) throws SQLException {
-//		return queryEx(ds, clazz, params, 0, 1, rsh);
-//	}
 	
 }

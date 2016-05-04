@@ -100,6 +100,11 @@ public class DateTimeComm {
 		return c.getTimeInMillis();
 	}
 	
+	public static Date getDay() {
+		return new Date(getDateMS());
+	}
+	
+	@Deprecated
 	public static Date getDate() {
 		return new Date(getDateMS());
 	}

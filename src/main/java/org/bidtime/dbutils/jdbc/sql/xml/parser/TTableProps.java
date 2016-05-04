@@ -4,7 +4,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -20,13 +19,8 @@ import org.bidtime.dbutils.jdbc.sql.SqlUtils;
 import org.bidtime.utils.comm.CaseInsensitiveHashSet;
 import org.bidtime.utils.comm.SimpleHashMap;
 import org.bidtime.utils.comm.SimpleHashSet;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class TTableProps {
-	
-	private static final Logger logger = LoggerFactory
-			.getLogger(TTableProps.class);
 
 	private String className;
 	private String tableName;
@@ -40,7 +34,6 @@ public class TTableProps {
 		return this.setPk;
 	}
 
-	//private String[] fieldPK=null;
 	private boolean nonePkInc=false;
 	public boolean isNonePkInc() {
 		return nonePkInc;
@@ -71,30 +64,10 @@ public class TTableProps {
 		this.mapColumnDescript = mapColumnDescript;
 	}
 
-	private Map<String,JsonHeadPro> mapJsonHeadPro = new HashMap<>();
 	private Map<String,SqlHeadCountPro> mapSqlHeadPro = new HashMap<>();
 	
-	//新的xml配置,使用此方法
-	public HeadSqlArray getHeadSqlArrayOfId(String id) throws SQLException {
-		if (logger.isDebugEnabled()) {
-			logger.debug("sqlId:" + id);
-		}
-		HeadSqlArray headSqlArray = null;
-		SqlHeadCountPro sqlHeadPro = getShcProOfId(id);
-		if (sqlHeadPro != null) {
-			headSqlArray = new HeadSqlArray(sqlHeadPro.getSql(), sqlHeadPro.getCountSql());
-		} else {
-			throw new SQLException("id:" + id + " is none sql props.");
-		}
-		return headSqlArray;
-	}
-	
-	public SqlHeadCountPro getShcProOfId(String id) {
-		return mapSqlHeadPro.get(id);
-	}
-	
 	public String getSqlOfId(String id) {
-		SqlHeadCountPro p = getShcProOfId(id);
+		SqlHeadCountPro p = mapSqlHeadPro.get(id);
 		if (p != null) {
 			return p.getSql();
 		} else {
@@ -102,21 +75,13 @@ public class TTableProps {
 		}
 	}
 	
-	public String[] getHeadArrayOfId(String id) {
-		JsonHeadPro p = getJsonHeadProOfId(id);
+	public String getSqlOfId(String id, String colId) {
+		SqlHeadCountPro p = mapSqlHeadPro.get(id);
 		if (p != null) {
-			return p.getArHeadFlds();
+			return p.getSql(colId);
 		} else {
 			return null;
 		}
-	}
-	
-	private JsonHeadPro getJsonHeadProOfId(String id) {
-		return mapJsonHeadPro.get(id);
-	}
-	
-	public void addJsonHeadPro(JsonHeadPro p) {
-		mapJsonHeadPro.put(p.getId(), p);
 	}
 	
 	public void addSqlHeadPro(SqlHeadCountPro p) {
@@ -309,9 +274,9 @@ public class TTableProps {
 	public TTableProps() {
 	}
 
-	public void finished() {
-		setSqlHeadPro_CountSql();
-	}
+//	public void finished() {
+//		setSqlHeadPro_CountSql();
+//	}
 
 	private void setDefaultValue(GsonRow r) {
 		if (r == null || !r.isExistsData() || !this.existDefault) {
@@ -367,7 +332,7 @@ public class TTableProps {
 				listAddHead.add(cp.getColumn());
 				listAddData.add(objDefault);
 			} else {
-				Object[] listOld = r.getArrayValueOfIdx(nIdx);
+				Object[] listOld = r.getArray(nIdx);
 				if (listOld != null && listOld.length > 0) {
 					for (int nn = 0; nn < listOld.length; nn++) {
 						Object objOld = listOld[nn];
@@ -375,7 +340,7 @@ public class TTableProps {
 							listOld[nn] = objDefault;
 						}
 					}
-					r.setArrayValueOfIdx(nIdx, listOld);
+					r.setArray(nIdx, listOld);
 				} else {
 					if (listAddHead == null) {
 						listAddHead = new ArrayList<String>();
@@ -393,23 +358,23 @@ public class TTableProps {
 		}
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private void setSqlHeadPro_CountSql() {
-		Set set = mapSqlHeadPro.entrySet();
-		Iterator it = set.iterator();
-		while(it.hasNext()) {
-			Map.Entry<String, SqlHeadCountPro> entry =
-				(Map.Entry<String, SqlHeadCountPro>) it.next();
-			SqlHeadCountPro p = entry.getValue();
-			if (p!=null && StringUtils.isNotEmpty(p.getCountSqlId())) {
-				//sqlId和countId,都已经放在一起了,所以这里再需要查找一下
-				SqlHeadCountPro hp = mapSqlHeadPro.get(p.getCountSqlId());
-				if (hp != null && StringUtils.isNotEmpty(hp.getSql())) {
-					p.setCountSql(hp.getSql());					
-				}
-			}
-		}
-	}
+//	@SuppressWarnings({ "rawtypes", "unchecked" })
+//	private void setSqlHeadPro_CountSql() {
+//		Set set = mapSqlHeadPro.entrySet();
+//		Iterator it = set.iterator();
+//		while(it.hasNext()) {
+//			Map.Entry<String, SqlHeadCountPro> entry =
+//				(Map.Entry<String, SqlHeadCountPro>) it.next();
+//			SqlHeadCountPro p = entry.getValue();
+//			if (p!=null && StringUtils.isNotEmpty(p.getCountSqlId())) {
+//				//sqlId和countId,都已经放在一起了,所以这里再需要查找一下
+//				SqlHeadCountPro hp = mapSqlHeadPro.get(p.getCountSqlId());
+//				if (hp != null && StringUtils.isNotEmpty(hp.getSql())) {
+//					p.setCountSql(hp.getSql());					
+//				}
+//			}
+//		}
+//	}
 
 	public void addColsCommonPro(String sJsonColumn, ColumnPro p) {
 		if (StringUtils.isNotEmpty(sJsonColumn)) {

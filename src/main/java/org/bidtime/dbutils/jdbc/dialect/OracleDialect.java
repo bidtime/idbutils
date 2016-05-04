@@ -19,10 +19,10 @@ public class OracleDialect implements Dialect {
 		return INSTANCE;
 	}
 
-	@Override
-	public String getIdSql() {
-		throw new UnsupportedOperationException();
-	}
+//	@Override
+//	public String getIdSql() {
+//		throw new UnsupportedOperationException();
+//	}
 
 	@Override
 	public String getSubSqlOfPage(String sql) {
