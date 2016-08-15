@@ -9,10 +9,8 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.Date;
 import java.util.Enumeration;
-import java.util.Map;
 import java.util.Properties;
 
-import org.bidtime.dbutils.gson.JSONHelper;
 import org.bidtime.utils.basic.ObjectComm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -283,21 +281,21 @@ public class PropEx extends Properties {
 		return result;
 	}
 
-	public <T> T mapToClazz(Class<T> type) throws Exception {
-		return JSONHelper.mapToClazz(this, type);
-	}
+//	public <T> T mapToClazz(Class<T> type) throws Exception {
+//		return JSONHelper.mapToClazz(this, type);
+//	}
+//
+//	public void clazzToMap(Object object, boolean clear) {
+//		Map<String, Object> map = JSONHelper.clazzToMap(object);
+//		if (clear) {
+//			this.clear();
+//		}
+//		putAll(map);
+//	}
 
-	public void clazzToMap(Object object, boolean clear) {
-		Map<String, Object> map = JSONHelper.clazzToMap(object);
-		if (clear) {
-			this.clear();
-		}
-		putAll(map);
-	}
-
-	public void clazzToMap(Object object) {
-		clazzToMap(object, false);
-	}
+//	public void clazzToMap(Object object) {
+//		clazzToMap(object, false);
+//	}
 
     private static void writeComments(BufferedWriter bw, String comments)
     		throws IOException {

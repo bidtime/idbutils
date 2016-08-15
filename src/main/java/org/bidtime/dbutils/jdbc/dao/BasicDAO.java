@@ -92,7 +92,7 @@ public class BasicDAO {
 	// insert
 
 	public int insert(Object object, PropAdapt pa) throws SQLException {
-		return insert(object, pa);
+		return SqlLoadUtils.insert(getCurrentDataSource(), this.getClass(), pa);
 	}
 	
 	public int insert(Object object) throws SQLException {
@@ -161,11 +161,36 @@ public class BasicDAO {
 		return SqlLoadUtils.insert(getCurrentDataSource(), this.getClass(), g);
 	}
 	
+	@SuppressWarnings({ "rawtypes" })
+	public int insertBatch(List list) throws SQLException {
+		return SqlLoadUtils.insertBatch(getCurrentDataSource(), this.getClass(), list);		
+	}
+	
+	@SuppressWarnings({ "rawtypes" })
+	public int insertBatch(List list, PropAdapt pa) throws SQLException {
+		return SqlLoadUtils.insertBatch(getCurrentDataSource(), this.getClass(), list);				
+	}
+	
+	@SuppressWarnings({ "rawtypes" })
+	public int updateBatch(List list) throws SQLException {
+		return SqlLoadUtils.updateBatch(getCurrentDataSource(), this.getClass(), list);		
+	}
+	
+	@SuppressWarnings({ "rawtypes" })
+	public int updateBatch(List list, PropAdapt pa) throws SQLException {
+		return SqlLoadUtils.updateBatch(getCurrentDataSource(), this.getClass(), list);				
+	}
+	
 	// delete
 
 	public int delete(Object[] ids) throws SQLException {
 		return SqlLoadUtils.delete(getCurrentDataSource(), this.getClass(),
 				ids);
+	}
+
+	public int delete(String fld, Object[] ids) throws SQLException {
+		return SqlLoadUtils.delete(getCurrentDataSource(), this.getClass(),
+				fld, ids);
 	}
 
 	public int delete(GsonRow g) throws SQLException {
@@ -420,8 +445,8 @@ public class BasicDAO {
 				sqlId, rsh, params);
 	}
 	
-	public <T> T queryOne(String sqlId, ResultSetHandler<T> rsh,
-			Map<String, ?> params) throws SQLException {
+	public <T> T queryOne(String sqlId, ResultSetHandler<T> rsh, Map<String, ?> params)
+			throws SQLException {
 		return SqlLoadUtils.queryOne(getCurrentDataSource(), this.getClass(),
 				sqlId, rsh, params);
 	}

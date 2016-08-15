@@ -1,22 +1,15 @@
 package org.bidtime.dbutils.gson;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
-import java.math.BigInteger;
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 import java.util.Set;
 
-import org.bidtime.dbutils.gson.dataset.GsonData;
-import org.bidtime.dbutils.gson.dataset.JsonData;
-import org.bidtime.dbutils.jdbc.bean.BasicBean;
 import org.bidtime.utils.comm.CaseInsensitiveHashSet;
 import org.bidtime.web.utils.UserHeadState;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 @SuppressWarnings("serial")
 public class ResultDTO<T> implements Serializable {
@@ -37,10 +30,6 @@ public class ResultDTO<T> implements Serializable {
 //	public Map<String, Set<String>> getColMapProps() {
 //		return colMapProps;
 //	}
-
-    public Map<String, ?> dataToMap() {
-        return JSONHelper.clazzToMap(data, colMapProps);
-    }
 
     private Set<String> getColMapPropsSet() {
         if (colMapProps == null || type == null) {
@@ -292,118 +281,17 @@ public class ResultDTO<T> implements Serializable {
         setMsg(msg);
     }
 
-//	@SuppressWarnings("rawtypes")
-//	private boolean isMapType() {
-//		Object o = null;
-//		if (data != null && data instanceof List) {
-//			o = ((List) data).get(0);
-//		}
-//		return (o != null && o instanceof Map) ? true : false;
-//	}
-
-    private static boolean isJavaSimpleClazz(Class<?> type) {
-        boolean result = false;
-        if (type == null) {        //要转换成json.null
-            result = false;
-        } else if (type.equals(String.class) || type.equals(Number.class) ||
-                type.equals(StringBuilder.class) || type.equals(StringBuffer.class) ||
-                type.equals(Boolean.class) || type.equals(Appendable.class)) {
-            result = true;
-        } else if (type.equals(Long.class) || type.equals(Integer.class)
-                || type.equals(Short.class) || type.equals(Number.class)
-                || type.equals(BigInteger.class) || type.equals(BigDecimal.class)) {
-            result = true;
-        } else if (type.equals(java.util.Date.class)) {
-            result = true;
-        } else if (type.equals(JsonData.class)) {
-            result = false;
-        } else if (type.equals(Set.class) || type.equals(Queue.class) ||
-                type.equals(Character.class) ||
-                type.equals(Math.class) || type.equals(Enum.class)) {
-            result = true;
-        } else {
-            result = false;
-        }
-        return result;
+    //组装数据用回调接口
+    @SuppressWarnings({ "rawtypes" })
+	public static void doResult(ResultDTO dto, AssembDataCallBack cb) throws Exception {
+    	if (dto != null) {
+    		dto.assemb(cb);
+    	}
     }
-
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    private Object dataToJson() {
-        Object jsonObject = null;
-        if (data instanceof List && !((List) data).isEmpty()) {
-            Object o = ((List) data).get(0);
-            boolean bMap = (o != null && o instanceof Map) ? true : false;
-            if (bMap) {
-                jsonObject = JSONHelper
-                        .listMapToJsonArray((List<Map<String, Object>>) data
-                                , colMapProps);
-            } else {
-                if (o != null && isJavaSimpleClazz(o.getClass())) {
-                    jsonObject = new JSONArray((List) data);
-                } else {
-                    jsonObject = JSONHelper.clazzToJsonArray((List) data, colMapProps);
-                }
-            }
-        } else {
-            if (data instanceof Map) {
-                jsonObject = JSONHelper.mapToJson((Map) (data), colMapProps);
-            } else if (data instanceof GsonData) {
-            	jsonObject = ((GsonData)(data)).toJson();
-            } else {
-                if (this.type != null && isJavaSimpleClazz(type)) {
-                    jsonObject = new JSONObject(data);
-                } else {
-                    jsonObject = JSONHelper.clazzToJson(data, colMapProps);
-                }
-            }
-        }
-        return jsonObject;
-    }
-
-    public JSONObject toJson() {
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("state", this.state);
-        jsonObject.put("msg", this.msg);
-        jsonObject.put("len", this.len);
-        if (this.data != null) {
-            jsonObject.put("data", dataToJson());
-        } else {
-            jsonObject.putOpt("data", JSONObject.NULL);
-        }
-        return jsonObject;
-    }
-
-    public JSONObject toJsonMsg() {
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("state", this.state);
-        //if (StringUtils.isBlank(msg)) {
-        //	jsonObject.put("msg", JSONObject.NULL);
-        //} else {
-        jsonObject.put("msg", this.msg);
-        //}
-        return jsonObject;
-    }
-
+    
     //组装数据用回调接口
     @Deprecated
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-	public void assemblyData(AssemblyResultDataCallBack cb) throws Exception {
-        if (isSuccess() && cb != null) {
-            Object o = this.getData();
-            if ( o != null ) {
-	            if (o instanceof List) {
-	                for (T t : (List<T>) o) {
-	                	cb.assembly(t);
-	                }
-	            } else {
-	            	cb.assembly(o);
-	            }
-            }
-        }
-    }
-
-    //组装数据用回调接口
-    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @SuppressWarnings({ "unchecked", "rawtypes" })
 	public void assemb(AssembDataCallBack cb) throws Exception {
         if (isSuccess() && cb != null) {
             Object o = this.getData();
@@ -413,15 +301,34 @@ public class ResultDTO<T> implements Serializable {
 	                	cb.assemb(t);
 	                }
 	            } else {
-	           		cb.assemb(o);
+	           		cb.assemb((T)o);
 	            }
             }
         }
     }
 
-    //是否有组装数据
-    public void showExtPorp() throws Exception {
-        this.addColSetProps(BasicBean.extPropName);
+    //组装数据用回调接口
+    @SuppressWarnings({ "rawtypes" })
+	public static void doResult(ResultDTO dto, ResultDataCallBack cb) throws SQLException {
+    	if (dto != null) {
+    		dto.resultData(cb);
+    	}
+    }
+	    
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+	private void resultData(ResultDataCallBack cb) throws SQLException {
+        if (isSuccess() && cb != null) {
+            Object o = this.getData();
+            if ( o != null ) {
+	            if (o instanceof List) {
+	                for (T t : (List<T>) o) {
+	                	cb.callback(t);
+	                }
+	            } else {
+	           		cb.callback((T)o);
+	            }
+            }
+        }
     }
 
 }

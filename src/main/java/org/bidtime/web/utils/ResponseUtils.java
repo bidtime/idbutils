@@ -7,8 +7,6 @@ import java.io.IOException;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.bidtime.dbutils.gson.ResultDTO;
-import org.bidtime.utils.exception.TipMsgException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,69 +20,6 @@ public class ResponseUtils {
 
 	private static final Logger logger = LoggerFactory
 			.getLogger(ResponseUtils.class);
-
-	public static void setSqlResultResponse(int applies, String msg,
-			HttpServletResponse r) {
-		short state = (applies > 0) ? UserHeadState.SUCCESS : UserHeadState.ERROR;
-		if (state == UserHeadState.SUCCESS) {
-			setStateMsgResponse(state, "", r);
-		} else {
-			setStateMsgResponse(state, msg, r);
-		}
-	}
-
-	public static void setSuccessResponse(String msg,
-			HttpServletResponse r) {
-		setStateMsgResponse(UserHeadState.SUCCESS, msg, r);
-	}
-
-	public static void setSuccessResponse(HttpServletResponse r) {
-		setStateMsgResponse(UserHeadState.SUCCESS, "", r);
-	}
-
-	public static void setErrorMsgResponse(String msg,
-			HttpServletResponse r) {
-		setStateMsgResponse(UserHeadState.ERROR, msg, r);
-	}
-
-	public static void setFrequentMsgResponse(String msg,
-			HttpServletResponse r) {
-		setStateMsgResponse(UserHeadState.USER_IS_FREQUENT, msg, r);
-	}
-
-	public static void setErrorMsgResponse(Exception e, String msg, 
-			HttpServletResponse r) {
-		if (logger.isErrorEnabled()) {
-			logger.error("setError", e);
-		}
-		if (e instanceof TipMsgException) {
-			setErrorMsgResponse(e.getLocalizedMessage(), r);
-		} else {
-			setErrorMsgResponse(msg, r);
-		}
-	}
-
-	public static void setErrorMsgResponse(Exception e,
-			HttpServletResponse r) {
-		if (logger.isErrorEnabled()) {
-			logger.error("setError", e);
-		}
-		setStateMsgResponse(UserHeadState.ERROR, e.getLocalizedMessage(), r);
-	}
-
-	public static void setStateMsgResponse(int n, String msg,
-			HttpServletResponse r) {
-		ResultDTO<Object> d = new ResultDTO<Object>(n, msg);
-		setResponseResultString(d.toJsonMsg().toString(), r);
-	}
-
-	@SuppressWarnings("rawtypes")
-	public static void setResponseResult(ResultDTO d, HttpServletResponse r) {
-		if (d == null) {
-			return;
-		}
-		setResponseResultObject(d.toJson(), r);
-	}
 
 	public static void setResponseResultObject(Object o, HttpServletResponse r) {
 		if (o == null) {
@@ -104,7 +39,7 @@ public class ResponseUtils {
 			r.setHeader("Pragma", "no-cache"); // HTTP 1.0
 			r.setDateHeader("Expires", 0); // prevents caching at the proxy server
 			r.setCharacterEncoding("UTF-8");
-			r.setContentType("text/html;charset=UTF-8");
+			r.setContentType("application/json;charset=UTF-8");
 			// write string
 			r.getWriter().write(s);
 			// flush buffer
@@ -147,38 +82,38 @@ public class ResponseUtils {
 		setResponseIntHeadString(r, UserHeadState.USER_NO_ONLINE, msg);
 	}
 	
-	/**
-	 * 帐号未激活
-	 * @param r
-	 * @param msg
-	 */
-	public static void setResponseHeadNoActive(HttpServletResponse r,
-			String msg) {
-		setResponseResultObject(UserHeadState.noPassJsonMsg(
-			UserHeadState.CHK_USER_NO_ACTIVE, msg), r);
-	}
-	
-	/**
-	 * 帐号来激活
-	 * @param r
-	 * @param msg
-	 */
-	public static void setResponseHeadNoCheck(HttpServletResponse r,
-			String msg) {
-		setResponseResultObject(UserHeadState.noPassJsonMsg(
-			UserHeadState.CHK_USER_NO_CHECK, msg), r);
-	}
-	
-	/**
-	 * 帐号来审核
-	 * @param r
-	 * @param msg
-	 */
-	public static void setResponseHeadNoPass(HttpServletResponse r,
-			String msg) {
-		setResponseResultObject(UserHeadState.noPassJsonMsg(
-			UserHeadState.CHK_USER_NO_PASS, msg), r);
-	}
+//	/**
+//	 * 帐号未激活
+//	 * @param r
+//	 * @param msg
+//	 */
+//	public static void setResponseHeadNoActive(HttpServletResponse r,
+//			String msg) {
+//		setResponseResultObject(UserHeadState.noPassJsonMsg(
+//			UserHeadState.CHK_USER_NO_ACTIVE, msg), r);
+//	}
+//	
+//	/**
+//	 * 帐号来激活
+//	 * @param r
+//	 * @param msg
+//	 */
+//	public static void setResponseHeadNoCheck(HttpServletResponse r,
+//			String msg) {
+//		setResponseResultObject(UserHeadState.noPassJsonMsg(
+//			UserHeadState.CHK_USER_NO_CHECK, msg), r);
+//	}
+//	
+//	/**
+//	 * 帐号来审核
+//	 * @param r
+//	 * @param msg
+//	 */
+//	public static void setResponseHeadNoPass(HttpServletResponse r,
+//			String msg) {
+//		setResponseResultObject(UserHeadState.noPassJsonMsg(
+//			UserHeadState.CHK_USER_NO_PASS, msg), r);
+//	}
 	
 	/**
 	 * 设置state以及GsonEbRst消息
@@ -205,7 +140,7 @@ public class ResponseUtils {
 			r.setHeader("Cache-Control", "no-cache"); // HTTP 1.1
 			r.setHeader("Pragma", "no-cache"); // HTTP 1.0
 			r.setDateHeader("Expires", 0); // prevents caching at the proxy server
-			r.setContentType("text/html;charset=UTF-8");
+			r.setContentType("application/json;charset=UTF-8");
 			// set notLogin value
 			r.addIntHeader(UserHeadState.NOT_LOGININ, intHead);
 			// write msg
@@ -220,50 +155,5 @@ public class ResponseUtils {
 			logger.error("setResponse", e);
 		}
 	}
-
-	/**
-	 * @param r
-	 */
-//	public static void setResponseHeadNoLogin(HttpServletResponse r) {
-//		setResponseHeadInt(r, UserHeadState.USER_NO_LOGIN); // -1,未登陆
-//	}
-//
-//	/**
-//	 * @param r
-//	 */
-//	public static void setResponseHeadNoOnLine(HttpServletResponse r) {
-//		setResponseHeadInt(r, UserHeadState.USER_NO_ONLINE);	//帐号已经登陆
-//	}
-//
-//	/**
-//	 * @param r
-//	 */
-//	public static void setResponseHeadNoOnPower(HttpServletResponse r) {
-//		setResponseHeadInt(r, UserHeadState.USER_NO_POWER);//用户无此权限
-//	}
-//
-//	/**
-//	 * @param r
-//	 */
-//	public static void setResponseHeadNoCheck(HttpServletResponse r) {
-//		setResponseHeadInt(r, UserHeadState.USER_NO_CHECK);//用户无此权限
-//	}
-
-	/**
-	 * @param r
-	 * @param n
-	 */
-//	private static void setResponseHeadInt(HttpServletResponse r, int n) {
-//		r.setHeader("Cache-Control", "no-cache"); // HTTP 1.1
-//		r.setHeader("Pragma", "no-cache"); // HTTP 1.0
-//		r.setDateHeader("Expires", 0); // prevents caching at the proxy server
-//		r.setCharacterEncoding("UTF-8");
-//		r.setContentType("text/html;charset=UTF-8");
-//		// set notLogin value
-//		r.addIntHeader(UserHeadState.NOT_LOGININ, n);
-//		if (logger.isDebugEnabled()) {
-//			logger.debug(UserHeadState.NOT_LOGININ + ":" + n);
-//		}
-//	}
 
 }

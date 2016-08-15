@@ -8,10 +8,8 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
-import org.bidtime.dbutils.gson.JSONHelper;
 import org.bidtime.utils.basic.ArrayComm;
 import org.bidtime.utils.basic.ObjectComm;
-import org.json.JSONArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -822,25 +820,25 @@ public class GsonRows extends GsonData {
 		return bReturn;
 	}
 	
-	@Override
-	protected JSONArray dataToJson() {
-		JSONArray jsonArray = new JSONArray();
-		for (int i = 0; i < data.length; i++) {
-			JSONArray ar1 = new JSONArray();
-			Object[] arObj = data[i];
-			for (int j = 0; j < head.length; j++) {
-				Object obj;
-				if (j<arObj.length) {
-					obj = arObj[j];
-				} else {
-					obj = null;
-				}
-				ar1.put(JSONHelper.objToJsonObj(obj, null));
-			}
-			jsonArray.put(ar1);
-		}
-		return jsonArray;
-	}
+//	@Override
+//	protected JSONArray dataToJson() {
+//		JSONArray jsonArray = new JSONArray();
+//		for (int i = 0; i < data.length; i++) {
+//			JSONArray ar1 = new JSONArray();
+//			Object[] arObj = data[i];
+//			for (int j = 0; j < head.length; j++) {
+//				Object obj;
+//				if (j<arObj.length) {
+//					obj = arObj[j];
+//				} else {
+//					obj = null;
+//				}
+//				ar1.put(JSONHelper.objToJsonObj(obj, null));
+//			}
+//			jsonArray.put(ar1);
+//		}
+//		return jsonArray;
+//	}
 	
 //	private static String getJson() {
 //		return "{\"head\":[\"code\",\"name\",\"id\"],\"data\":[[\"1\",\"1\",2],[\"1\",\"1\",3]]}";

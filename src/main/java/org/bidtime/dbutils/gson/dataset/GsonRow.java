@@ -8,10 +8,8 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
-import org.bidtime.dbutils.gson.JSONHelper;
 import org.bidtime.utils.basic.ArrayComm;
 import org.bidtime.utils.basic.ObjectComm;
-import org.json.JSONArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,19 +61,19 @@ public class GsonRow extends GsonData {
 		this.data = data;
 	}
 	
-	protected JSONArray dataToJson() {
-		JSONArray ar1 = new JSONArray();
-		for (int j = 0; j < head.length; j++) {
-			Object obj;
-			if (j < data.length) {
-				obj = data[j];
-			} else {
-				obj = null;
-			}
-			ar1.put(JSONHelper.objToJsonObj(obj, null));
-		}
-		return ar1;
-	}
+//	protected JSONArray dataToJson() {
+//		JSONArray ar1 = new JSONArray();
+//		for (int j = 0; j < head.length; j++) {
+//			Object obj;
+//			if (j < data.length) {
+//				obj = data[j];
+//			} else {
+//				obj = null;
+//			}
+//			ar1.put(JSONHelper.objToJsonObj(obj, null));
+//		}
+//		return ar1;
+//	}
 
 	public boolean renameHead(String newName, String oldName) {
 		int nPos = this.getPosOfName(oldName);

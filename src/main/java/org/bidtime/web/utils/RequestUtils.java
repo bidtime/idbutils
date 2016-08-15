@@ -1,5 +1,7 @@
 package org.bidtime.web.utils;
 
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.ParseException;
@@ -15,7 +17,6 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
-import org.bidtime.dbutils.gson.JSONHelper;
 import org.bidtime.utils.basic.ArrayComm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -169,29 +170,29 @@ public class RequestUtils {
 	// }
 	// }
 
-	public static Map<String, Object> jsonStrToMap(HttpServletRequest request,
-			String sParam) throws Exception {
-		String jsonObject = RequestUtils.getString(request, sParam);
-		return JSONHelper.jsonStrToMap(jsonObject);
-	}
-
-	public static <T> T jsonStrToClazz(HttpServletRequest request,
-			String sParam, Class<T> type) throws Exception {
-		String json = RequestUtils.getString(request, sParam);
-		return JSONHelper.jsonStrToClazz(json, type);
-	}
-
-	@SuppressWarnings("rawtypes")
-	public static <T> T paramsMapToClazz(HttpServletRequest request,
-			Class<T> type) throws Exception {
-		Map map = getMapOfRequest(request);
-		if (map != null) {
-			return (T) JSONHelper.mapToClazz(map, type);
-			// BeanUtils.populate(t, request.getParameterMap());
-		} else {
-			return null;
-		}
-	}
+//	public static Map<String, Object> jsonStrToMap(HttpServletRequest request,
+//			String sParam) throws Exception {
+//		String jsonObject = RequestUtils.getString(request, sParam);
+//		return JSONHelper.jsonStrToMap(jsonObject);
+//	}
+//
+//	public static <T> T jsonStrToClazz(HttpServletRequest request,
+//			String sParam, Class<T> type) throws Exception {
+//		String json = RequestUtils.getString(request, sParam);
+//		return JSONHelper.jsonStrToClazz(json, type);
+//	}
+//
+//	@SuppressWarnings("rawtypes")
+//	public static <T> T paramsMapToClazz(HttpServletRequest request,
+//			Class<T> type) throws Exception {
+//		Map map = getMapOfRequest(request);
+//		if (map != null) {
+//			return (T) JSONHelper.mapToClazz(map, type);
+//			// BeanUtils.populate(t, request.getParameterMap());
+//		} else {
+//			return null;
+//		}
+//	}
 
 	public static Object[] getSplit(HttpServletRequest request, String sParam,
 			String splitChar) {
@@ -469,11 +470,16 @@ public class RequestUtils {
 	@SuppressWarnings({ "rawtypes" })
 	public static String getParamsOfRequest(HttpServletRequest request,
 			boolean bHttpEncode) {
-		StringBuilder sb = new StringBuilder();
 		Map map = request.getParameterMap();
-		Set keSet = map.entrySet();
+		return getParamsOfMap(map, bHttpEncode);
+	}
+
+	@SuppressWarnings({ "rawtypes" })
+	public static String getParamsOfMap(Map map, boolean bHttpEncode) {
+		StringBuilder sb = new StringBuilder();
+		Set keySet = map.entrySet();
 		boolean bExistsKeyValue = false;
-		for (Iterator itr = keSet.iterator(); itr.hasNext();) {
+		for (Iterator itr = keySet.iterator(); itr.hasNext();) {
 			Map.Entry me = (Map.Entry) itr.next();
 			Object objectKey = me.getKey();
 			Object objectValue = me.getValue();
@@ -525,5 +531,28 @@ public class RequestUtils {
 		}
 		return mapRtn;
 	}
+	
+	public static String getBodyStr(HttpServletRequest request) throws IOException {
+		return getBodyStr(request.getReader());
+	}
 
+	public static String getBodyStr(BufferedReader br) {
+		StringBuilder sb = new StringBuilder();
+		try {
+			String inputLine;
+			while ((inputLine = br.readLine()) != null) {
+				sb.append(inputLine);
+			}
+			br.close();
+		} catch (IOException e) {
+			logger.error("getBodyStr", e);
+		}
+		return sb.toString();
+	}
+
+//	public static Map<String, Object> getBodyMap(HttpServletRequest request) throws IOException {
+//		String bodyStr = getBodyStr(request);
+//		return JSONHelper.jsonStrToMap(bodyStr, false);
+//	}
+	
 }

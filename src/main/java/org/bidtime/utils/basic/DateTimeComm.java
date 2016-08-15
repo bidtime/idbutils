@@ -6,6 +6,14 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 
 public class DateTimeComm {
+	
+	public static boolean isSameTime(Date date1, Date date2) {
+		if (date1 == null) {
+			return (date2 == null) ? true : false;
+		} else {
+			return (date2 == null) ? false : date1.getTime() == date2.getTime();
+		}
+	}
 
 	public static Date objectToDate(Object o) {
 		if (o != null) {
@@ -100,12 +108,12 @@ public class DateTimeComm {
 		return c.getTimeInMillis();
 	}
 	
-	public static Date getDay() {
-		return new Date(getDateMS());
-	}
-	
 	@Deprecated
 	public static Date getDate() {
+		return getDay();
+	}
+	
+	public static Date getDay() {
 		return new Date(getDateMS());
 	}
 
@@ -140,6 +148,14 @@ public class DateTimeComm {
 		c.setTime(d);
 		c.add(Calendar.DATE, n);
 		return c.getTime();
+	}
+
+	public static Date getFirstDayOfMonth(Date date) {
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(date);
+		final int firstDay = 1;
+		calendar.set(Calendar.DAY_OF_MONTH, firstDay);
+		return calendar.getTime();
 	}
 
 	public static Date getLastDayOfMonth(Date date) {

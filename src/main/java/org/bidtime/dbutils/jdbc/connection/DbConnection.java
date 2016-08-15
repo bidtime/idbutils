@@ -336,7 +336,7 @@ public class DbConnection {
 				&& ((ResultSetDTOHandler) rsh).isCountSql()) {
 			sqlCount = SqlUtils.getCountSql(sql);
 		}
-		return queryConn(conn, sql, sqlCount, params, 
+		return queryConn(conn, sql, sqlCount, params,
 				nPageIdx, nPageSize, rsh);
 	}
 	
@@ -400,8 +400,8 @@ public class DbConnection {
 			if (LogSelectSql.logInfoOrDebug()) {
 				LogSelectSql.logFormatEndTimeNow(startTime, endTime, sql, paramAll);
 			}
-			if (t != null) {
-				if (t instanceof ResultDTO && bCountSql) {
+			if (t != null && bCountSql) {
+				if (t instanceof ResultDTO) {
 					((ResultDTO) t).setLen(nTotalRows);
 				}
 			}

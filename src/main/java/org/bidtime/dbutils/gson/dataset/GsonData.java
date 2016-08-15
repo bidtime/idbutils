@@ -2,9 +2,6 @@ package org.bidtime.dbutils.gson.dataset;
 
 import java.util.HashMap;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 abstract public class GsonData {
 
 	protected HashMap<String, Integer> mapHead = new HashMap<String, Integer>();
@@ -25,20 +22,20 @@ abstract public class GsonData {
 		return getDataLen() > 0 ? true:false;
 	}
 	
-	public JSONObject toJson() {
-		JSONObject jsonObject = new JSONObject();
-		if (head != null && head.length>0) {
-			jsonObject.put("head", this.head);			
-		}
-		if (isExistsData()) {
-			jsonObject.put("data", dataToJson());
-		} else {
-			jsonObject.putOpt("data", JSONObject.NULL);
-		}
-		return jsonObject;
-	}
-	
-	abstract protected JSONArray dataToJson();
+//	public JSONObject toJson() {
+//		JSONObject jsonObject = new JSONObject();
+//		if (head != null && head.length>0) {
+//			jsonObject.put("head", this.head);			
+//		}
+//		if (isExistsData()) {
+//			jsonObject.put("data", dataToJson());
+//		} else {
+//			jsonObject.putOpt("data", JSONObject.NULL);
+//		}
+//		return jsonObject;
+//	}
+//	
+//	abstract protected JSONArray dataToJson();
 	
 	protected void clearIndex() {
 		mapHead.clear();

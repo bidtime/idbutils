@@ -64,7 +64,7 @@ public class TTableProps {
 		this.mapColumnDescript = mapColumnDescript;
 	}
 
-	private Map<String,SqlHeadCountPro> mapSqlHeadPro = new HashMap<>();
+	private Map<String, SqlHeadCountPro> mapSqlHeadPro = new HashMap<>();
 	
 	public String getSqlOfId(String id) {
 		SqlHeadCountPro p = mapSqlHeadPro.get(id);
@@ -123,12 +123,15 @@ public class TTableProps {
 	private String getInsertSqlOfJsonHead(String tblName, String[] jsonHead) {
 		List<String> listColumn=new ArrayList<String>();
 		for (String sIdx: jsonHead) {
-			ColumnPro p = this.mapPropertyColumn.get(sIdx);
-			if (p!=null) {
-				listColumn.add(p.getColumn());
-			} else {
+			if (mapColumnDescript.containsKey(sIdx)) {
 				listColumn.add(sIdx);
 			}
+//			ColumnPro p = this.mapPropertyColumn.get(sIdx);
+//			if (p!=null) {
+//				listColumn.add(p.getColumn());
+//			} else {
+//				listColumn.add(sIdx);
+//			}
 		}
 		return SqlUtils.getInsertSql(tblName,ArrayUtils.listToStringArray(listColumn));			
 	}
@@ -149,15 +152,10 @@ public class TTableProps {
 		List<String> listPks = new ArrayList<String>();
 		for (int i = 0; i < jsonAllHead.length; i++) {
 			String sIdx = jsonAllHead[i];
-			ColumnPro p = this.mapPropertyColumn.get(sIdx);
-			if (p != null) {
-				if (setJsonPkHead.contains(sIdx)) {
-					listPks.add(p.getColumn());
-				} else {
-					listCols.add(p.getColumn());
-				}
+			if (setJsonPkHead.contains(sIdx)) {
+				listPks.add(sIdx);
 			} else {
-				listCols.add(sIdx);						
+				listCols.add(sIdx);
 			}
 		}
 		return SqlUtils.getUpdateSql(tblName, ArrayUtils.listToStringArray(listCols),
@@ -170,39 +168,6 @@ public class TTableProps {
 
 	public String getSelectSql() {
 		return SqlUtils.getSelectSql(tableName, mapPropertyColumn);
-	}
-
-	/*
-	 * 通过json名称,获取可以执行的update sql
-	 */	
-	public String getUpdateSqlOfHead(String tblName, String[] jsonHead, List<String> outPkJson) {
-		List<String> listColumn=new ArrayList<String>();
-		List<String> listPk=new ArrayList<String>();
-		try {
-			for (int i = 0; i< jsonHead.length; i++) {
-				String sIdx = jsonHead[i];
-				ColumnPro p = this.mapPropertyColumn.get(sIdx);
-				if (p != null) {
-					if (p.getPk()) {
-						listPk.add(p.getColumn());
-						if (outPkJson != null) {
-							outPkJson.add(sIdx);
-						}
-					} else {
-						listColumn.add(p.getColumn());
-					}
-				} else {
-					listColumn.add(sIdx);
-				}
-			}
-			return SqlUtils.getUpdateSql(tblName, ArrayUtils.listToStringArray(listColumn),
-					ArrayUtils.listToStringArray(listPk));
-		} finally {
-			listColumn.clear();
-			listColumn = null;
-			listPk.clear();
-			listPk = null;
-		}
 	}
 
 	public List<String> getJsonPk() {
@@ -224,43 +189,13 @@ public class TTableProps {
 		}
 		return set;
 	}
-	
-	/*
-	 * 获取可以执行的delete sql
-	 */
-//	public String getDeleteSql(String tblName) {
-//		return SqlUtils.getDeleteSql(tblName, this.fieldPK);
-//	}
 
 	public String getDeleteSql(String tblName, Object[] ids) {
 		return SqlUtils.getDeleteSql(tblName, getFieldPK(), ids);
 	}
 
-	public String getDeleteSqlOfHead(String tblName, String[] heads) {
-		List<String> listPk = new ArrayList<>();
-		for (int i=0; i<heads.length; i++) {
-			String sIdx = heads[i];
-			ColumnPro p = this.mapPropertyColumn.get(sIdx);
-			if (p != null) {
-				listPk.add(p.getColumn());
-			}
-		}
-		return SqlUtils.getDeleteSql(tblName, ArrayUtils.listToStringArray(listPk));	
-	}
-
-	public String getDeleteSqlOfHead(String tblName, String[] heads, List<String> listJsonPk) {
-		List<String> listPk = new ArrayList<>();
-		for (int i=0; i<heads.length; i++) {
-			String sIdx = heads[i];
-			ColumnPro p = this.mapPropertyColumn.get(sIdx);
-			if (p != null && p.getPk()) {
-				listPk.add(p.getColumn());
-				if (listJsonPk != null) {
-					listJsonPk.add(sIdx);
-				}
-			}
-		}
-		return SqlUtils.getDeleteSql(tblName, ArrayUtils.listToStringArray(listPk));	
+	public String getDeleteSql(String tblName, String[] flds, Object[] ids) {
+		return SqlUtils.getDeleteSql(tblName, flds, ids);
 	}
 
 	public String getClassName() {

@@ -44,7 +44,7 @@ public class ResultSetDTOHandler<T> extends ResultSetExHandler<ResultDTO<T>> {
 	public T doDTO(ResultSet rs) throws SQLException {
 		if (rs.next()) {
 			return (T) convert.toBean(rs, type, mapBeanPropColumns,
-					setColumns);
+				setColumns);
 		} else {
 			return null;
 		}

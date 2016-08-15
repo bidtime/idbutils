@@ -6,9 +6,6 @@ package org.bidtime.dbutils.gson.dataset;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.bidtime.dbutils.gson.JSONHelper;
-import org.json.JSONObject;
-
 /**
  * @author Administrator
  * 
@@ -192,25 +189,25 @@ public class ParserDataSet {
 //		return parserString(json);	//GsonComm.fromJson(s, ParserDataSetJson.class);
 //	}
 
-	protected JSONObject toJson() {
-		JSONObject jsonObject = new JSONObject();
-		if (this.isExistsInsertRows()) {
-			jsonObject.put("add", JSONHelper.listToJson(this.add, null));
-		}
-		if (this.isExistsUpdateRows()) {
-			jsonObject.put("edit", JSONHelper.listToJson(this.edit, null));
-		}
-		if (this.isExistsDelRows()) {
-			jsonObject.put("del", JSONHelper.listToJson(this.del, null));
-		}
-		return jsonObject;
-	}
+//	protected JSONObject toJson() {
+//		JSONObject jsonObject = new JSONObject();
+//		if (this.isExistsInsertRows()) {
+//			jsonObject.put("add", JSONHelper.listToJson(this.add, null));
+//		}
+//		if (this.isExistsUpdateRows()) {
+//			jsonObject.put("edit", JSONHelper.listToJson(this.edit, null));
+//		}
+//		if (this.isExistsDelRows()) {
+//			jsonObject.put("del", JSONHelper.listToJson(this.del, null));
+//		}
+//		return jsonObject;
+//	}
 
-	@Override
-	public String toString() {
-		JSONObject jsonObject = toJson();
-		return jsonObject.toString();
-	}
+//	@Override
+//	public String toString() {
+//		JSONObject jsonObject = toJson();
+//		return jsonObject.toString();
+//	}
 	
 //	private String testToJson() {
 //		String[] head = new String[]{"id", "id", "id"};
