@@ -33,7 +33,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 public class DbConnection {
 
 	// 使用 ThreadLocal 保存 DataSourceTransactionHolder 变量
-	private volatile static ThreadLocal<DataSourceTransactionHolder> dataSourceTransThreadLocal = new ThreadLocal<>();
+	private volatile static ThreadLocal<DataSourceTransactionHolder> dataSourceTransThreadLocal = new ThreadLocal<DataSourceTransactionHolder>();
 	
 	private static Connection getConnOfSpringCtx(DataSource ds) throws SQLException {
 		ConnectionHolder conHolder = (ConnectionHolder) TransactionSynchronizationManager

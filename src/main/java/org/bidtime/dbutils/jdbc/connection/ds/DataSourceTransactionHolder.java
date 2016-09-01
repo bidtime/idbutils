@@ -12,7 +12,7 @@ import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 public class DataSourceTransactionHolder {
 
-	protected Map<Integer, TransactionManagerHolder> mapTransHolder = new HashMap<>();
+	protected Map<Integer, TransactionManagerHolder> mapTransHolder = new HashMap<Integer, TransactionManagerHolder>();
 	
 	public DataSourceTransactionHolder(DataSource dataSource) {
 		put(dataSource);
@@ -123,7 +123,7 @@ public class DataSourceTransactionHolder {
 		return isEmpty();
 	}
 	
-	protected volatile static Map<Integer, DataSourceTransactionManager> mapManager = new HashMap<>();
+	protected volatile static Map<Integer, DataSourceTransactionManager> mapManager = new HashMap<Integer, DataSourceTransactionManager>();
 	
 	private static DataSourceTransactionManager getOfDataSource(DataSource dataSource) {
 		DataSourceTransactionManager m = mapManager.get(dataSource.hashCode());

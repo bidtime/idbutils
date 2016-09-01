@@ -44,7 +44,7 @@ public class CryptPropertyConfig extends PropertyPlaceholderConfigurer {
 		this.propKeys = propKeys;
 		if (!StringUtils.isEmpty(propKeys)) {
 			if (!propKeys.trim().equals("*")) {
-				propSet = new HashSet<>();
+				propSet = new HashSet<String>();
 				String[] ar = propKeys.split(";");
 				for (int i=0; i<ar.length; i++) {
 					propSet.add(ar[i]);

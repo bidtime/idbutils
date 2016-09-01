@@ -31,7 +31,7 @@ public class DutyTest extends BasicTest {
 
 	@Test
 	public void test_insertList() throws SQLException {
-		List<Duty> list = new ArrayList<>();
+		List<Duty> list = new ArrayList<Duty>();
 		//
 		Duty duty1 = new Duty();
 		duty1.setName("1 dept");
@@ -48,7 +48,7 @@ public class DutyTest extends BasicTest {
 
 	@Test
 	public void test_updateList() throws SQLException {
-		List<Duty> list = new ArrayList<>();
+		List<Duty> list = new ArrayList<Duty>();
 		//
 		Duty duty1 = new Duty();
 		duty1.setId(7L);
@@ -116,7 +116,7 @@ public class DutyTest extends BasicTest {
 
 	@Test
 	public void test_deleteList() throws SQLException {
-		List<Object> list = new ArrayList<>();
+		List<Object> list = new ArrayList<Object>();
 		list.add(9L);
 		int n = service.delete(list);
 		System.out.println("update: " + n);
@@ -124,7 +124,7 @@ public class DutyTest extends BasicTest {
 
 	@Test
 	public void test_getBeanDTOHandler() throws SQLException {
-		BeanDTOHandler<Duty> h = new BeanDTOHandler<>(Duty.class);
+		BeanDTOHandler<Duty> h = new BeanDTOHandler<Duty>(Duty.class);
 		ResultDTO<Duty> dto = service.list(h);
 		if (dto != null) {
 			System.out.println(dto);
@@ -133,84 +133,9 @@ public class DutyTest extends BasicTest {
 		}
 	}
 
-//	@Test
-//	public void test_getBeanPageHandler() throws SQLException {
-//		Page page = newPage(4, 2);
-//		BeanPageHandler<Duty> h = new BeanPageHandler<>(Duty.class, page);
-//		ResultPage<Duty> dto = service.list(h);
-//		if (dto != null) {
-//			System.out.println(dto);
-//		} else {
-//			System.out.println("null");
-//		}
-//		System.out.println("page:" + page.toString());
-//	}
-//
-//	@Test
-//	public void test_getBeanListPageHandler() throws SQLException {
-//		Page page = newPage(1, 2);
-//		BeanListPageHandler<Duty> h = new BeanListPageHandler<>(Duty.class, page, false);
-//		ResultData<List<Duty>> dto = service.list(h);
-//		if (dto != null) {
-//			System.out.println(dto);
-//		} else {
-//			System.out.println("null");
-//		}
-//		System.out.println("page:" + page.toString());
-//	}
-//
-//	@Test
-//	public void test_getBeanListDataHandler() throws SQLException {
-//		Page page = newPage(1, 2);
-//		BeanListDataHandler<Duty> h = new BeanListDataHandler<>(Duty.class, page);
-//		ResultData<List<Duty>> dto = service.list(h);
-//		if (dto != null) {
-//			System.out.println(dto);
-//		} else {
-//			System.out.println("null");
-//		}
-//		System.out.println("page:" + page.toString());
-//	}
-//
-//	@Test
-//	public void test_getBeanDataHandler() throws SQLException {
-//		Page page = newPage(1, 2);
-//		BeanDataHandler<Duty> h = new BeanDataHandler<>(Duty.class, page);
-//		ResultData<Duty> dto = service.list(h);
-//		if (dto != null) {
-//			System.out.println(dto);
-//		} else {
-//			System.out.println("null");
-//		}
-//	}
-//
-//	@Test
-//	public void test_getMapDataHandler() throws SQLException {
-//		Page page = newPage(1, 2);
-//		MapDataHandler h = new MapDataHandler(page);
-//		ResultData<Map<String, Object>> dto = service.list(h);
-//		if (dto != null) {
-//			System.out.println(dto);
-//		} else {
-//			System.out.println("null");
-//		}
-//	}
-//
-//	@Test
-//	public void test_getMapPageHandler() throws SQLException {
-//		Page page = newPage(1, 2);
-//		MapPageHandler h = new MapPageHandler(page);
-//		ResultPage<Map<String, Object>> dto = service.list(h);
-//		if (dto != null) {
-//			System.out.println(dto);
-//		} else {
-//			System.out.println("null");
-//		}
-//	}
-
 	@Test
 	public void test_info() throws SQLException {
-		BeanDTOHandler<Duty> h = new BeanDTOHandler<>(Duty.class);
+		BeanDTOHandler<Duty> h = new BeanDTOHandler<Duty>(Duty.class);
 		ResultDTO<Duty> dto = service.info(h, 0);
 		if (dto != null) {
 			System.out.println(dto);
@@ -221,7 +146,7 @@ public class DutyTest extends BasicTest {
 
 	@Test
 	public void test_info_() throws SQLException {
-		BeanHandler<Duty> h = new BeanHandler<>(Duty.class);
+		BeanHandler<Duty> h = new BeanHandler<Duty>(Duty.class);
 		Duty dto = service.info(h, 0);
 		if (dto != null) {
 			System.out.println(dto);

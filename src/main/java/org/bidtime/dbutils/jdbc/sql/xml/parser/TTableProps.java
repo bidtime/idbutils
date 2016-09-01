@@ -64,7 +64,7 @@ public class TTableProps {
 		this.mapColumnDescript = mapColumnDescript;
 	}
 
-	private Map<String, SqlHeadCountPro> mapSqlHeadPro = new HashMap<>();
+	private Map<String, SqlHeadCountPro> mapSqlHeadPro = new HashMap<String, SqlHeadCountPro>();
 	
 	public String getSqlOfId(String id) {
 		SqlHeadCountPro p = mapSqlHeadPro.get(id);
@@ -426,7 +426,7 @@ public class TTableProps {
 	@SuppressWarnings("rawtypes")
 	public List<Map<String, Object>> clazzToMap(List list, PropAdapt pa) throws SQLException {
 		if (list != null && list.size()>0) {
-			List<Map<String, Object>> listMap = new ArrayList<>();
+			List<Map<String, Object>> listMap = new ArrayList<Map<String, Object>>();
 			for (int i=0; i<list.size(); i++) {
 				Object object = list.get(i);
 				listMap.add(clazzToMap(object, pa));
