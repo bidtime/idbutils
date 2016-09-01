@@ -199,6 +199,8 @@
 			<artifactId>spring-aop</artifactId>
 			<version>${spring.version}</version>
 		</dependency>
+		
+		<!-- below is for test, if u rm test unit, u can drop its -->
         
         <!--TEST-->
         <dependency>
@@ -226,8 +228,10 @@
             <artifactId>mchange-commons-java</artifactId>
             <version>0.2.8</version>
         </dependency>
+        
         <!--c3p0 end -->
 
+		<!-- mysql jdbc driver -->
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
