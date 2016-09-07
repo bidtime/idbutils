@@ -43,7 +43,7 @@ public class HttpResponseUtils {
 		} else {
 			sReturn = HttpUtils.get(sUrl, sData);
 		}
-		ResponseUtils.setResponseResultString(sReturn, response);
+		ResponseUtils.writeString(sReturn, response);
 	}
 
 }

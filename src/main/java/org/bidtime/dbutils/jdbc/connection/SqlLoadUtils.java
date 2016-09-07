@@ -16,7 +16,6 @@ import org.apache.commons.dbutils.handlers.ScalarHandler;
 import org.bidtime.dbutils.gson.PropAdapt;
 import org.bidtime.dbutils.gson.dataset.GsonRow;
 import org.bidtime.dbutils.gson.dataset.GsonRows;
-import org.bidtime.dbutils.gson.dataset.JsonData;
 import org.bidtime.dbutils.jdbc.dao.PKCallback;
 import org.bidtime.dbutils.jdbc.sql.SqlParser;
 import org.bidtime.dbutils.jdbc.sql.SqlUtils;
@@ -193,8 +192,6 @@ public class SqlLoadUtils {
             result = true;
         } else if (type.equals(java.util.Date.class)) {
             result = true;
-        } else if (type.equals(JsonData.class)) {
-            result = false;
         } else if (type.equals(Set.class) || type.equals(Queue.class) ||
                 type.equals(Character.class) ||
                 type.equals(Math.class) || type.equals(Enum.class)) {

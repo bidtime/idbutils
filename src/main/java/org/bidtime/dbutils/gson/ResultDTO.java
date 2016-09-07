@@ -4,10 +4,12 @@ import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.bidtime.web.utils.UserHeadState;
-
 @SuppressWarnings("serial")
 public class ResultDTO<T> implements Serializable {
+	
+	//数据状态: sucess, state
+	private static final short SUCCESS = 0;			//成功
+	private static final short ERROR = 1;			//通用错误
 
     /**
      * 数据，真正的结果对象
@@ -121,8 +123,8 @@ public class ResultDTO<T> implements Serializable {
 
     @SuppressWarnings("rawtypes")
     public static ResultDTO apply(int applies, String msg) {
-        short state = (applies > 0) ? UserHeadState.SUCCESS : UserHeadState.ERROR;
-        if (state == UserHeadState.SUCCESS) {
+        short state = (applies > 0) ? SUCCESS : ERROR;
+        if (state == SUCCESS) {
             return ResultDTO.success();
         } else {
             return ResultDTO.error(msg);
@@ -131,8 +133,8 @@ public class ResultDTO<T> implements Serializable {
 
     @SuppressWarnings("rawtypes")
     public static ResultDTO apply(int applies) {
-        short state = (applies > 0) ? UserHeadState.SUCCESS : UserHeadState.ERROR;
-        if (state == UserHeadState.SUCCESS) {
+        short state = (applies > 0) ? SUCCESS : ERROR;
+        if (state == SUCCESS) {
             return ResultDTO.success();
         } else {
             return ResultDTO.error();
