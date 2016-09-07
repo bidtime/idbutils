@@ -33,7 +33,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.bidtime.dbutils.gson.dataset.GsonRow;
 import org.bidtime.dbutils.gson.dataset.GsonRows;
@@ -77,8 +76,6 @@ public class BeanProcessorEx implements Serializable {
      */
     private final Map<String, String> columnToPropertyOverrides;
 
-    private final Set<String> setColumnNames;
-
     static {
         primitiveDefaults.put(Integer.TYPE, Integer.valueOf(0));
         primitiveDefaults.put(Short.TYPE, Short.valueOf((short) 0));
@@ -105,13 +102,6 @@ public class BeanProcessorEx implements Serializable {
      */
     public BeanProcessorEx(Map<String, String> columnToPropertyOverrides) {
         super();
-        this.setColumnNames = null;
-        this.columnToPropertyOverrides = columnToPropertyOverrides;
-    }
-
-	public BeanProcessorEx(Map<String, String> columnToPropertyOverrides, Set<String> columnNames) {
-        super();
-        this.setColumnNames = columnNames;
         this.columnToPropertyOverrides = columnToPropertyOverrides;
     }
 
@@ -149,17 +139,13 @@ public class BeanProcessorEx implements Serializable {
      * @return the newly created bean
      */
     public <T> T toBean(ResultSet rs, Class<T> type) throws SQLException {
-        return toBean(rs, type, columnToPropertyOverrides, this.setColumnNames);
+        return toBean(rs, type, columnToPropertyOverrides);
     }
 
-    public <T> T toBean(ResultSet rs, Class<T> type, Map<String, String> mapBeanProps) throws SQLException {
-        return toBean(rs, type, mapBeanProps, this.setColumnNames);
-    }
-
-	public <T> T toBean(ResultSet rs, Class<T> type, Map<String, String> mapBeanProps, Set<String> mapCloumns) throws SQLException {
+	public <T> T toBean(ResultSet rs, Class<T> type, Map<String, String> mapBeanProps) throws SQLException {
         PropertyDescriptor[] props = this.propertyDescriptors(type);
         ResultSetMetaData rsmd = rs.getMetaData();
-        int[] columnToProperty = this.mapColumnsToProperties(rsmd, props, mapBeanProps, mapCloumns);
+        int[] columnToProperty = this.mapColumnsToProperties(rsmd, props, mapBeanProps);
         return this.createBean(rs, type, props, columnToProperty);
     }
 
@@ -200,18 +186,14 @@ public class BeanProcessorEx implements Serializable {
         return toBeanList(rs, type, this.columnToPropertyOverrides);
     }
 
-    public <T> List<T> toBeanList(ResultSet rs, Class<T> type, Map<String,String> mapBeanProps) throws SQLException {
-        return toBeanList(rs, type, mapBeanProps, this.setColumnNames);
-    }
-
-	public <T> List<T> toBeanList(ResultSet rs, Class<T> type, Map<String,String> mapBeanProps, Set<String> mapCloumns) throws SQLException {
+	public <T> List<T> toBeanList(ResultSet rs, Class<T> type, Map<String,String> mapBeanProps) throws SQLException {
         List<T> results = new ArrayList<T>();
         if (!rs.next()) {
             return results;
         }
         PropertyDescriptor[] props = this.propertyDescriptors(type);
         ResultSetMetaData rsmd = rs.getMetaData();
-        int[] columnToProperty = this.mapColumnsToProperties(rsmd, props, mapBeanProps, mapCloumns);
+        int[] columnToProperty = this.mapColumnsToProperties(rsmd, props, mapBeanProps);
         do {
             results.add(this.createBean(rs, type, props, columnToProperty));
         } while (rs.next());
@@ -421,17 +403,11 @@ public class BeanProcessorEx implements Serializable {
     protected int[] mapColumnsToProperties(ResultSetMetaData rsmd,
             PropertyDescriptor[] props) throws SQLException {
        return mapColumnsToProperties(rsmd, props, 
-    		   this.columnToPropertyOverrides, this.setColumnNames);
+    		   this.columnToPropertyOverrides);
     }
-
+   
 	protected int[] mapColumnsToProperties(ResultSetMetaData rsmd,
-            PropertyDescriptor[] props, Map<String,String> mapColumnPro) throws SQLException {
-    	return mapColumnsToProperties(rsmd, props, mapColumnPro, this.setColumnNames);
-    }
-    
-	protected int[] mapColumnsToProperties(ResultSetMetaData rsmd,
-            PropertyDescriptor[] props, Map<String,String> mapBeanReflactColumn,
-            Set<String> setColumnNames) throws SQLException {
+            PropertyDescriptor[] props, Map<String,String> mapBeanReflactColumn) throws SQLException {
         int cols = rsmd.getColumnCount();
         int[] columnToProperty = new int[cols + 1];
         Arrays.fill(columnToProperty, PROPERTY_NOT_FOUND);
@@ -446,10 +422,6 @@ public class BeanProcessorEx implements Serializable {
 	            String columnName = rsmd.getColumnLabel(col);
 	            if (null == columnName || 0 == columnName.length()) {
 	              columnName = rsmd.getColumnName(col);
-	            }
-	            // mapCloPros put
-	            if (setColumnNames != null) {
-	            	setColumnNames.add(columnName);
 	            }
 	            // try get pro from map
 	            String propertyName = null;

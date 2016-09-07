@@ -2,160 +2,33 @@ package org.bidtime.dbutils.gson;
 
 import java.io.Serializable;
 import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
-import org.bidtime.utils.comm.CaseInsensitiveHashSet;
 import org.bidtime.web.utils.UserHeadState;
 
 @SuppressWarnings("serial")
 public class ResultDTO<T> implements Serializable {
 
-    Map<String, Set<String>> colMapProps = null;
-    protected Class<T> type;
-
-    @SuppressWarnings("rawtypes")
-    public Class getType() {
-        return type;
-    }
-
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    public void setType(Class type) {
-        this.type = type;
-    }
-
-//	public Map<String, Set<String>> getColMapProps() {
-//		return colMapProps;
-//	}
-
-    private Set<String> getColMapPropsSet() {
-        if (colMapProps == null || type == null) {
-            return null;
-        }
-        return colMapProps.get(type.getName());
-    }
-
-    public void setColMapProps(Map<String, Set<String>> setPro) {
-        this.colMapProps = setPro;
-    }
-
-//	public Set<String> getColSetProps() {
-//		return (colMapProps != null && type != null) ? colMapProps.get(type.getName()) : null;
-//	}
-
-    public void delColSetProps(String col) {
-        Set<String> setColPro = getColMapPropsSet();
-        if (setColPro != null && !setColPro.isEmpty()) {
-            if (setColPro.remove(col)) {
-                colMapProps.put(type.getName(), setColPro);
-            }
-        }
-    }
-
-    public void delColSetProps(Set<String> colSetProps) {
-        Set<String> setColPro = getColMapPropsSet();
-        if (setColPro != null && !setColPro.isEmpty()) {
-            if (setColPro.removeAll(colSetProps)) {
-                colMapProps.put(type.getName(), setColPro);
-            }
-        }
-    }
-
-    public void delColSetProps(String[] arStrs) {
-        if (colMapProps == null || type == null) {
-            return;
-        }
-        Set<String> set = new HashSet<String>(Arrays.asList(arStrs));
-        delColSetProps(set);
-    }
-
-    public void addColSetProps(String col) {
-        if (colMapProps == null || type == null) {
-            return;
-        }
-        Set<String> setColPro = colMapProps.get(type.getName());
-        if (setColPro == null) {
-            setColPro = new CaseInsensitiveHashSet();
-        }
-        if (setColPro.add(col)) {
-            colMapProps.put(type.getName(), setColPro);
-        }
-    }
-
-    public void addColSetProps(Set<String> colSetProps) {
-        addColSetProps(type, colSetProps);
-    }
-
-    public void addColSetProps(String[] arStrs) {
-        Set<String> set = new HashSet<String>(Arrays.asList(arStrs));
-        addColSetProps(type, set);
-    }
-
-    @SuppressWarnings("rawtypes")
-    private void addColSetProps(Class type, String[] arStrs) {
-        Set<String> set = new HashSet<String>(Arrays.asList(arStrs));
-        addColSetProps(type, set);
-    }
-
-    @SuppressWarnings("rawtypes")
-    private void addColSetProps(Class type, Set<String> colSetProps) {
-        if (colMapProps == null || type == null) {
-            return;
-        }
-        Set<String> setColPro = colMapProps.get(type.getName());
-        if (setColPro == null) {
-            setColPro = new CaseInsensitiveHashSet();
-        }
-        setColPro.addAll(colSetProps);
-        colMapProps.put(type.getName(), setColPro);
-    }
-
     /**
      * 数据，真正的结果对象
      */
-    T data;
+    private T data;
 
     public T getData() {
         return data;
     }
 
-    @SuppressWarnings({"rawtypes", "unchecked"})
+    @SuppressWarnings({"rawtypes"})
     public void setData(T data) {
         if (data != null) {
             //this.setType(data.getClass());
             if (data instanceof List) {
                 this.len = ((List) data).size();
             } else if (data instanceof ResultDTO) {
-                ResultDTO resultDTO = (ResultDTO) data;
-                if (this.colMapProps == null) {
-                    colMapProps = resultDTO.colMapProps;
-                } else {
-                    colMapProps.putAll(resultDTO.colMapProps);
-                }
+                // ResultDTO resultDTO = (ResultDTO) data;
             }
         }
         this.data = data;
-    }
-
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    public void putMapHead(ResultDTO resultDTO) {
-        if (this.colMapProps == null) {
-            colMapProps = resultDTO.colMapProps;
-        } else {
-            if (resultDTO.colMapProps != null) {
-                colMapProps.putAll(resultDTO.colMapProps);
-            }
-        }
-    }
-
-    public void putMapHead(Object o, String[] arStrs) {
-        if (colMapProps == null || type == null || o == null) {
-            return;
-        }
-        addColSetProps(o.getClass(), arStrs);
     }
 
     public boolean isSuccess() {
@@ -200,6 +73,11 @@ public class ResultDTO<T> implements Serializable {
 
     public void setSuccess(boolean b) {
         setState(b ? 0 : 1);
+    }
+    
+    public void setError(String msg) {
+    	setSuccess(false);
+    	setMsg(msg);
     }
 
     public ResultDTO() {

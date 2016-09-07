@@ -9,6 +9,7 @@ import org.bidtime.basicdata.duty.bean.Duty;
 import org.bidtime.basicdata.duty.service.DutyService;
 import org.bidtime.dbutils.gson.ResultDTO;
 import org.bidtime.dbutils.jdbc.rs.handle.BeanDTOHandler;
+import org.bidtime.dbutils.jdbc.rs.handle.BeanListDTOHandler;
 import org.bidtime.test.BasicTest;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -102,7 +103,7 @@ public class DutyTest extends BasicTest {
 	@Test
 	public void test_delete() throws SQLException {
 		Duty duty = new Duty();
-		duty.setId(7L);
+		duty.setId(3L);
 		int n = service.delete(duty);
 		System.out.println("update: " + n);
 	}
@@ -136,7 +137,18 @@ public class DutyTest extends BasicTest {
 	@Test
 	public void test_info() throws SQLException {
 		BeanDTOHandler<Duty> h = new BeanDTOHandler<Duty>(Duty.class);
-		ResultDTO<Duty> dto = service.info(h, 0);
+		ResultDTO<Duty> dto = service.info(h, 1);
+		if (dto != null) {
+			System.out.println(dto);
+		} else {
+			System.out.println("null");
+		}
+	}
+
+	@Test
+	public void test_list() throws SQLException {
+		BeanListDTOHandler<Duty> h = new BeanListDTOHandler<Duty>(Duty.class);
+		ResultDTO<List<Duty>> dto = service.list(h);
 		if (dto != null) {
 			System.out.println(dto);
 		} else {

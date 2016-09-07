@@ -17,19 +17,6 @@ import org.bidtime.dbutils.jdbc.rs.BeanProcessorEx;
 @SuppressWarnings("serial")
 public class ResultSetExHandler<T> implements ResultSetHandler<T>, Serializable {
 
-	protected BeanAdapt beanAdapt = null;
-
-	public boolean isBeanAdapt() {
-		return ( beanAdapt != null && beanAdapt == BeanAdapt.AUTO ) ? true : false;
-	}
-
-//	public void setThumbsHead(boolean thumbsHead) {
-//		this.thumbsHead = thumbsHead;
-//		if (thumbsHead) {
-//			setMapColumnNames(new CaseInsensitiveHashMap());
-//		}
-//	}
-
 	protected Class<T> type;
 
 	protected BeanProcessorEx convert = null;
@@ -57,7 +44,6 @@ public class ResultSetExHandler<T> implements ResultSetHandler<T>, Serializable 
 		this.type = type;
 		this.convert = convert;
 		this.countSql = countSql;
-		this.beanAdapt = beanAdapt;
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })

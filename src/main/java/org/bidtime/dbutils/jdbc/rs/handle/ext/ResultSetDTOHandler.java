@@ -3,11 +3,8 @@ package org.bidtime.dbutils.jdbc.rs.handle.ext;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
-import java.util.Set;
 
 import org.bidtime.dbutils.gson.ResultDTO;
-import org.bidtime.utils.comm.CaseInsensitiveHashMap;
-import org.bidtime.utils.comm.CaseInsensitiveHashSet;
 
 /**
  * @author jss
@@ -19,32 +16,18 @@ import org.bidtime.utils.comm.CaseInsensitiveHashSet;
 public class ResultSetDTOHandler<T> extends ResultSetExHandler<ResultDTO<T>> {
 
 	protected Map<String, String> mapBeanPropColumns = null;
-	protected CaseInsensitiveHashSet setColumns = null;
 
 	@Override
 	public ResultDTO<T> handle(ResultSet rs) throws SQLException {
 		ResultDTO<T> t = new ResultDTO<T>();
-		if (this.isBeanAdapt()) {
-			setColumns = new CaseInsensitiveHashSet();
-			t.setData(doDTO(rs));
-			if (type != null) {
-				t.setType(type);
-				Map<String, Set<String>> mapColPro = new CaseInsensitiveHashMap<Set<String>>();
-				mapColPro.put(type.getName(), setColumns);
-				t.setColMapProps(mapColPro);
-			}
-		} else {
-			t.setData(doDTO(rs));
-			t.setType(type);
-		}
+		t.setData(doDTO(rs));
 		return t;
 	}
 
 	@SuppressWarnings("unchecked")
 	public T doDTO(ResultSet rs) throws SQLException {
 		if (rs.next()) {
-			return (T) convert.toBean(rs, type, mapBeanPropColumns,
-				setColumns);
+			return (T) convert.toBean(rs, type, mapBeanPropColumns);
 		} else {
 			return null;
 		}
