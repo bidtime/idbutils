@@ -11,8 +11,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class HttpGzipUtils {
+	
 	private static final Logger logger = LoggerFactory
 			.getLogger(HttpGzipUtils.class);
+	
 	private static final String GET_METHOD = "GET";
 	private static final String POST_METHOD = "POST";
 	private static final String ENCODING_UTF8 = "UTF-8";
@@ -146,4 +148,5 @@ public class HttpGzipUtils {
 //			e.printStackTrace();
 //		}
 //	}
+	
 }

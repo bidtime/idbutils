@@ -2,6 +2,7 @@ package org.bidtime.dbutils.jdbc.connection;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +18,8 @@ import org.bidtime.dbutils.gson.PropAdapt;
 import org.bidtime.dbutils.gson.dataset.GsonRow;
 import org.bidtime.dbutils.gson.dataset.GsonRows;
 import org.bidtime.dbutils.jdbc.dao.PKCallback;
+import org.bidtime.dbutils.jdbc.dao.SQLCallback;
+import org.bidtime.dbutils.jdbc.dialect.CAutoFitSql;
 import org.bidtime.dbutils.jdbc.sql.SqlParser;
 import org.bidtime.dbutils.jdbc.sql.SqlUtils;
 import org.bidtime.dbutils.jdbc.sql.xml.JsonFieldXmlsLoader;
@@ -290,6 +293,11 @@ public class SqlLoadUtils {
 		return insert(ds, clazz, object, PropAdapt.NOTNULL);
 	}
 
+	@SuppressWarnings({ "rawtypes"})
+	public static int insertIgnore(DataSource ds, Class clazz, Object object) throws SQLException {
+		return insertIgnore(ds, clazz, object, PropAdapt.NOTNULL);
+	}
+
 	@SuppressWarnings({ "rawtypes", "unchecked"})
 	public static int insert(DataSource ds, Class clazz, Object object, PropAdapt pa) throws SQLException {
 		if (object == null) {
@@ -305,6 +313,32 @@ public class SqlLoadUtils {
 			}
 			String sql = tp.getInsertSql(g, true);
 			return DbConnection.update(ds, sql, g.getData());
+		} finally {
+			g = null;
+		}
+	}
+
+	@SuppressWarnings({ "rawtypes", "unchecked"})
+	public static int insertIgnore(DataSource ds, Class clazz, Object object, PropAdapt pa) throws SQLException {
+		if (object == null) {
+			return 0;
+		}
+		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
+		GsonRow g = null;
+		try {
+			if (object instanceof Map) {
+				g = tp.mapToRow((Map)object, true);
+			} else {
+				g = tp.clazzToRow(object, true, pa);
+			}
+			return DbConnection.update(ds, tp, g, 
+					new SQLCallback<TTableProps, GsonRow, Connection>(){
+	            @Override  
+	            public String getSql(TTableProps tp, GsonRow g, Connection c) throws SQLException {
+	            	String insSql = CAutoFitSql.getInsertIgnore(c);
+		        	return tp.getInsertSql(g, true, insSql);
+		        }  
+			});
 		} finally {
 			g = null;
 		}
@@ -332,6 +366,36 @@ public class SqlLoadUtils {
 				}
 				String sql = tp.getInsertSql(g, true);
 				n += DbConnection.update(ds, sql, g.getData());
+			} finally {
+				g = null;
+			}
+		}
+		return n;
+	}
+
+	@SuppressWarnings({ "rawtypes", "unchecked"})
+	public static int insertIgnore(DataSource ds, Class clazz, List list, PropAdapt pa) throws SQLException {
+		if (list == null || list.isEmpty()) {
+			return 0;
+		}
+		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
+		int n = 0;
+		for (Object o : list) {
+			GsonRow g = null;
+			try {
+				if (o instanceof Map) {
+					g = tp.mapToRow((Map)o, true);
+				} else {
+					g = tp.clazzToRow(o, true, pa);
+				}
+				n += DbConnection.update(ds, tp, g, 
+						new SQLCallback<TTableProps, GsonRow, Connection>(){
+		            @Override  
+		            public String getSql(TTableProps tp, GsonRow g, Connection c) throws SQLException {
+		            	String insSql = CAutoFitSql.getInsertIgnore(c);
+			        	return tp.getInsertSql(g, true, insSql);
+			        }  
+				});
 			} finally {
 				g = null;
 			}

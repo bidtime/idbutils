@@ -14,6 +14,9 @@ public interface Dialect {
 	 * 构建分页查询
 	 */
 	public String getSubSqlOfPage(String sql);
+	
+	
+	public String getInsertIgnore();
 
 	/**
 	 * 构建分页查询

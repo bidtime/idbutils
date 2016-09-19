@@ -8,6 +8,7 @@ import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 
 public class CAutoFitSql {
+	
 	public static final String DERBY = "apache derby";
 	public static final String SQLSRV = "Microsoft SQL Server";
 	public static final String MYSQL = "mysql";
@@ -51,9 +52,15 @@ public class CAutoFitSql {
 		Dialect dialect = getDialectOfConn(conn);
 		return dialect.getSubSqlOfPage(sql);
 	}
+
+	public static String getInsertIgnore(Connection conn) throws SQLException {
+		Dialect dialect = getDialectOfConn(conn);
+		return dialect.getInsertIgnore();
+	}
 	
 //	public static String getLastIdSql(Connection conn) throws SQLException {
 //		Dialect dialect = getDialectOfConn(conn);
 //		return dialect.getIdSql();
 //	}
+	
 }

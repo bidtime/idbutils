@@ -46,6 +46,10 @@ public class DutyService {
 		return dao.insert(u);
 	}
 	
+	public int insertIgnore(Duty u) throws SQLException {
+		return dao.insertIgnore(u);
+	}
+	
 	public int update(Duty u) throws SQLException {
 		return dao.update(u);
 	}
@@ -66,6 +70,11 @@ public class DutyService {
 	@SuppressWarnings("rawtypes")
 	public int insert(List list) throws SQLException {
 		return dao.insert(list);
+	}
+	
+	@SuppressWarnings("rawtypes")
+	public int insertIgnore(List list) throws SQLException {
+		return dao.insertIgnore(list);
 	}
 	
 	@SuppressWarnings("rawtypes")

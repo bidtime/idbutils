@@ -113,11 +113,25 @@ public class TTableProps {
 		return getInsertSqlOfJsonHead(tableName, g.getHead());
 	}
 	
+	public String getInsertSql(GsonRow g, boolean setDefault, String insSql) {
+		if (setDefault) {
+			setDefaultValue(g);
+		}
+		return getInsertSqlOfJsonHead(tableName, g.getHead(), insSql);
+	}
+	
 	public String getInsertSql(GsonRows g, boolean setDefault) {
 		if (setDefault) {
 			setDefaultValue(g);
 		}
 		return getInsertSqlOfJsonHead(tableName, g.getHead());
+	}
+	
+	public String getInsertSql(GsonRows g, boolean setDefault, String insSql) {
+		if (setDefault) {
+			setDefaultValue(g);
+		}
+		return getInsertSqlOfJsonHead(tableName, g.getHead(), insSql);
 	}
 	
 	private String getInsertSqlOfJsonHead(String tblName, String[] jsonHead) {
@@ -126,14 +140,18 @@ public class TTableProps {
 			if (mapColumnDescript.containsKey(sIdx)) {
 				listColumn.add(sIdx);
 			}
-//			ColumnPro p = this.mapPropertyColumn.get(sIdx);
-//			if (p!=null) {
-//				listColumn.add(p.getColumn());
-//			} else {
-//				listColumn.add(sIdx);
-//			}
 		}
-		return SqlUtils.getInsertSql(tblName,ArrayUtils.listToStringArray(listColumn));			
+		return SqlUtils.getInsertSql(tblName, ArrayUtils.listToStringArray(listColumn));			
+	}
+	
+	private String getInsertSqlOfJsonHead(String tblName, String[] jsonHead, String insSql) {
+		List<String> listColumn=new ArrayList<String>();
+		for (String sIdx: jsonHead) {
+			if (mapColumnDescript.containsKey(sIdx)) {
+				listColumn.add(sIdx);
+			}
+		}
+		return SqlUtils.getInsertSql(tblName, ArrayUtils.listToStringArray(listColumn), insSql);			
 	}
 
 	public String getUpdateSqlHead(String tblName, String[] jsonAllHead, String[] jsonPkHead) {

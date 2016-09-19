@@ -21,6 +21,11 @@ public class DerbyDialect implements Dialect {
 	public String getSubSqlOfPage(String sql) {
 		return sql + " OFFSET ? ROWS FETCH NEXT ? ROWS ONLY ";
 	}
+	
+	@Override
+	public String getInsertIgnore() {
+		return "insert ignore into";
+	}
 
 	// public SqlHolder buildPageQuerySql(SqlHolder holder, PageInfo pageInfo) {
 	// String sql = holder.getSql();

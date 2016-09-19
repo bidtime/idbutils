@@ -21,6 +21,11 @@ public class MySQLDialect implements Dialect {
 	public String getSubSqlOfPage(String sql) {
 		return sql + " limit ?,? ";
 	}
+	
+	@Override
+	public String getInsertIgnore() {
+		return "insert ignore into";
+	}
 
 	// public SqlHolder buildPageQuerySql(SqlHolder holder, PageInfo pageInfo) {
 	// String sql = holder.getSql();

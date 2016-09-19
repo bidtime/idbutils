@@ -12,8 +12,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class HttpUtils {
+	
 	private static final Logger logger = LoggerFactory
 			.getLogger(HttpUtils.class);
+	
 	private static final String GET_METHOD = "GET";
 	private static final String POST_METHOD = "POST";
 	public static final String CHARSET_UTF8 = "UTF-8";

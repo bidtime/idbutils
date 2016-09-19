@@ -89,8 +89,31 @@ public class BasicDAO {
 		return tp != null ? tp.getTableName() : null;
 	}
 
-	// insert
+	// insert ignore
 
+	public int insertIgnore(Object object, PropAdapt pa) throws SQLException {
+		return SqlLoadUtils.insertIgnore(getCurrentDataSource(), this.getClass(), pa);
+	}
+	
+	public int insertIgnore(Object object) throws SQLException {
+		return SqlLoadUtils.insertIgnore(getCurrentDataSource(), this.getClass(),
+				object);
+	}
+
+	@SuppressWarnings("rawtypes")
+	public int insertIgnore(List list, PropAdapt pa) throws SQLException {
+		return SqlLoadUtils.insertIgnore(getCurrentDataSource(),
+				this.getClass(), list, pa);
+	}
+	
+	@SuppressWarnings("rawtypes")
+	public int insertIgnore(List list) throws SQLException {
+		return SqlLoadUtils.insertIgnore(getCurrentDataSource(),
+				this.getClass(), list);
+	}
+
+	// insert
+	
 	public int insert(Object object, PropAdapt pa) throws SQLException {
 		return SqlLoadUtils.insert(getCurrentDataSource(), this.getClass(), pa);
 	}
@@ -102,7 +125,8 @@ public class BasicDAO {
 
 	@SuppressWarnings("rawtypes")
 	public int insert(List list, PropAdapt pa) throws SQLException {
-		return insert(list, pa);
+		return SqlLoadUtils.insert(getCurrentDataSource(),
+				this.getClass(), list, pa);
 	}
 	
 	@SuppressWarnings("rawtypes")

@@ -20,6 +20,11 @@ public class SqlServerDialect implements Dialect {
 	public String getSubSqlOfPage(String sql) {
 		throw new UnsupportedOperationException();
 	}
+	
+	@Override
+	public String getInsertIgnore() {
+		return "insert ignore into";
+	}
 
 	// public SqlHolder buildPageQuerySql(SqlHolder holder, PageInfo pageInfo) {
 	// throw new UnsupportedOperationException();

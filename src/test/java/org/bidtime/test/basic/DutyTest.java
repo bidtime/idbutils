@@ -31,6 +31,33 @@ public class DutyTest extends BasicTest {
 	}
 
 	@Test
+	public void test_insertIgnore() throws SQLException {
+		Duty duty = new Duty();
+		duty.setId(3L);
+		duty.setCode("D-3");
+		duty.setName("销售部");
+		int n = service.insertIgnore(duty);
+		System.out.println("insert: " + n);
+	}
+
+	@Test
+	public void test_insertIgnoreList() throws SQLException {
+		List<Duty> list = new ArrayList<Duty>();
+		//
+		Duty duty1 = new Duty();
+		duty1.setName("1 dept");
+		list.add(duty1);
+		//
+		Duty duty2 = new Duty();
+		duty2.setName("2 dept");
+		duty2.setCode("002");
+		list.add(duty2);
+		//
+		int n = service.insertIgnore(list);
+		System.out.println("insert: " + n);
+	}
+
+	@Test
 	public void test_insertList() throws SQLException {
 		List<Duty> list = new ArrayList<Duty>();
 		//

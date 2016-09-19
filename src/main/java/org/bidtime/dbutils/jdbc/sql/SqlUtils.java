@@ -152,6 +152,15 @@ public class SqlUtils {
 		return sql.toString();
 	}
 
+	public static String getInsertOfTable(String tableName,	String sFldValsSubSql, String insSql) {
+		StringBuilder sql = new StringBuilder();
+		sql.append(insSql);
+		sql.append(" ");
+		sql.append(tableName);
+		sql.append(sFldValsSubSql);
+		return sql.toString();
+	}
+
 	public static String getUpdateOfTable(String tableName, String sFldVals,
 			String sWhereSql) {
 		StringBuilder sql = new StringBuilder();
@@ -211,6 +220,15 @@ public class SqlUtils {
 		String fldValsql = SqlUtils
 				.getInsertFldValsSubSqlOfListObject(arAllFlds);
 		return SqlUtils.getInsertOfTable(tableName, fldValsql);
+	}
+
+	/*
+	 * 通过json名称,获取可以执行的insert sql
+	 */
+	public static String getInsertSql(String tableName, String[] arAllFlds, String insSql) {
+		String fldValsql = SqlUtils
+				.getInsertFldValsSubSqlOfListObject(arAllFlds);
+		return SqlUtils.getInsertOfTable(tableName, fldValsql, insSql);
 	}
 
 	/*

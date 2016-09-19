@@ -11,14 +11,17 @@ import org.apache.commons.dbutils.handlers.ScalarHandler;
 import org.apache.commons.lang.StringUtils;
 import org.bidtime.dbutils.QueryRunnerEx;
 import org.bidtime.dbutils.gson.ResultDTO;
+import org.bidtime.dbutils.gson.dataset.GsonRow;
 import org.bidtime.dbutils.jdbc.connection.ds.DataSourceTransactionHolder;
 import org.bidtime.dbutils.jdbc.connection.log.LogInsertSql;
 import org.bidtime.dbutils.jdbc.connection.log.LogSelectSql;
 import org.bidtime.dbutils.jdbc.connection.log.LogSpSql;
 import org.bidtime.dbutils.jdbc.connection.log.LogUpdateSql;
+import org.bidtime.dbutils.jdbc.dao.SQLCallback;
 import org.bidtime.dbutils.jdbc.dialect.CAutoFitSql;
 import org.bidtime.dbutils.jdbc.rs.handle.ext.ResultSetDTOHandler;
 import org.bidtime.dbutils.jdbc.sql.SqlUtils;
+import org.bidtime.dbutils.jdbc.sql.xml.parser.TTableProps;
 import org.bidtime.utils.basic.ArrayComm;
 import org.bidtime.utils.basic.ObjectComm;
 import org.springframework.jdbc.datasource.ConnectionHolder;
@@ -125,6 +128,25 @@ public class DbConnection {
 			LogInsertSql.logFormatTimeNow(startTime, sql, params);				
 		}
 		return generatedKeys;
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public static int update(DataSource ds, TTableProps tp, GsonRow g, SQLCallback cb)
+			throws SQLException {
+		Connection conn = getConnOfSpringCtx(ds);
+		if (conn == null) {
+			conn = DataSourceUtils.getConnection(ds);
+			try {
+				String sql = cb.getSql(tp, g, conn);
+				return updateConn(conn, sql, g.getData());
+			} finally {
+				DataSourceUtils.releaseConnection(conn, ds);
+				conn = null;
+			}
+		} else {
+			String sql = cb.getSql(tp, g, conn);
+			return updateConn(conn, sql, g.getData());
+		}
 	}
 
 	public static int update(DataSource ds, String sql, Object[] params)
