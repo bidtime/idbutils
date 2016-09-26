@@ -109,7 +109,7 @@ public class SqlLoadUtils {
 			if (r == null || !r.isExistsData()) {
 				return 0;
 			}
-			String sql = SqlUtils.getDeleteSql(tblName, heads);
+			String sql = SqlUtils.getDeleteSql(tblName, r.getHead());
 			return DbConnection.update(ds, sql, r.getData());
 		} finally {
 			r = null;
@@ -126,7 +126,7 @@ public class SqlLoadUtils {
 			if (r == null || !r.isExistsData()) {
 				return 0;
 			}
-			String sql = SqlUtils.getDeleteSql(tblName, heads);
+			String sql = SqlUtils.getDeleteSql(tblName, r.getHead());
 			return DbConnection.updateBatch(ds, sql, r.getData());
 		} finally {
 			r = null;
