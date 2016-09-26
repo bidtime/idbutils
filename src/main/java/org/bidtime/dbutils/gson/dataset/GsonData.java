@@ -64,7 +64,8 @@ abstract public class GsonData {
 		if (mapHead.size() <= 0) {
 			initIndex();
 		}
-		return mapHead.get(headName.toLowerCase());
+		Integer n = mapHead.get(headName.toLowerCase());
+		return (n != null) ? n : -1;
 	}
 	
 	private List<Integer> findHead(String[] arHead) {
