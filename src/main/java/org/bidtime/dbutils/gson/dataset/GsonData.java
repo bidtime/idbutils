@@ -1,6 +1,13 @@
 package org.bidtime.dbutils.gson.dataset;
 
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
+
+import org.bidtime.utils.basic.ArrayComm;
 
 abstract public class GsonData {
 
@@ -12,8 +19,13 @@ abstract public class GsonData {
 		return head;
 	}
 
-	public void setHead(String[] head) {
-		this.head = head;
+	public void setHead(List<String> heads) {
+		setHead( ArrayComm.listToStringArray(heads) );
+	}
+	
+	public void setHead(String[] heads) {
+		this.head = heads;
+		clearIndex();
 	}
 	
 	abstract protected int getDataLen();
@@ -49,15 +61,43 @@ abstract public class GsonData {
 	}
 
 	public int getPosOfName(String headName) {
-		int n = -1;
-		try {
-			if (mapHead.size() <= 0) {
-				initIndex();
-			}
-			n = mapHead.get(headName.toLowerCase());
-		} catch (Exception e) {
+		if (mapHead.size() <= 0) {
+			initIndex();
 		}
-		return n;
+		return mapHead.get(headName.toLowerCase());
+	}
+	
+	private List<Integer> findHead(String[] arHead) {
+		List<Integer> list = new ArrayList<Integer>();
+		for (int j = 0; j < arHead.length; j++) {
+			int pos = getPosOfName(arHead[j]);
+			if (pos != -1) {
+				list.add(pos);
+			}
+		}
+		return list;
+	}
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	protected Integer[] getHeadPosArrayOfName(String[] arHead) throws SQLException {
+		List<Integer> list = findHead(arHead);
+		if (list.size() != arHead.length) {
+			throw new SQLException("head is not compare.");
+		}
+		if ( list.size() > 1 ) {
+			Comparator comp = new Comparator() {
+				public int compare(Object o1, Object o2) {
+					Integer p1 = (Integer) o1;
+					Integer p2 = (Integer) o2;
+					if (p1 < p2)
+						return 0;
+					else
+						return 1;
+				}
+			};
+			Collections.sort(list, comp);
+		}
+		return (Integer[]) list.toArray(new Integer[list.size()]);
 	}
 
 }

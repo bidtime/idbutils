@@ -2,9 +2,8 @@ package org.bidtime.dbutils.gson.dataset;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -176,33 +175,6 @@ public class GsonRow extends GsonData {
 		data = ArrayComm.mergeArray(data, arData);
 		clearIndex();
 	}
-
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private Integer[] getHeadPosArrayOfName(String[] arHead) {
-		List<Integer> list = new ArrayList<Integer>();
-		for (int i = 0; i < head.length; i++) {
-			for (int j = 0; j < arHead.length; j++) {
-				if (arHead[j].equalsIgnoreCase(head[i])) {
-					list.add(i);
-				} else {
-				}
-			}
-		}
-		if (list.size()>1) {
-			Comparator comp = new Comparator() {
-				public int compare(Object o1, Object o2) {
-					Integer p1 = (Integer) o1;
-					Integer p2 = (Integer) o2;
-					if (p1 < p2)
-						return 0;
-					else
-						return 1;
-				}
-			};
-			Collections.sort(list, comp);
-		}
-		return (Integer[]) list.toArray(new Integer[list.size()]);
-	}
 	
 	public void revHead(String[] arHead) throws Exception {
 		List<String> list = new ArrayList<String>();			
@@ -243,23 +215,6 @@ public class GsonRow extends GsonData {
 		for (int i=0; i<arHead.length; i++) {
 			delHead(arHead[i]);
 		}
-		/*Integer[] nPos = getHeadPosArrayOfName(arHead);
-		if (nPos != null && nPos.length > 0) {
-			List<String> listHead = new ArrayList<String>();
-			CArrayComm.arraysToList(head, listHead);
-			List<Object> listData = new ArrayList<Object>();
-			CArrayComm.arraysToList(data, listData);
-			for (int i = nPos.length-1; i >= 0; i--) {
-				int nIdx = nPos[i];
-				if (nIdx > -1) {
-					listHead.remove(nIdx);
-					listData.remove(nIdx);
-				}
-			}
-			head = CArrayComm.listToStringArray(listHead);
-			data = listData.toArray();
-			clearIndex();
-		} */
 	}
 
 	private GsonRow remain(Integer[] nIdxs) {
@@ -277,8 +232,8 @@ public class GsonRow extends GsonData {
 		return g;
 	}
 	
-	public GsonRow remain(String[] arHead) {
-		Integer[] listCols=getHeadPosArrayOfName(arHead);
+	public GsonRow remain(String[] arHead) throws SQLException {
+		Integer[] listCols = getHeadPosArrayOfName(arHead);
 		return remain(listCols);
 	}
 	

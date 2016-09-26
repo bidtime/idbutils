@@ -2,9 +2,8 @@ package org.bidtime.dbutils.gson.dataset;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -55,7 +54,20 @@ public class GsonRows extends GsonData {
 		this.setData(array2);
 		this.clearIndex();
 	}
-
+	
+	public void resetHeadList(String[] head, Object[][] array) {
+		this.setHead(head);
+		this.setData(array);
+		this.clearIndex();
+	}
+	
+	public void resetHeadList(List<String> listHead, List<Object[]> listData) {
+		String head[] = ArrayComm.listToStringArray(listHead);
+		Object[][] array = (Object[][]) listData
+				.toArray(new Object[listData.size()][head.length]);
+		resetHeadList(head, array);
+	}
+	
 	public void setHeadList(String[] head, List<Object[]> list) {
 		if (head == null) {
 			logger.error("head is null");
@@ -418,7 +430,7 @@ public class GsonRows extends GsonData {
 		return g;
 	}
 
-	public GsonRows remain(String[] arHead) {
+	public GsonRows remain(String[] arHead) throws SQLException {
 		Integer[] listCols = getHeadPosArrayOfName(arHead);
 		return remain(listCols);
 	}
@@ -436,31 +448,6 @@ public class GsonRows extends GsonData {
 				}
 			}
 		}
-	}
-
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private Integer[] getHeadPosArrayOfName(String[] arHead) {
-		List<Integer> list = new ArrayList<Integer>();
-		for (String head : arHead) {
-			int idx = getPosOfName(head);
-			if (idx > -1) {
-				list.add(idx);
-			}
-		}
-		if (list.size() > 1) {
-			Comparator comp = new Comparator() {
-				public int compare(Object o1, Object o2) {
-					Integer p1 = (Integer) o1;
-					Integer p2 = (Integer) o2;
-					if (p1 < p2)
-						return 0;
-					else
-						return 1;
-				}
-			};
-			Collections.sort(list, comp);
-		}
-		return (Integer[]) list.toArray(new Integer[list.size()]);
 	}
 
 	public void revHead(String[] arHead) throws Exception {
