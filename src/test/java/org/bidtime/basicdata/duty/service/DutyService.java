@@ -2,6 +2,7 @@ package org.bidtime.basicdata.duty.service;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.dbutils.ResultSetHandler;
 import org.bidtime.basicdata.duty.bean.Duty;
@@ -56,6 +57,18 @@ public class DutyService {
 	
 	public int delete(Duty u) throws SQLException {
 		return dao.delete(u);
+	}
+	
+	public int delete(Duty u, String[] heads) throws SQLException {
+		return dao.delete(u, heads);
+	}
+	
+	public int delete(Map<String, Object> m) throws SQLException {
+		return dao.delete(m);
+	}
+	
+	public int delete(Map<String, Object> m, String[] heads) throws SQLException {
+		return dao.delete(m, heads);
 	}
 	
 	public int delete(Object[] ids) throws SQLException {

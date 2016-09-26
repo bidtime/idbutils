@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <classes>
   <class package="" name="t_duty" table="t_duty">
-	<id name="id" column="dutyid" length="20" generator="none-identity" />
+	<id name="id" column="dutyid" length="20" generator="identity" />
 	<property name="code" column="dutycode" length="20" not-null="true" />
 	<property name="name" column="dutyname" length="50" not-null="true" />
 	<property name="createTime" column="createTime" length="50" not-null="true" />

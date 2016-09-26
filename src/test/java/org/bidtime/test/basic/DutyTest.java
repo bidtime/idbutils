@@ -2,7 +2,9 @@ package org.bidtime.test.basic;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.dbutils.handlers.BeanHandler;
 import org.bidtime.basicdata.duty.bean.Duty;
@@ -132,6 +134,24 @@ public class DutyTest extends BasicTest {
 		Duty duty = new Duty();
 		duty.setId(3L);
 		int n = service.delete(duty);
+		System.out.println("update: " + n);
+	}
+
+	@Test
+	public void test_delete_heads() throws SQLException {
+		Duty duty = new Duty();
+		duty.setId(3L);
+		duty.setCode("e");
+		int n = service.delete(duty, new String[]{"dutycode", "dutyid"});
+		System.out.println("update: " + n);
+	}
+
+	@Test
+	public void test_deleteMap() throws SQLException {
+		Map<String, Object> map = new HashMap<>();
+		map.put("dutyid", 3L);
+		map.put("dutycode", "e");
+		int n = service.delete(map, new String[]{"dutyid", "dutycode"});
 		System.out.println("update: " + n);
 	}
 
