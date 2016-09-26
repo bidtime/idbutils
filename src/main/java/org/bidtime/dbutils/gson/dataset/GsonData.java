@@ -60,15 +60,20 @@ abstract public class GsonData {
 		}
 	}
 
-	public Integer getColumnIdx(String headName) {
+	public Integer getColumnIdx(String head) {
 		if (mapHead.size() <= 0) {
 			initIndex();
 		}
-		return mapHead.get(headName.toLowerCase());
+		return mapHead.get(head.toLowerCase());
 	}
 	
 	public boolean existsColumnName(String headName) {
 		return ( getColumnIdx(headName) != null ) ? true : false;
+	}
+	
+	public int getPosOfName(String head) {
+		Integer n = getColumnIdx(head);
+		return (n != null) ? n : -1;
 	}
 	
 	private List<Integer> findHead(String[] arHead) {
