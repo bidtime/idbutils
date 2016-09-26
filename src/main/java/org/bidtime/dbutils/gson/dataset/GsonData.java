@@ -60,19 +60,22 @@ abstract public class GsonData {
 		}
 	}
 
-	public int getPosOfName(String headName) {
+	public Integer getColumnIdx(String headName) {
 		if (mapHead.size() <= 0) {
 			initIndex();
 		}
-		Integer n = mapHead.get(headName.toLowerCase());
-		return (n != null) ? n : -1;
+		return mapHead.get(headName.toLowerCase());
+	}
+	
+	public boolean existsColumnName(String headName) {
+		return ( getColumnIdx(headName) != null ) ? true : false;
 	}
 	
 	private List<Integer> findHead(String[] arHead) {
 		List<Integer> list = new ArrayList<Integer>();
 		for (int j = 0; j < arHead.length; j++) {
-			int pos = getPosOfName(arHead[j]);
-			if (pos != -1) {
+			Integer pos = getColumnIdx(arHead[j]);
+			if (pos != null) {
 				list.add(pos);
 			}
 		}

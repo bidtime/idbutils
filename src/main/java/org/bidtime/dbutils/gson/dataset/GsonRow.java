@@ -75,9 +75,9 @@ public class GsonRow extends GsonData {
 //	}
 
 	public boolean renameHead(String newName, String oldName) {
-		int nPos = this.getPosOfName(oldName);
-		if (nPos >= 0) {
-			if (getPosOfName(newName)<0) {
+		Integer nPos = this.getColumnIdx(oldName);
+		if (nPos != null) {
+			if ( !existsColumnName(newName) ) {
 				head[nPos] = newName;
 				return true;
 			} else {
@@ -91,9 +91,9 @@ public class GsonRow extends GsonData {
 	private boolean canRenameHead(String[] newNames, String[] oldNames, Integer[] idxOlds) {
 		boolean bReturn = true;
 		for (int i=0; i<newNames.length; i++) {
-			int nPos = this.getPosOfName(oldNames[i]);
-			if (nPos >= 0) {
-				if (getPosOfName(newNames[i])>=0) {
+			Integer nPos = this.getColumnIdx(oldNames[i]);
+			if (nPos != null) {
+				if (existsColumnName(newNames[i])) {
 					bReturn = false;
 					break;
 				} else {
@@ -123,8 +123,8 @@ public class GsonRow extends GsonData {
 	}
 
 	public void autoAddHeadData(String headName, Object value) {
-		int nIdx = this.getPosOfName(headName);
-		if (nIdx < 0) {
+		Integer nIdx = this.getColumnIdx(headName);
+		if (nIdx == null) {
 			addHeadData(headName, value);
 		} else {
 			this.setValue(nIdx, value);
@@ -138,8 +138,8 @@ public class GsonRow extends GsonData {
 	}
 
 	public void autoInsertHeadData(String headName, Object value) {
-		int nIdx = this.getPosOfName(headName);
-		if (nIdx < 0) {
+		Integer nIdx = this.getColumnIdx(headName);
+		if (nIdx == null) {
 			insertHeadData(headName, value);
 		} else {
 			this.setValue(nIdx, value);
