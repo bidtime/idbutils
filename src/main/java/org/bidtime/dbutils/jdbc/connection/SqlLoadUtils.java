@@ -373,6 +373,11 @@ public class SqlLoadUtils {
 		return n;
 	}
 
+	@SuppressWarnings({ "rawtypes" })
+	public static int insertIgnore(DataSource ds, Class clazz, List list) throws SQLException {
+		return insertIgnore(ds, clazz, list, PropAdapt.NOTNULL);
+	}
+	
 	@SuppressWarnings({ "rawtypes", "unchecked"})
 	public static int insertIgnore(DataSource ds, Class clazz, List list, PropAdapt pa) throws SQLException {
 		if (list == null || list.isEmpty()) {
