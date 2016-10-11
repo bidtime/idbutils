@@ -2,9 +2,12 @@ package org.bidtime.test.basic;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.dbutils.handlers.BeanHandler;
 import org.bidtime.basicdata.duty.bean.Duty;
@@ -12,6 +15,10 @@ import org.bidtime.basicdata.duty.service.DutyService;
 import org.bidtime.dbutils.gson.ResultDTO;
 import org.bidtime.dbutils.jdbc.rs.handle.BeanDTOHandler;
 import org.bidtime.dbutils.jdbc.rs.handle.BeanListDTOHandler;
+import org.bidtime.dbutils.jdbc.rs.handle.ColumnSetDTOHandler;
+import org.bidtime.dbutils.jdbc.rs.handle.ColumnSetHandler;
+import org.bidtime.dbutils.jdbc.rs.handle.cb.CollectionCallback;
+import org.bidtime.dbutils.jdbc.rs.handle.cb.SetCallback;
 import org.bidtime.test.BasicTest;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -185,6 +192,38 @@ public class DutyTest extends BasicTest {
 	public void test_info() throws SQLException {
 		BeanDTOHandler<Duty> h = new BeanDTOHandler<Duty>(Duty.class);
 		ResultDTO<Duty> dto = service.info(h, 1);
+		if (dto != null) {
+			System.out.println(dto);
+		} else {
+			System.out.println("null");
+		}
+	}
+
+	@Test
+	public void test_column_set_dto() throws SQLException {	
+		ColumnSetDTOHandler<Long> h = new ColumnSetDTOHandler<>(new SetCallback<Long>() {
+		    @Override
+		    public Set<Long> callback() {
+		    	return new HashSet<Long>();
+		    }
+		});
+		ResultDTO<Set<Long>> dto = service.list(h);
+		if (dto != null) {
+			System.out.println(dto);
+		} else {
+			System.out.println("null");
+		}
+	}
+
+	@Test
+	public void test_column_set() throws SQLException {	
+		ColumnSetHandler<Long> h = new ColumnSetHandler<>(new SetCallback<Long>() {
+		    @Override
+		    public Set<Long> callback() {
+		    	return new HashSet<Long>();
+		    }
+		});
+		Set<Long> dto = service.list(h);
 		if (dto != null) {
 			System.out.println(dto);
 		} else {

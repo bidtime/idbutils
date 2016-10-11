@@ -32,29 +32,28 @@ public class ResponseJsonp {
 //		}
 //	}
 	
-	public static void setCookies(HttpServletRequest request, HttpServletResponse response) {
-		Cookie[] cs = request.getCookies();
+	public static void setCookies(HttpServletRequest req, HttpServletResponse res) {
+		Cookie[] cs = req.getCookies();
 		if (cs != null) {
 			for (Cookie c : cs) {
-				response.addCookie(c);
+				res.addCookie(c);
 			}
 		}
 	}
 	
-	public static void writeString(HttpServletRequest request, HttpServletResponse response, 
-			String msg) {
-		String callback_name = RequestUtils.getString(request, CALLBACK_FUN);
+	public static void writeString(HttpServletRequest req, HttpServletResponse res, String s) {
+		String callback_name = RequestUtils.getString(req, CALLBACK_FUN);
 		if (StringUtils.isNotEmpty(callback_name)) {
-			request.getCookies();
+			req.getCookies();
 			StringBuilder sb = new StringBuilder();
 			sb.append(callback_name);
 			sb.append("(");
-			sb.append(msg);
+			sb.append(s);
 			sb.append(")");
-			setCookies(request, response);
-			ResponseUtils.writeString(sb.toString(), response);
+			setCookies(req, res);
+			ResponseUtils.writeString(sb.toString(), res);
 		} else {
-			ResponseUtils.writeString(msg, response);
+			ResponseUtils.writeString(s, res);
 		}
 	}
 

@@ -3,9 +3,9 @@ package org.bidtime.dbutils.jdbc.rs.handle;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 
-import org.bidtime.dbutils.jdbc.rs.handle.cb.ListCallback;
+import org.bidtime.dbutils.jdbc.rs.handle.cb.CollectionCallback;
 import org.bidtime.dbutils.jdbc.rs.handle.ext.ResultSetDTOHandler;
 
 /**
@@ -15,21 +15,21 @@ import org.bidtime.dbutils.jdbc.rs.handle.ext.ResultSetDTOHandler;
  *
  */
 @SuppressWarnings("serial")
-public abstract class AbstractListDTOHandler<T> extends
-	ResultSetDTOHandler<List<T>> {
+public abstract class AbstractCollectDTOHandler<T> extends
+	ResultSetDTOHandler<Collection<T>> {
 	
-	protected ListCallback<T> ccb;
-
-	protected List<T> newCollect() {
+	protected CollectionCallback<T> ccb;
+	
+	protected Collection<T> newCollect() {
 		return new ArrayList<>();
 	}
 
 	@Override
-	public List<T> doDTO(ResultSet rs) throws SQLException {
+	public Collection<T> doDTO(ResultSet rs) throws SQLException {
 		if (!rs.next()) {
 			return null;
 		} else {
-			List<T> collect = null;
+			Collection<T> collect = null;
 			if (ccb != null) {
 				collect = ccb.callback();
 			} else {
