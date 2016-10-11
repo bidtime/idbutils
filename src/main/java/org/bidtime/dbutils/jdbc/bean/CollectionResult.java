@@ -117,7 +117,7 @@ public class CollectionResult {
 	//差集
     @SuppressWarnings({ "rawtypes", "unchecked" })
 	public static Collection subtract(final Collection a, final Collection b) {
-        ArrayList list = new ArrayList( a );
+    	Collection list = new ArrayList( a );
         for (Iterator it = b.iterator(); it.hasNext();) {
             list.remove(it.next());
         }

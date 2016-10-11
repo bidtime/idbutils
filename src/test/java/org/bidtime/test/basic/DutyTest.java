@@ -2,7 +2,6 @@ package org.bidtime.test.basic;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -17,7 +16,6 @@ import org.bidtime.dbutils.jdbc.rs.handle.BeanDTOHandler;
 import org.bidtime.dbutils.jdbc.rs.handle.BeanListDTOHandler;
 import org.bidtime.dbutils.jdbc.rs.handle.ColumnSetDTOHandler;
 import org.bidtime.dbutils.jdbc.rs.handle.ColumnSetHandler;
-import org.bidtime.dbutils.jdbc.rs.handle.cb.CollectionCallback;
 import org.bidtime.dbutils.jdbc.rs.handle.cb.SetCallback;
 import org.bidtime.test.BasicTest;
 import org.junit.Test;
