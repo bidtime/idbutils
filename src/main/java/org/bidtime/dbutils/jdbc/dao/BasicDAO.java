@@ -568,4 +568,23 @@ public class BasicDAO {
 			Object params) throws SQLException {
 		return queryByPK(sqlId, rsh, params);
 	}
+	
+	//
+	public <T> T getListOfParms(ResultSetHandler<T> h, Map<String, Object> params,
+			Integer pageIdx, Integer pageSize) throws SQLException {
+		return this.query("getFullSql", h, params, pageIdx, pageSize);
+	}
+	
+	public <T> T getListOfParms(ResultSetHandler<T> h, Map<String, Object> params) throws SQLException {
+		return this.query("getFullSql", h, params);
+	}
+	
+	public <T> T getInfoById(ResultSetHandler<T> h, Object id) throws SQLException {
+		return this.queryByPK("getFullSql", h, id);
+	}
+	
+	public <T> T getInfoByParam(ResultSetHandler<T> h, Map<String, Object> params) throws SQLException {
+		return this.queryOne("getFullSql", h, params);
+	}
+	
 }
