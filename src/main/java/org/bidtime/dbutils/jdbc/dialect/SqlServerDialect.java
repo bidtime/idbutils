@@ -25,6 +25,10 @@ public class SqlServerDialect implements Dialect {
 	public String getInsertIgnore() {
 		return "insert ignore into";
 	}
+	
+	public String getReplace() {
+		return "replace into";
+	}
 
 	// public SqlHolder buildPageQuerySql(SqlHolder holder, PageInfo pageInfo) {
 	// throw new UnsupportedOperationException();

@@ -57,6 +57,11 @@ public class CAutoFitSql {
 		Dialect dialect = getDialectOfConn(conn);
 		return dialect.getInsertIgnore();
 	}
+
+	public static String getReplace(Connection conn) throws SQLException {
+		Dialect dialect = getDialectOfConn(conn);
+		return dialect.getReplace();
+	}
 	
 //	public static String getLastIdSql(Connection conn) throws SQLException {
 //		Dialect dialect = getDialectOfConn(conn);

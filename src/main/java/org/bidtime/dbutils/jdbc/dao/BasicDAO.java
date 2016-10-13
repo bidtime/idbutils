@@ -112,6 +112,29 @@ public class BasicDAO {
 				this.getClass(), list);
 	}
 
+	// replace
+
+	public int replace(Object object, PropAdapt pa) throws SQLException {
+		return SqlLoadUtils.replace(getCurrentDataSource(), this.getClass(), pa);
+	}
+	
+	public int replace(Object object) throws SQLException {
+		return SqlLoadUtils.replace(getCurrentDataSource(), this.getClass(),
+				object);
+	}
+
+	@SuppressWarnings("rawtypes")
+	public int replace(List list, PropAdapt pa) throws SQLException {
+		return SqlLoadUtils.replace(getCurrentDataSource(),
+				this.getClass(), list, pa);
+	}
+	
+	@SuppressWarnings("rawtypes")
+	public int replace(List list) throws SQLException {
+		return SqlLoadUtils.replace(getCurrentDataSource(),
+				this.getClass(), list);
+	}
+
 	// insert
 	
 	public int insert(Object object, PropAdapt pa) throws SQLException {
@@ -529,44 +552,6 @@ public class BasicDAO {
 			Object params) throws SQLException {
 		return SqlLoadUtils.queryByPKOne(getCurrentDataSource(), this.getClass(),
 				sqlId, colId, rsh, params);
-	}
-	
-	// queryEx
-	
-	@Deprecated
-	public <T> T queryExOne(String sqlId, ResultSetHandler<T> rsh,
-			Map<String, ?> params) throws SQLException {
-		return queryOne(sqlId, rsh, params);
-	}
-
-	@Deprecated
-	public <T> T queryExOneByPK(String sqlId, ResultSetHandler<T> rsh,
-			Object params) throws SQLException {
-		return queryByPKOne(sqlId, rsh, params);
-	}	
-
-	@Deprecated
-	public <T> T queryEx(String sqlId, ResultSetHandler<T> rsh, Map<String, ?> params, 
-			Integer nPageIdx, Integer nPageSize) throws SQLException {
-		return query(sqlId, rsh, params, nPageIdx, nPageSize);
-	}
-
-	@Deprecated
-	public <T> T queryExByPK(String sqlId, ResultSetHandler<T> rsh, Object params, 
-			Integer nPageIdx, Integer nPageSize) throws SQLException {
-		return queryByPK(sqlId, rsh, params, nPageIdx, nPageSize);
-	}
-
-	@Deprecated
-	public <T> T queryEx(String sqlId, ResultSetHandler<T> rsh,
-			Map<String, ?> params) throws SQLException {
-		return query(sqlId, rsh, params);
-	}
-	
-	@Deprecated
-	public <T> T queryExByPK(String sqlId, ResultSetHandler<T> rsh,
-			Object params) throws SQLException {
-		return queryByPK(sqlId, rsh, params);
 	}
 	
 	//

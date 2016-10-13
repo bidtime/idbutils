@@ -26,6 +26,10 @@ public class DerbyDialect implements Dialect {
 	public String getInsertIgnore() {
 		return "insert ignore into";
 	}
+	
+	public String getReplace() {
+		return "replace into";
+	}
 
 	// public SqlHolder buildPageQuerySql(SqlHolder holder, PageInfo pageInfo) {
 	// String sql = holder.getSql();
