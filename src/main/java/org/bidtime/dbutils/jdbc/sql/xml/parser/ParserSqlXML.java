@@ -58,7 +58,6 @@ public class ParserSqlXML {
 	// //visitListTable(list);
 	// ParserSqlXML.parserSql(ParserSqlXML.class,"/com/qmsk/sql/db.xml");
 	// } catch (DocumentException e) {
-	// e.printStackTrace();
 	// } finally {
 	// }
 	// }

@@ -48,7 +48,6 @@ public class DownloadFile {
 			toClient.flush();
 			toClient.close();
 		} catch (IOException e) {
-			// ex.printStackTrace();
 			logger.error(e.getMessage());
 		}
 		return response;
@@ -84,7 +83,6 @@ public class DownloadFile {
 				toClient.close();
 			}
 		} catch (IOException e) {
-			// ex.printStackTrace();
 			logger.error(e.getMessage());
 		}
 		return bReturn;
@@ -126,8 +124,8 @@ public class DownloadFile {
 	 * byte[] buffer = new byte[1204]; int length; while ((byteread =
 	 * inStream.read(buffer)) != -1) { bytesum += byteread;
 	 * System.out.println(bytesum); fs.write(buffer, 0, byteread); } } catch
-	 * (FileNotFoundException e) { e.printStackTrace(); } catch (IOException e)
-	 * { e.printStackTrace(); } }
+	 * (FileNotFoundException e) {} catch (IOException e)
+	 * {} }
 	 */
 
 	/*

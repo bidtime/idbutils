@@ -14,6 +14,9 @@
 	<packaging>jar</packaging>
 	<version>1.0.15-SNAPSHOT</version>
 	<name>idbutils</name>
+    <properties>
+        <fastjson.version>1.2.12</fastjson.version>
+    </properties>
 
 	<dependencies>
 
@@ -207,6 +210,7 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-test</artifactId>
             <version>${spring.version}</version>
+            <scope>test</scope>
         </dependency>
         
         <dependency>
@@ -221,12 +225,14 @@
             <groupId>c3p0</groupId>
             <artifactId>c3p0</artifactId>
             <version>0.9.1.2</version>
+            <scope>test</scope>
         </dependency>
         
         <dependency>
             <groupId>com.mchange</groupId>
             <artifactId>mchange-commons-java</artifactId>
             <version>0.2.8</version>
+            <scope>test</scope>
         </dependency>
         
         <!--c3p0 end -->
@@ -236,6 +242,15 @@
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <version>5.1.33</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- json -->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>${fastjson.version}</version>
+            <scope>test</scope>
         </dependency>
         
 	</dependencies>

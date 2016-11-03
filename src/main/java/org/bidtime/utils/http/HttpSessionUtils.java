@@ -144,10 +144,8 @@ public class HttpSessionUtils {
 //		String sUrl = "http://192.168.1.15:8080/CarWeb/carColor/find/all/0/10";
 //		try {
 //			String ss = HttpGZipUtils.get(sUrl);
-//			System.out.println(ss);
 //			SessionUtils.listMapSession();
 //		} catch (IOException e) {
-//			e.printStackTrace();
 //		}
 //	}
 }

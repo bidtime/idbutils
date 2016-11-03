@@ -7,6 +7,7 @@ import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.bidtime.dbutils.jdbc.sql.xml.TableFieldXmlsParser;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.servlet.support.RequestContext;
 
@@ -20,19 +21,19 @@ public class SpringLocalMsg {
 
 	public static String getMessage(HttpServletRequest request, String message) {
 		return getMessage(request, message, null, "",
-				SpringContextUtils.getContext());
+				TableFieldXmlsParser.getCtx());
 	}
 
 	public static String getMessage(HttpServletRequest request, String message,
 			String defaultValue) {
 		return getMessage(request, message, null, defaultValue,
-				SpringContextUtils.getContext());
+				TableFieldXmlsParser.getCtx());
 	}
 
 	public static String getMessage(HttpServletRequest request, String message,
 			Object[] params) {
 		return getMessage(request, message, params, "",
-				SpringContextUtils.getContext());
+				TableFieldXmlsParser.getCtx());
 	}
 
 	// private static String getMessage(HttpServletRequest request,
@@ -47,7 +48,7 @@ public class SpringLocalMsg {
 	public static String getMessage(HttpServletRequest request, String message,
 			Object[] params, String defaultValue) {
 		return getMessage(request, message, params, defaultValue,
-				SpringContextUtils.getContext());
+				TableFieldXmlsParser.getCtx());
 	}
 
 	private static String getMessage(HttpServletRequest request,
@@ -56,7 +57,7 @@ public class SpringLocalMsg {
 		RequestContext requestContext = new RequestContext(request);
 		Locale locale = requestContext.getLocale();
 
-		String ss = SpringContextUtils.getContext().getMessage(message, params,
+		String ss = TableFieldXmlsParser.getCtx().getMessage(message, params,
 				defaultValue, locale);
 		return ss;
 	}
@@ -66,25 +67,25 @@ public class SpringLocalMsg {
 	public static String getMessageLocal(HttpServletRequest request,
 			String message) {
 		return getMessageLocal(request, message, null, "",
-				SpringContextUtils.getContext());
+				TableFieldXmlsParser.getCtx());
 	}
 
 	public static String getMessageLocal(HttpServletRequest request,
 			String message, String defaultValue) {
 		return getMessageLocal(request, message, null, defaultValue,
-				SpringContextUtils.getContext());
+				TableFieldXmlsParser.getCtx());
 	}
 
 	public static String getMessageLocal(HttpServletRequest request,
 			String message, Object[] params) {
 		return getMessageLocal(request, message, params, "",
-				SpringContextUtils.getContext());
+				TableFieldXmlsParser.getCtx());
 	}
 
 	public static String getMessageLocalId(HttpServletRequest request,
 			String message, String sParamsId) {
 		return getMessageLocal(request, message, new Object[] { sParamsId },
-				"", SpringContextUtils.getContext());
+				"", TableFieldXmlsParser.getCtx());
 	}
 
 	// private static String getMessage(HttpServletRequest request, String
@@ -100,7 +101,7 @@ public class SpringLocalMsg {
 	public static String getMessageLocal(HttpServletRequest request,
 			String message, Object[] params, String defaultValue) {
 		return getMessageLocal(request, message, params, defaultValue,
-				SpringContextUtils.getContext());
+				TableFieldXmlsParser.getCtx());
 	}
 
 	/**
@@ -126,11 +127,11 @@ public class SpringLocalMsg {
 		if (params != null && params.length > 0) {
 			paramsLocal = new Object[params.length];
 			for (int i = 0; i < paramsLocal.length; i++) {
-				paramsLocal[i] = SpringContextUtils.getContext().getMessage(
+				paramsLocal[i] = TableFieldXmlsParser.getCtx().getMessage(
 						String.valueOf(params[i]), null, "", locale); // .US
 			}
 		}
-		String ss = SpringContextUtils.getContext().getMessage(message,
+		String ss = TableFieldXmlsParser.getCtx().getMessage(message,
 				paramsLocal, defaultValue, locale); // .US
 		if (ss == null) {
 			ss = "";

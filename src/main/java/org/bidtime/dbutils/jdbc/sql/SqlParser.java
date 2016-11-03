@@ -111,7 +111,6 @@ public class SqlParser {
 //			Map<String, Object> map = getMapOfFieldPK(sql, set);
 //			System.out.println(map);
 //		} catch (SQLException e) {
-//			e.printStackTrace();
 //		}
 //	}
 

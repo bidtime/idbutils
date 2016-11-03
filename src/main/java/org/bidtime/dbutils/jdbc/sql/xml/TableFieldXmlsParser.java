@@ -15,6 +15,9 @@ import org.bidtime.utils.basic.PackageUtils;
 import org.dom4j.DocumentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
 /**
  * <code>TableFieldXmlsParser</code> is a registry for sets of queries so that multiple
@@ -22,10 +25,34 @@ import org.slf4j.LoggerFactory;
  * loads properties files filled with query name to SQL mappings. This class is
  * thread safe.
  */
-public class TableFieldXmlsParser {
+public class TableFieldXmlsParser implements ApplicationContextAware {
 
 	private static final Logger logger = LoggerFactory
 			.getLogger(TableFieldXmlsParser.class);
+	
+	private static ApplicationContext ctx;  
+    
+	/** 
+     * 此方法可以把ApplicationContext对象inject到当前类中作为一个静态成员变量。 
+     * @param applicationContext ApplicationContext 对象. 
+     * @throws BeansException 
+     */
+	public void setApplicationContext(ApplicationContext ac) throws BeansException {
+		ctx = ac;
+	}
+	
+	public static ApplicationContext getCtx() {
+		return ctx;
+	}
+ 
+    /** 
+     * 这是一个便利的方法，帮助我们快速得到一个BEAN 
+     * @param beanName bean的名字 
+     * @return 返回一个bean对象 
+     */  
+    public static Object getBean(String name) {  
+        return ctx.getBean(name);  
+    }
 
 	/**
 	 * Maps query set names to Maps of their queries.

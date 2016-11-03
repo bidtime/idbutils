@@ -40,7 +40,6 @@ public class ParserSpringDsXml {
 //		// "com.mchange.v2.c3p0.ComboPooledDataSource");
 //		// System.out.println(list.size());
 //		// } catch (DocumentException e) {
-//		// e.printStackTrace();
 //		// }
 //	}
 

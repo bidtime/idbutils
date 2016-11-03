@@ -7,6 +7,9 @@ import net.sourceforge.pinyin4j.format.HanyuPinyinToneType;
 import net.sourceforge.pinyin4j.format.HanyuPinyinVCharType;
 import net.sourceforge.pinyin4j.format.exception.BadHanyuPinyinOutputFormatCombination;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * @author jss
  * 
@@ -14,6 +17,9 @@ import net.sourceforge.pinyin4j.format.exception.BadHanyuPinyinOutputFormatCombi
  *
  */
 public class CnSpellUtil {
+	
+	private static final Logger logger = LoggerFactory
+			.getLogger(CnSpellUtil.class);
 	
 	public static String getPingYinUpper(String inputString) {
 		return getPingYin(inputString, HanyuPinyinCaseType.UPPERCASE);
@@ -46,7 +52,7 @@ public class CnSpellUtil {
 					output += java.lang.Character.toString(input[i]);
 			}
 		} catch (BadHanyuPinyinOutputFormatCombination e) {
-			e.printStackTrace();
+			logger.error("getPingYin:{}", e.getMessage());
 		}
 		return output;
 	}
@@ -95,7 +101,7 @@ public class CnSpellUtil {
 						pybf.append(temp[0].charAt(0));
 					}
 				} catch (BadHanyuPinyinOutputFormatCombination e) {
-					e.printStackTrace();
+					logger.error("getFirstSpell:{}", e.getMessage());
 				}
 			} else {
 				pybf.append(arr[i]);
@@ -131,7 +137,7 @@ public class CnSpellUtil {
 					pybf.append(PinyinHelper.toHanyuPinyinStringArray(arr[i],
 							defaultFormat)[0]);
 				} catch (BadHanyuPinyinOutputFormatCombination e) {
-					e.printStackTrace();
+					logger.error("getFullSpell:{}", e.getMessage());
 				}
 			} else {
 				pybf.append(arr[i]);
