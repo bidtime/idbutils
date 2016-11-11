@@ -1,11 +1,7 @@
 package org.bidtime.test;
 
-import org.bidtime.utils.spring.SpringContextUtils;
 import org.junit.Ignore;
 import org.junit.runner.RunWith;
-import org.springframework.beans.BeansException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -18,17 +14,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 	})
 
 @Ignore
-public class BasicTest implements ApplicationContextAware {
-
-	// protected GenericXmlApplicationContext c;
-	protected ApplicationContext ctx;
-
-	@Override
-	public void setApplicationContext(ApplicationContext arg0)
-			throws BeansException {
-		this.ctx = arg0;
-		SpringContextUtils.setContext(arg0);
-	}
+public class BasicTest {
 
 //	public Page newPage() {
 //		return newPage(1, 10);
