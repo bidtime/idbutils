@@ -1,0 +1,10 @@
+﻿# idbutils
+
+Welcome to the idbutils! 
+1.本工具的特点： 
+  a. java ORM 工具； 
+  b. sql基于xml文件进行配置； 
+  c. 高效、简洁、入门简单，参看test测试用例； 
+  d. 语法和方法使用方面，只要使用或了解过apache dbutils就会使用idbutils。
+
+本站网站：https://github.com/bidtime/idbutils

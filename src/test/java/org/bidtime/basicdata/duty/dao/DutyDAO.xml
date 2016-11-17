@@ -12,12 +12,11 @@
 	  
 	  <id name="selectSqlOfAll">
 	  	<![CDATA[
-	  		select 
-	  			dutyid as id,
-	  			dutycode as code,
+	  		select
 	  			dutyname as name 
 	  		from t_duty
-	  		<<where dutyid=#id#>>
+	  		where true=true
+	  		<<and dutyid=#id#>>
 	  		<<and dutycode=#code#>>
 	  		<<and dutyname like #name#>>
 	  		{order by dutyid=#idSort#, dutycode=#codeSort#, dutyname=#nameSort#}
@@ -29,7 +28,8 @@
 	  		select 
 	  			dutyid as id
 	  		from t_duty
-	  		<<where dutyid=#id#>>
+	  		where true=true
+	  		<<and dutyid=#id#>>
 	  		<<and dutycode=#code#>>
 	  		<<and dutyname like #name#>>
 	  		{order by dutyid=#idSort#, dutycode=#codeSort#, dutyname=#nameSort#}

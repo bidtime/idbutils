@@ -31,4 +31,12 @@ public class BasicTest {
 //		return page;
 //	}
 	
+	public void print(Object dto) {
+		if (dto != null) {
+			System.out.println(dto);
+		} else {
+			System.out.println("null");
+		}
+	}
+	
 }

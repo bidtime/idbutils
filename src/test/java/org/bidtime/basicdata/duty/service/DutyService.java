@@ -108,6 +108,10 @@ public class DutyService {
 		return dao.info(h, o);
 	}
 	
+	public List<Long> findIdByCode(String code) throws SQLException {
+		return dao.findIdByCode(code);
+	}
+	
 //	public void doIt() throws Exception {
 //		ArrayListLen<Duty> listBeans = getGsonOfAll1(new GsonListBeanHandler<Duty>(Duty.class));
 //		logger.info("ArrayListLen<Duty>:" + listBeans.toString());

@@ -2,9 +2,11 @@ package org.bidtime.basicdata.duty.dao;
 
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.dbutils.ResultSetHandler;
+import org.apache.commons.dbutils.handlers.ColumnListHandler;
 import org.bidtime.dbutils.jdbc.dao.BasicDAO;
 import org.springframework.stereotype.Repository;
 
@@ -37,6 +39,18 @@ public class DutyDAO extends BasicDAO {
 //		Map<String, Object> params = new HashMap<String, Object>();
 //		return (T) this.queryEx("selectSqlOfAll", h, params, nPageIdx, nPageSize);
 //	}
+	
+    public <T> T findIdByCode(ResultSetHandler<T> h, String code) throws SQLException {
+        Map<String, Object> params = new HashMap<>();
+        params.put("code", code);
+        return this.query("selectSqlOfId", h, params);
+    }
+
+    public List<Long> findIdByCode(String code) throws SQLException {
+        ColumnListHandler<Long> h = new ColumnListHandler<>();
+        List<Long> list = findIdByCode(h, code);
+        return list;
+    }
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public <T> T list(ResultSetHandler h) throws SQLException {

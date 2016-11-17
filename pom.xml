@@ -220,30 +220,46 @@
             <scope>test</scope>
         </dependency>
         
-        <!--c3p0 begin -->
+        <!--c3p0 begin url: http://download.softagency.net/MySQL/Downloads/Connector-J/ -->
+        <!--
         <dependency>
             <groupId>c3p0</groupId>
             <artifactId>c3p0</artifactId>
             <version>0.9.1.2</version>
             <scope>test</scope>
         </dependency>
+        -->
+        
+		<dependency>
+           <groupId>com.mchange</groupId>
+           <artifactId>c3p0</artifactId>
+           <version>0.9.5.2</version>
+           <scope>test</scope>
+       </dependency>
         
         <dependency>
             <groupId>com.mchange</groupId>
             <artifactId>mchange-commons-java</artifactId>
-            <version>0.2.8</version>
+            <version>0.2.12</version>
             <scope>test</scope>
         </dependency>
         
         <!--c3p0 end -->
 
 		<!-- mysql jdbc driver -->
-        <dependency>
+		<dependency>
+		    <groupId>org.mariadb.jdbc</groupId>
+		    <artifactId>mariadb-java-client</artifactId>
+		    <version>1.5.5</version>
+		</dependency>
+
+		<!-- 
+		<dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>5.1.33</version>
-            <scope>test</scope>
+            <version>5.1.40</version>
         </dependency>
+        -->
 
         <!-- json -->
         <dependency>

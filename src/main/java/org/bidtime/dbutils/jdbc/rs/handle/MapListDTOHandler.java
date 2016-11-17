@@ -27,7 +27,7 @@ public class MapListDTOHandler extends AbstractListDTOHandler<Map<String, Object
 			boolean countSql) {
 		super.setProp(Map.class, convert, countSql);
 	}
-  
+	
     @Override
     protected Map<String, Object> handleRow(ResultSet rs) throws SQLException {
         return this.convert.toMap(rs, this.mapBeanPropColumns);

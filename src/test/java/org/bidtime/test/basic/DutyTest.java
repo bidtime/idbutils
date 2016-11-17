@@ -179,22 +179,14 @@ public class DutyTest extends BasicTest {
 	public void test_getBeanDTOHandler() throws SQLException {
 		BeanDTOHandler<Duty> h = new BeanDTOHandler<Duty>(Duty.class);
 		ResultDTO<Duty> dto = service.list(h);
-		if (dto != null) {
-			System.out.println(dto);
-		} else {
-			System.out.println("null");
-		}
+		print(dto);		
 	}
 
 	@Test
-	public void test_info() throws SQLException {
+	public void test_info_dto() throws SQLException {
 		BeanDTOHandler<Duty> h = new BeanDTOHandler<Duty>(Duty.class);
 		ResultDTO<Duty> dto = service.info(h, 1);
-		if (dto != null) {
-			System.out.println(dto);
-		} else {
-			System.out.println("null");
-		}
+		print(dto);		
 	}
 
 	@Test
@@ -206,11 +198,7 @@ public class DutyTest extends BasicTest {
 		    }
 		});
 		ResultDTO<Set<Long>> dto = service.list(h);
-		if (dto != null) {
-			System.out.println(dto);
-		} else {
-			System.out.println("null");
-		}
+		print(dto);		
 	}
 
 	@Test
@@ -222,33 +210,27 @@ public class DutyTest extends BasicTest {
 		    }
 		});
 		Set<Long> dto = service.list(h);
-		if (dto != null) {
-			System.out.println(dto);
-		} else {
-			System.out.println("null");
-		}
+		print(dto);		
 	}
 
 	@Test
 	public void test_list() throws SQLException {
 		BeanListDTOHandler<Duty> h = new BeanListDTOHandler<Duty>(Duty.class);
 		ResultDTO<List<Duty>> dto = service.list(h);
-		if (dto != null) {
-			System.out.println(dto);
-		} else {
-			System.out.println("null");
-		}
+		print(dto);		
 	}
 
 	@Test
-	public void test_info_() throws SQLException {
+	public void test_info_bean() throws SQLException {
 		BeanHandler<Duty> h = new BeanHandler<Duty>(Duty.class);
 		Duty dto = service.info(h, 0);
-		if (dto != null) {
-			System.out.println(dto);
-		} else {
-			System.out.println("null");
-		}
+		print(dto);
+	}
+	
+	@Test
+	public void findIdByCode() throws SQLException {
+		List<Long> dto = service.findIdByCode("01");
+		print(dto);
 	}
 
 }
