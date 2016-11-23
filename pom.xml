@@ -273,7 +273,8 @@
 
     <build>
         <resources>
-
+			
+			<!--
             <resource>
                 <directory>src/test/java</directory>
                 <includes>
@@ -288,6 +289,7 @@
                     <include>*.properties</include>
                 </includes>
             </resource>
+            -->
 
         </resources>
         
