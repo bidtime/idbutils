@@ -12,7 +12,7 @@
 	<groupId>org.bidtime.utils</groupId>
 	<artifactId>idbutils</artifactId>
 	<packaging>jar</packaging>
-	<version>1.0.15-SNAPSHOT</version>
+	<version>1.0.15</version>
 	<name>idbutils</name>
     <properties>
         <fastjson.version>1.2.12</fastjson.version>
@@ -301,17 +301,17 @@
                 </configuration>
             </plugin>
 
-		<plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <skipTests>true</skipTests>
-                    <includes>
-                        <include>**/*Test.java</include>
-                    </includes>
-                    <argLine>-Xmx256m</argLine>
-                </configuration>
-            </plugin>
+			<plugin>
+	                <groupId>org.apache.maven.plugins</groupId>
+	                <artifactId>maven-surefire-plugin</artifactId>
+	                <configuration>
+	                    <skipTests>true</skipTests>
+	                    <includes>
+	                        <include>**/*Test.java</include>
+	                    </includes>
+	                    <argLine>-Xmx256m</argLine>
+	                </configuration>
+	        </plugin>
 
         </plugins>        
         
