@@ -188,23 +188,35 @@ public class LogSqlUtils {
 
 	public static void logFormatEndTimeNow(long startTime, long endTime,
 			String sql, Object[] params, final Logger logger) {
+		StringBuilder sb = null;
 		long spanSeconds = endTime - startTime;
 		long spanTimeOut = StmtParams.getInstance().getSpanTimeOut();
 		long spanTime = spanSeconds - spanTimeOut;
-		StringBuilder sb = new StringBuilder();
 		try {
-			sb.append(getSqlParams(sql, params));
-			sb.append("\n");
-			sb.append(getFmtDiffMillseconds(spanSeconds, spanTime, spanTimeOut,
-					logger));
+			if (spanTime > 0 || logger.isDebugEnabled()) { 
+				sb = new StringBuilder();
+			}
+			if (sb != null) {
+				sb.append(endTime);
+				sb.append("-");
+				sb.append(startTime);
+				sb.append("=");
+				sb.append(spanSeconds);
+				sb.append(getSqlParams(sql, params));
+				sb.append("\n");
+				sb.append(getFmtDiffMillseconds(spanSeconds, spanTime, spanTimeOut,
+						logger));
+			}
 			if (spanTime > 0) {
 				logger.warn(sb.toString());
 			} else if (logger.isDebugEnabled()) {
 				logger.debug(sb.toString());
 			}
 		} finally {
-			sb.setLength(0);
-			sb = null;
+			if (sb != null) {
+				sb.setLength(0);
+				sb = null;
+			}
 		}
 	}
 

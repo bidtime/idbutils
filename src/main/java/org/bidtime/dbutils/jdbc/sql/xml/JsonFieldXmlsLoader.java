@@ -58,6 +58,22 @@ public class JsonFieldXmlsLoader extends TableFieldXmlsParser {
 	public static void setInstance(JsonFieldXmlsLoader u) {
 		instance = u;
 	}
+
+	public JsonFieldXmlsLoader(String path) {
+		super(path);
+	}
+
+	public JsonFieldXmlsLoader() {
+		super();
+	}
+	
+	public JsonFieldXmlsLoader(String path, String ext) {
+		super(path, ext);
+	}
+	
+	public JsonFieldXmlsLoader(String path, String ext, Boolean recu) {
+		super(path, ext, recu);
+	}
 	
 	public static TTableProps getTableProps(Object o) throws SQLException {
 		return instance.get(o.getClass());

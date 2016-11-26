@@ -221,15 +221,6 @@
         </dependency>
         
         <!--c3p0 begin url: http://download.softagency.net/MySQL/Downloads/Connector-J/ -->
-        <!--
-        <dependency>
-            <groupId>c3p0</groupId>
-            <artifactId>c3p0</artifactId>
-            <version>0.9.1.2</version>
-            <scope>test</scope>
-        </dependency>
-        -->
-        
 		<dependency>
            <groupId>com.mchange</groupId>
            <artifactId>c3p0</artifactId>
@@ -243,7 +234,6 @@
             <version>0.2.12</version>
             <scope>test</scope>
         </dependency>
-        
         <!--c3p0 end -->
 
 		<!-- mysql jdbc driver -->
@@ -272,26 +262,26 @@
 	</dependencies>
 
     <build>
-        <resources>
+    	<!--
+        <testResources>
 			
-			<!--
-            <resource>
+            <testResource>
                 <directory>src/test/java</directory>
                 <includes>
                     <include>**/*.xml</include>
                 </includes>
-            </resource>
+            </testResource>
 
-            <resource>
+            <testResource>
                 <directory>src/test/resources</directory>
                 <includes>
                     <include>*.xml</include>
                     <include>*.properties</include>
                 </includes>
-            </resource>
-            -->
+            </testResource>
 
-        </resources>
+        </testResources>
+        -->
         
         <plugins>
             <plugin>

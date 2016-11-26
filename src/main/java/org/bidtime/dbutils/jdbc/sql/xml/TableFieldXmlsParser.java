@@ -62,13 +62,28 @@ public class TableFieldXmlsParser implements ApplicationContextAware {
 	/**
 	 * TableFieldXmlsParser constructor.
 	 */
-	protected TableFieldXmlsParser() {
+	public TableFieldXmlsParser() {
 		super();
+	}
+	
+	public TableFieldXmlsParser(String path) {
+		this(path, ".xml", true);
+	}
+
+	public TableFieldXmlsParser(String path, String ext) {
+		this(path, ext, true);
+	}
+	
+	public TableFieldXmlsParser(String path, String ext, Boolean recu) {
+		packageRoot = path;
+		extName = ext;
+		recursive = recu;
+		init();
 	}
 
 	private String packageRoot;
 	private String extName;
-	private boolean recursive;
+	private Boolean recursive;
 	
 	public String getPackageRoot() {
 		return packageRoot;
