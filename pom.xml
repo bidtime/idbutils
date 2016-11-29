@@ -18,7 +18,6 @@
 	<name>idbutils</name>
     <properties>
         <pinyin4j.version>2.5.1</pinyin4j.version>
-        <!--
 		<spring.version>4.3.2.RELEASE</spring.version>
         <fastjson.version>1.2.17</fastjson.version>
         <commons-dbutils.version>1.6</commons-dbutils.version>
@@ -37,7 +36,6 @@
         <c3p0.version>0.9.5.2</c3p0.version>
         <mchange-commons-java.version>0.2.12</mchange-commons-java.version>
         <mariadb-java-client.version>1.5.5</mariadb-java-client.version>
-        -->
     </properties>
 
 	<dependencies>
