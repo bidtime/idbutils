@@ -2,6 +2,7 @@ package org.bidtime.dbutils.jdbc.rs.handle;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -35,9 +36,10 @@ public abstract class AbstractSetDTOHandler<T> extends
 			} else {
 				collect = this.newCollect();
 			}
-			do {
-				collect.add(handleRow(rs));
-			} while (rs.next());
+			handleIt(rs, collect);
+//			do {
+//				collect.add(handleRow(rs));
+//			} while (rs.next());
 			return collect;
 		}
 	}
@@ -51,6 +53,6 @@ public abstract class AbstractSetDTOHandler<T> extends
 	 * @throws SQLException
 	 *             error occurs
 	 */
-	protected abstract T handleRow(ResultSet rs) throws SQLException;
+	protected abstract void handleIt(ResultSet rs, Collection<T> c) throws SQLException;
 
 }

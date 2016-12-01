@@ -13,6 +13,8 @@
 	  <id name="selectSqlOfAll">
 	  	<![CDATA[
 	  		select
+	  			dutyId as id,
+	  			dutyCode as code,
 	  			dutyname as name 
 	  		from t_duty
 	  		where true=true
@@ -26,7 +28,9 @@
 	  <id name="selectSqlOfId">
 	  	<![CDATA[
 	  		select 
-	  			dutyid as id
+	  			dutyId as id,
+	  			dutyCode as code,
+	  			dutyname as name 
 	  		from t_duty
 	  		where true=true
 	  		<<and dutyid=#id#>>

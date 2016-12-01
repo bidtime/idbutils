@@ -219,6 +219,20 @@ public class DutyTest extends BasicTest {
 		ResultDTO<List<Duty>> dto = service.list(h);
 		print(dto);		
 	}
+	
+	@Test
+	public void test_set() throws SQLException {
+		ColumnSetHandler<String> h = new ColumnSetHandler<>("code");
+		Set<String> dto = service.list(h);
+		print(dto);		
+	}
+	
+	@Test
+	public void test_set_dto() throws SQLException {
+		ColumnSetDTOHandler<String> h = new ColumnSetDTOHandler<>("code");
+		ResultDTO<Set<String>> dto = service.list(h);
+		print(dto);		
+	}
 
 	@Test
 	public void test_info_bean() throws SQLException {

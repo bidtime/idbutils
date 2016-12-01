@@ -18,7 +18,9 @@ package org.bidtime.dbutils.jdbc.rs.handle;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Collection;
 
+import org.bidtime.dbutils.jdbc.rs.BeanProcessorEx;
 import org.bidtime.dbutils.jdbc.rs.handle.cb.SetCallback;
 
 /**
@@ -100,13 +102,12 @@ public class ColumnSetHandler<T> extends AbstractSetHandler<T> {
      */
     // We assume that the user has picked the correct type to match the column
     // so getObject will return the appropriate type and the cast will succeed.
-    @SuppressWarnings("unchecked")
     @Override
-    protected T handleRow(ResultSet rs) throws SQLException {
+    protected void handleIt(ResultSet rs, Collection<T> c) throws SQLException {
         if (this.columnName == null) {
-            return (T) rs.getObject(this.columnIndex);
+        	BeanProcessorEx.toColumnCollection(rs, c, columnIndex);
         } else {
-        	return (T) rs.getObject(this.columnName);
+        	BeanProcessorEx.toColumnCollection(rs, c, columnName);
         }
    }
 

@@ -26,11 +26,7 @@ public class ResultSetDTOHandler<T> extends ResultSetExHandler<ResultDTO<T>> {
 
 	@SuppressWarnings("unchecked")
 	public T doDTO(ResultSet rs) throws SQLException {
-		if (rs.next()) {
-			return (T) convert.toBean(rs, type, mapBeanPropColumns);
-		} else {
-			return null;
-		}
+		return rs.next() ? (T)this.convert.toBean(rs, type, mapBeanPropColumns) : null;
 	}
 
 //  protected String[] getResultSetCols(ResultSetMetaData rsmd) throws SQLException {

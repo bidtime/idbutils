@@ -2,6 +2,7 @@ package org.bidtime.dbutils.jdbc.rs.handle;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Collection;
 
 import org.bidtime.dbutils.jdbc.rs.BeanAdapt;
 import org.bidtime.dbutils.jdbc.rs.BeanProcessorEx;
@@ -46,10 +47,10 @@ public class BeanListDTOHandler<T> extends AbstractListDTOHandler<T> {
 		super.setProp(type, convert, countSql, beanAdapt);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	protected T handleRow(ResultSet rs) throws SQLException {
-		return (T) this.convert.toBean(rs, this.type, this.mapBeanPropColumns);
+	protected void handleIt(ResultSet rs, Collection<T> c) throws SQLException {
+		//this.convert.toBean(rs, this.type, this.mapBeanPropColumns);
+		convert.toBeanList(rs, type, c, mapBeanPropColumns);
 	}
 
 }

@@ -30,6 +30,7 @@ import java.sql.SQLXML;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -183,21 +184,42 @@ public class BeanProcessorEx implements Serializable {
      * @return the newly created List of beans
      */
     public <T> List<T> toBeanList(ResultSet rs, Class<T> type) throws SQLException {
-        return toBeanList(rs, type, this.columnToPropertyOverrides);
+        return toBeanList(rs, type, columnToPropertyOverrides);
     }
 
 	public <T> List<T> toBeanList(ResultSet rs, Class<T> type, Map<String,String> mapBeanProps) throws SQLException {
         List<T> results = new ArrayList<T>();
-        if (!rs.next()) {
-            return results;
-        }
-        PropertyDescriptor[] props = this.propertyDescriptors(type);
-        ResultSetMetaData rsmd = rs.getMetaData();
-        int[] columnToProperty = this.mapColumnsToProperties(rsmd, props, mapBeanProps);
-        do {
-            results.add(this.createBean(rs, type, props, columnToProperty));
-        } while (rs.next());
+        toBeanList(rs, type, results, mapBeanProps);
         return results;
+    }
+	
+	@SuppressWarnings("rawtypes")
+	public void toBeanList(ResultSet rs, Class type, Collection results) throws SQLException {
+		toBeanList(rs, type, results, columnToPropertyOverrides);
+	}
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public void toBeanList(ResultSet rs, Class type, Collection results, Map<String,String> mapBeanProps) throws SQLException {
+        PropertyDescriptor[] props = propertyDescriptors(type);
+        ResultSetMetaData rsmd = rs.getMetaData();
+        int[] columnToProperty = mapColumnsToProperties(rsmd, props, mapBeanProps);
+        do {
+            results.add(createBean(rs, type, props, columnToProperty));
+        } while (rs.next());
+    }
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public static void toColumnCollection(ResultSet rs, Collection results, String columnName) throws SQLException {
+        do {
+            results.add(rs.getObject(columnName));
+        } while (rs.next());
+    }
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public static void toColumnCollection(ResultSet rs, Collection results, int columnIndex) throws SQLException {
+        do {
+            results.add(rs.getObject(columnIndex));
+        } while (rs.next());
     }
 
     /**
@@ -213,30 +235,22 @@ public class BeanProcessorEx implements Serializable {
     private <T> T createBean(ResultSet rs, Class<T> type,
             PropertyDescriptor[] props, int[] columnToProperty)
             throws SQLException {
-
         T bean = this.newInstance(type);
-
         for (int i = 1; i < columnToProperty.length; i++) {
-
             if (columnToProperty[i] == PROPERTY_NOT_FOUND) {
                 continue;
             }
-
             PropertyDescriptor prop = props[columnToProperty[i]];
             Class<?> propType = prop.getPropertyType();
-
             Object value = null;
             if(propType != null) {
                 value = this.processColumn(rs, i, propType);
-
                 if (value == null && propType.isPrimitive()) {
                     value = primitiveDefaults.get(propType);
                 }
             }
-
             this.callSetter(bean, prop, value);
         }
-
         return bean;
     }
 

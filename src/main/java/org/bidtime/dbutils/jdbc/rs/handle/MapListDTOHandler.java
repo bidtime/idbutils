@@ -2,6 +2,7 @@ package org.bidtime.dbutils.jdbc.rs.handle;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.Map;
 
 import org.bidtime.dbutils.jdbc.rs.BeanProcessorEx;
@@ -29,8 +30,8 @@ public class MapListDTOHandler extends AbstractListDTOHandler<Map<String, Object
 	}
 	
     @Override
-    protected Map<String, Object> handleRow(ResultSet rs) throws SQLException {
-        return this.convert.toMap(rs, this.mapBeanPropColumns);
+    protected void handleIt(ResultSet rs, Collection<Map<String, Object>> c) throws SQLException {
+        this.convert.toMap(rs, this.mapBeanPropColumns);
     }
 
 }
