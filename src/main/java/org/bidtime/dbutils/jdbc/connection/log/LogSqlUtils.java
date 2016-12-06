@@ -19,73 +19,66 @@ public class LogSqlUtils {
 //		System.out.println(oo);
 //	}
 
-	public static String getSqlParams(String sql, Object[] params) {
-		StringBuilder sb = new StringBuilder();
-		try {
-			sb.append("sql: ");
-			if (params == null) {
-				sb.append(sql);
-				sb.append("\n\t");
-				sb.append("params:is none");
-			} else if (params.length == 0) {
-				sb.append(sql);
-				sb.append("\n\t");
-				sb.append("params: 0");
-			} else {
-				if (!StmtParams.getInstance().getSqlOutParam()) {
-					StringBuilder sbSql = new StringBuilder();
-					try {
-						int j = 0;
-						for (int i = 0; i < sql.length(); i++) {
-							char c = sql.charAt(i);
-							if (c == '?') {
-								if (j < params.length) {
-									String val = objectToString(params[j], ',', true);
-									sbSql.append(val);
-									j++;
-								} else {
-									sbSql.append(c);
-								}
+	private static void getSqlParams(String sql, Object[] params, StringBuilder sb) {
+		sb.append("sql: ");
+		if (params == null) {
+			sb.append(sql);
+			sb.append("\n\t");
+			sb.append("params:is none");
+		} else if (params.length == 0) {
+			sb.append(sql);
+			sb.append("\n\t");
+			sb.append("params: 0");
+		} else {
+			if (!StmtParams.getInstance().getSqlOutParam()) {
+				StringBuilder sbSql = new StringBuilder();
+				try {
+					int j = 0;
+					for (int i = 0; i < sql.length(); i++) {
+						char c = sql.charAt(i);
+						if (c == '?') {
+							if (j < params.length) {
+								String val = objectToString(params[j], ',', true);
+								sbSql.append(val);
+								j++;
 							} else {
 								sbSql.append(c);
 							}
-						}
-						if (StmtParams.getInstance().getFormatSql()) {
-							sb.append(SqlFmtter.fmt(sbSql.toString()));
-							sb.append("\n\n    ");
 						} else {
-							sb.append(sbSql.toString());
-							sb.append("\n\t");
+							sbSql.append(c);
 						}
-						sb.append("params: ");
-						sb.append(params.length);
-					} finally {
-						sbSql.setLength(0);
-						sbSql = null;
 					}
-				} else {
 					if (StmtParams.getInstance().getFormatSql()) {
-						sb.append(SqlFmtter.fmt(sql));
+						sb.append(SqlFmtter.fmt(sbSql.toString()));
 						sb.append("\n\n    ");
 					} else {
-						sb.append(sql);						
+						sb.append(sbSql.toString());
 						sb.append("\n\t");
 					}
 					sb.append("params: ");
 					sb.append(params.length);
-					for (int i = 0; i < params.length; i++) {
-						sb.append("\n\t");
-						sb.append("[");
-						sb.append(i);
-						sb.append("]:");
-						sb.append(objectToString(params[i], ',', true));
-					}
+				} finally {
+					sbSql.setLength(0);
+					sbSql = null;
+				}
+			} else {
+				if (StmtParams.getInstance().getFormatSql()) {
+					sb.append(SqlFmtter.fmt(sql));
+					sb.append("\n\n    ");
+				} else {
+					sb.append(sql);						
+					sb.append("\n\t");
+				}
+				sb.append("params: ");
+				sb.append(params.length);
+				for (int i = 0; i < params.length; i++) {
+					sb.append("\n\t");
+					sb.append("[");
+					sb.append(i);
+					sb.append("]:");
+					sb.append(objectToString(params[i], ',', true));
 				}
 			}
-			return sb.toString();
-		} finally {
-			sb.setLength(0);
-			sb = null;
 		}
 	}
 
@@ -166,34 +159,12 @@ public class LogSqlUtils {
 
 	public static void logFormatEndTimeNow(long startTime, long endTime,
 			String sql, Object[] params, int nResult, final Logger logger) {
-		long spanSeconds = endTime - startTime;
-		long spanTimeOut = StmtParams.getInstance().getSpanTimeOut();
-		long spanTime = spanSeconds - spanTimeOut;
-		StringBuilder sb = new StringBuilder();
-		try {
-			sb.append(getSqlParams(sql, params));
-			sb.append("\n");
-			sb.append(getFmtDiffMillseconds(spanSeconds, spanTime, spanTimeOut,
-					nResult, logger));
-			if (spanTime > 0) {
-				logger.warn(sb.toString());
-			} else if (logger.isDebugEnabled()) {
-				logger.debug(sb.toString());
-			}
-		} finally {
-			sb.setLength(0);
-			sb = null;
-		}
-	}
-
-	public static void logFormatEndTimeNow(long startTime, long endTime,
-			String sql, Object[] params, final Logger logger) {
+		long betweenTotal = endTime - startTime;
+		long tmTimeOut = StmtParams.getInstance().getSpanTimeOut();
+		long betweenTimeout = betweenTotal - tmTimeOut;
 		StringBuilder sb = null;
-		long spanSeconds = endTime - startTime;
-		long spanTimeOut = StmtParams.getInstance().getSpanTimeOut();
-		long spanTime = spanSeconds - spanTimeOut;
 		try {
-			if (spanTime > 0 || logger.isDebugEnabled()) { 
+			if (betweenTimeout > 0 || logger.isDebugEnabled()) { 
 				sb = new StringBuilder();
 			}
 			if (sb != null) {
@@ -201,13 +172,13 @@ public class LogSqlUtils {
 				sb.append("-");
 				sb.append(startTime);
 				sb.append("=");
-				sb.append(spanSeconds);
-				sb.append(getSqlParams(sql, params));
+				sb.append(betweenTotal);
+				sb.append(". ");
+				getSqlParams(sql, params, sb);
 				sb.append("\n");
-				sb.append(getFmtDiffMillseconds(spanSeconds, spanTime, spanTimeOut,
-						logger));
+				getFmtDiffMillseconds(betweenTotal, betweenTimeout, nResult, sb);
 			}
-			if (spanTime > 0) {
+			if (betweenTimeout > 0) {
 				logger.warn(sb.toString());
 			} else if (logger.isDebugEnabled()) {
 				logger.debug(sb.toString());
@@ -220,41 +191,78 @@ public class LogSqlUtils {
 		}
 	}
 
-	private static String getFmtDiffMillseconds(long spanSeconds,
-			long spanTime, long spanTimeOut, final Logger logger) {
+	public static void logFormatEndTimeNow(long startTime, long endTime,
+			String sql, Object[] params, final Logger logger) {
+		long betweenTotal = endTime - startTime;
+		long tmTimeOut = StmtParams.getInstance().getSpanTimeOut();
+		long betweenTimeout = betweenTotal - tmTimeOut;
+		StringBuilder sb = null;
+		try {
+			if (betweenTimeout > 0 || logger.isDebugEnabled()) { 
+				sb = new StringBuilder();
+			}
+			if (sb != null) {
+				sb.append(endTime);
+				sb.append("-");
+				sb.append(startTime);
+				sb.append("=");
+				sb.append(betweenTotal);
+				sb.append(". ");
+				getSqlParams(sql, params, sb);
+				sb.append("\n");
+				getFmtDiffMillseconds(betweenTotal, betweenTimeout, sb);
+			}
+			if (betweenTimeout > 0) {
+				logger.warn(sb.toString());
+			} else if (logger.isDebugEnabled()) {
+				logger.debug(sb.toString());
+			}
+		} finally {
+			if (sb != null) {
+				sb.setLength(0);
+				sb = null;
+			}
+		}
+	}
+	
+	private static void getFmtDiffMillseconds(long betweenTotal,
+			long betweenTimeout, StringBuilder sb) {
 		Calendar c = Calendar.getInstance();
-		c.setTimeInMillis(spanSeconds);
-		return getFmtCalendar(c, spanTime, spanTimeOut, logger);
+		c.setTimeInMillis(betweenTotal);
+		getFmtCalendar(c, betweenTimeout, sb);
 	}
 
-	private static String getFmtCalendar(Calendar c, long spanTime,
-			long spanTimeOut, final Logger logger) {
-		StringBuilder sb = new StringBuilder("\tspan:");
+	private static void getFmtCalendar(Calendar c, long betweenTimeout, StringBuilder sb) {
+		sb.append("\tspan:");
 		sb.append(c.get(Calendar.MINUTE));
 		sb.append("m:");
 		sb.append(c.get(Calendar.SECOND));
 		sb.append("s:");
 		sb.append(c.get(Calendar.MILLISECOND));
 		sb.append("ms");
-		if (spanTime > 0 && logger.isWarnEnabled()) {
+		if (betweenTimeout > 0) {
 			sb.append("(exceed ");
-			sb.append(spanTime);
+			sb.append(betweenTimeout);
 			sb.append("ms)");
 		}
 		sb.append(".");
-		return sb.toString();
 	}
+	
+	/*
+		long betweenTotal = endTime - startTime;
+		long tmTimeOut = StmtParams.getInstance().getSpanTimeOut();
+		long betweenTimeout = betweenTotal - tmTimeOut;
+	 */
 
-	private static String getFmtDiffMillseconds(long spanSeconds,
-			long spanTime, long spanTimeOut, int nResult, final Logger logger) {
+	private static void getFmtDiffMillseconds(long betweenTotal,
+			long betweenTimeout, int nResult, StringBuilder sb) {
 		Calendar c = Calendar.getInstance();
-		c.setTimeInMillis(spanSeconds);
-		return getFmtCalendar(c, spanTime, spanTimeOut, nResult, logger);
+		c.setTimeInMillis(betweenTotal);
+		getFmtCalendar(c, betweenTimeout, nResult, sb);
 	}
 
-	private static String getFmtCalendar(Calendar c, long spanTime,
-			long spanTimeOut, int nResult, final Logger logger) {
-		StringBuilder sb = new StringBuilder();
+	private static void getFmtCalendar(Calendar c, long betweenTimeout,
+			int nResult, StringBuilder sb) {
 		// applies
 		sb.append("\tapplies:");
 		sb.append(nResult);
@@ -267,40 +275,12 @@ public class LogSqlUtils {
 		sb.append("s:");
 		sb.append(c.get(Calendar.MILLISECOND));
 		sb.append("ms");
-		if (spanTime > 0) {
+		if (betweenTimeout > 0) {
 			sb.append("(exceed ");
-			sb.append(spanTime);
+			sb.append(betweenTimeout);
 			sb.append("ms)");
 		}
 		sb.append(".");
-		return sb.toString();
-	}
-
-	public static String getFmtDiffNowMs(long start) {
-		long end = System.currentTimeMillis();
-		return getFmtDiffStartEndMs(start, end);
-	}
-
-	public static String getFmtDiffStartEndMs(long start, long end) {
-		return getFmtDiffMS(end - start);
-	}
-
-	public static String getFmtDiffMS(long spanSeconds) {
-		Calendar c = Calendar.getInstance();
-		c.setTimeInMillis(spanSeconds);
-		return getFmtCalendar(c);
-	}
-
-	public static String getFmtCalendar(Calendar c) {
-		StringBuilder sb = new StringBuilder("");
-		sb.append(c.get(Calendar.MINUTE));
-		sb.append("m:");
-		sb.append(c.get(Calendar.SECOND));
-		sb.append("s:");
-		sb.append(c.get(Calendar.MILLISECOND));
-		sb.append("ms");
-		sb.append(".");
-		return sb.toString();
 	}
 
 }
