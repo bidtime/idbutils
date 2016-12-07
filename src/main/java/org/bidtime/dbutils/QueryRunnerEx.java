@@ -26,6 +26,9 @@ import javax.sql.DataSource;
 
 import org.apache.commons.dbutils.AbstractQueryRunner;
 import org.apache.commons.dbutils.ResultSetHandler;
+import org.bidtime.dbutils.jdbc.connection.log.LogInsertSql;
+import org.bidtime.dbutils.jdbc.connection.log.LogSelectSql;
+import org.bidtime.dbutils.jdbc.connection.log.LogUpdateSql;
 import org.bidtime.dbutils.params.StmtParams;
 
 /**
@@ -45,8 +48,7 @@ import org.bidtime.dbutils.params.StmtParams;
  */
 public class QueryRunnerEx extends AbstractQueryRunner {
 
-//	private static final Logger logger = Logger
-//			.getLogger(QueryRunnerEx.class);
+	//private static final Logger logger = LoggerFactory.getLogger(QueryRunnerEx.class);
 
     /**
      * Constructor for QueryRunner.
@@ -155,6 +157,7 @@ public class QueryRunnerEx extends AbstractQueryRunner {
             throw new SQLException("Null parameters. If parameters aren't need, pass an empty array.");
         }
 
+        long startTime = System.currentTimeMillis();
         PreparedStatement stmt = null;
         int[] rows = null;
         try {
@@ -172,6 +175,10 @@ public class QueryRunnerEx extends AbstractQueryRunner {
             if (closeConn) {
                 close(conn);
             }
+    		if (LogUpdateSql.logInfoOrDebug()) {
+    			LogUpdateSql.logFormatTimeNow(startTime, sql, params,
+    					(rows != null ? rows.length : 0));
+    		}
         }
         return rows;
     }
@@ -349,6 +356,7 @@ public class QueryRunnerEx extends AbstractQueryRunner {
         PreparedStatement stmt = null;
         ResultSet rs = null;
         T result = null;
+        long startTime = System.currentTimeMillis();
         try {
             //stmt = this.prepareStatement(conn, sql);
         	stmt = (PreparedStatement) conn.prepareStatement(sql, ResultSet.TYPE_FORWARD_ONLY,  
@@ -370,6 +378,9 @@ public class QueryRunnerEx extends AbstractQueryRunner {
                     close(conn);
                 }
             }
+    		if (LogSelectSql.logInfoOrDebug()) {
+    			LogSelectSql.logFormatTimeNow(startTime, sql, params);
+    		}
         }
 
         return result;
@@ -489,7 +500,7 @@ public class QueryRunnerEx extends AbstractQueryRunner {
 
         PreparedStatement stmt = null;
         int rows = 0;
-
+        long startTime = System.currentTimeMillis();
         try {
             stmt = this.prepareStatement(conn, sql);
             stmt.setQueryTimeout(StmtParams.getInstance().getStmtUpdateTimeOut());
@@ -502,6 +513,9 @@ public class QueryRunnerEx extends AbstractQueryRunner {
             if (closeConn) {
                 close(conn);
             }
+    		if (LogUpdateSql.logInfoOrDebug()) {
+    			LogUpdateSql.logFormatTimeNow(startTime, sql, params);				
+    		}
         }
         return rows;
     }
@@ -604,6 +618,7 @@ public class QueryRunnerEx extends AbstractQueryRunner {
         }
 
         PreparedStatement stmt = null;
+        long startTime = System.currentTimeMillis();
         T generatedKeys = null;
         try {
             stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
@@ -619,6 +634,9 @@ public class QueryRunnerEx extends AbstractQueryRunner {
             if (closeConn) {
                 close(conn);
             }
+    		if (LogInsertSql.logInfoOrDebug()) {
+    			LogInsertSql.logFormatTimeNow(startTime, sql, params);				
+    		}
         }
         return generatedKeys;
     }
@@ -690,6 +708,7 @@ public class QueryRunnerEx extends AbstractQueryRunner {
         }
 
         PreparedStatement stmt = null;
+        long startTime = System.currentTimeMillis();
         T generatedKeys = null;
         try {
             stmt = this.prepareStatement(conn, sql, Statement.RETURN_GENERATED_KEYS);
@@ -709,6 +728,9 @@ public class QueryRunnerEx extends AbstractQueryRunner {
             if (closeConn) {
                 close(conn);
             }
+    		if (LogInsertSql.logInfoOrDebug()) {
+    			LogInsertSql.logFormatTimeNow(startTime, sql, params);				
+    		}
         }
         return generatedKeys;
     }

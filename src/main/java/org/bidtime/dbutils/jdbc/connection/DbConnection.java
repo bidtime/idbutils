@@ -13,10 +13,7 @@ import org.bidtime.dbutils.QueryRunnerEx;
 import org.bidtime.dbutils.gson.ResultDTO;
 import org.bidtime.dbutils.gson.dataset.GsonRow;
 import org.bidtime.dbutils.jdbc.connection.ds.DataSourceTransactionHolder;
-import org.bidtime.dbutils.jdbc.connection.log.LogInsertSql;
-import org.bidtime.dbutils.jdbc.connection.log.LogSelectSql;
 import org.bidtime.dbutils.jdbc.connection.log.LogSpSql;
-import org.bidtime.dbutils.jdbc.connection.log.LogUpdateSql;
 import org.bidtime.dbutils.jdbc.dao.SQLCallback;
 import org.bidtime.dbutils.jdbc.dialect.CAutoFitSql;
 import org.bidtime.dbutils.jdbc.rs.handle.ext.ResultSetDTOHandler;
@@ -117,15 +114,11 @@ public class DbConnection {
 	private static <T> T insertConn(Connection conn, String sql, ResultSetHandler<T> rsh, Object[] params)
 			throws SQLException {
 		T generatedKeys = null;
-		long startTime = System.currentTimeMillis();
 		QueryRunnerEx q = new QueryRunnerEx();
 		try {
 			generatedKeys = q.insert(conn, sql, rsh, params);
 		} finally {
 			q = null;
-		}
-		if (LogInsertSql.logInfoOrDebug()) {
-			LogInsertSql.logFormatTimeNow(startTime, sql, params);				
 		}
 		return generatedKeys;
 	}
@@ -167,16 +160,12 @@ public class DbConnection {
 	
 	private static int updateConn(Connection conn, String sql, Object[] params)
 			throws SQLException {
-		long startTime = System.currentTimeMillis();
 		QueryRunnerEx q = new QueryRunnerEx();
 		int nResult = 0;
 		try {
 			nResult = q.update(conn, sql, params);
 		} finally {
 			q = null;
-		}
-		if (LogUpdateSql.logInfoOrDebug()) {
-			LogUpdateSql.logFormatTimeNow(startTime, sql, params, nResult);
 		}
 		return nResult;
 	}
@@ -206,15 +195,11 @@ public class DbConnection {
 	private static <T> T insertBatchConn(Connection conn, String sql, ResultSetHandler<T> rsh, Object[][] params)
 			throws SQLException {
 		T generatedKeys = null;
-		long startTime = System.currentTimeMillis();
 		QueryRunnerEx q = new QueryRunnerEx();
 		try {
 			generatedKeys = q.insertBatch(conn, sql, rsh, params);
 		} finally {
 			q = null;
-		}
-		if (LogInsertSql.logInfoOrDebug()) {
-			LogInsertSql.logFormatTimeNow(startTime, sql, params);				
 		}
 		return generatedKeys;
 	}
@@ -244,7 +229,6 @@ public class DbConnection {
 	private static int updateBatchConn(Connection conn, String sql, Object[][] params)
 			throws SQLException {
 		int nResult = 0;
-		long startTime = System.currentTimeMillis();
 		QueryRunnerEx q = new QueryRunnerEx();
 		int[] affectedRows = null;
 		try {
@@ -260,10 +244,6 @@ public class DbConnection {
 					nResult = affectedRows.length;
 				}
 			}
-		}
-		if (LogUpdateSql.logInfoOrDebug()) {
-			LogUpdateSql.logFormatTimeNow(startTime, sql, params,
-					(affectedRows != null ? affectedRows.length : 0));
 		}
 		return nResult;
 	}
@@ -379,10 +359,6 @@ public class DbConnection {
 		boolean bCountSql = false;
 		Long nTotalRows = null;
 		T t = null;
-		Long startTime_count = null;
-		Long endTime_count = null;
-		long startTime = 0;
-		long endTime = 0;
 		Object[] paramAll = null;
 		QueryRunnerEx qr = new QueryRunnerEx();
 		try {
@@ -397,31 +373,18 @@ public class DbConnection {
 							nPageSize);
 				}
 			}
-			startTime = System.currentTimeMillis();
 			if (nPageSize != null) {
 				sql = CAutoFitSql.getSubSqlOfPage(conn, sql);
 			}
 			t = qr.query(conn, sql, rsh, paramAll);
-			endTime = System.currentTimeMillis();
 			if (StringUtils.isNotEmpty(sqlCount)) { // total rows
 				bCountSql = true;
-				startTime_count = System.currentTimeMillis();
 				nTotalRows = ObjectComm.objectToLong(qr.query(conn,
 						sqlCount, new ScalarHandler<Long>(1),
 						params));
-				endTime_count = System.currentTimeMillis();
 			}
 		} finally {
 			qr = null;
-			if (bCountSql) {
-				if (LogSelectSql.logInfoOrDebug()) {
-					LogSelectSql.logFormatEndTimeNow(startTime_count, endTime_count,
-							sqlCount, params);
-				}
-			}
-			if (LogSelectSql.logInfoOrDebug()) {
-				LogSelectSql.logFormatEndTimeNow(startTime, endTime, sql, paramAll);
-			}
 			if (t != null && bCountSql) {
 				if (t instanceof ResultDTO) {
 					((ResultDTO) t).setLen(nTotalRows);
