@@ -480,7 +480,40 @@ public class SqlLoadUtils {
 		return n;
 	}
 	
-	// insertBatch
+	// insertIgnoreBatch
+
+	@SuppressWarnings({ "rawtypes" })
+	public static int insertIgnoreBatch(DataSource ds, Class clazz, List list) throws SQLException {
+		return insertIgnoreBatch(ds, clazz, list, PropAdapt.NOTNULL);
+	}
+	
+	@SuppressWarnings({ "rawtypes", "unchecked"})
+	public static int insertIgnoreBatch(DataSource ds, Class clazz, List list, PropAdapt pa) throws SQLException {
+		if (list == null || list.isEmpty()) {
+			return 0;
+		}
+		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
+		int n = 0;
+		GsonRows g = null;
+		try {
+			if (list.get(0) instanceof Map) {
+				g = tp.mapsToRows((List<Map<String, Object>>)list, true);
+			} else {
+				g = tp.clazzToRows(list, true, pa);
+			}
+			n += DbConnection.updateBatch(ds, tp, g, 
+					new SQLCallback<TTableProps, GsonRows, Connection>(){
+	            @Override  
+	            public String getSql(TTableProps tp, GsonRows g, Connection c) throws SQLException {
+	            	String insSql = CAutoFitSql.getInsertIgnore(c);
+		        	return tp.getInsertSql(g, true, insSql);
+		        }  
+			});
+		} finally {
+			g = null;
+		}
+		return n;
+	}
 
 	@SuppressWarnings({ "rawtypes" })
 	public static int insertBatch(DataSource ds, Class clazz, List list) throws SQLException {
@@ -591,7 +624,7 @@ public class SqlLoadUtils {
 			} else {
 				g = tp.clazzToRow(o, true, pa);
 			}
-			String sql = tp.getInsertSql(g, true);;
+			String sql = tp.getInsertSql(g, true);
 			return (T) DbConnection.insert(ds, sql, new ScalarHandler<T>()
 					, g.getData());
 		} finally {

@@ -12,6 +12,7 @@ import org.apache.commons.lang.StringUtils;
 import org.bidtime.dbutils.QueryRunnerEx;
 import org.bidtime.dbutils.gson.ResultDTO;
 import org.bidtime.dbutils.gson.dataset.GsonRow;
+import org.bidtime.dbutils.gson.dataset.GsonRows;
 import org.bidtime.dbutils.jdbc.connection.ds.DataSourceTransactionHolder;
 import org.bidtime.dbutils.jdbc.connection.log.LogSpSql;
 import org.bidtime.dbutils.jdbc.dao.SQLCallback;
@@ -124,8 +125,7 @@ public class DbConnection {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public static int update(DataSource ds, TTableProps tp, GsonRow g, SQLCallback cb)
-			throws SQLException {
+	public static int update(DataSource ds, TTableProps tp, GsonRow g, SQLCallback cb) throws SQLException {
 		Connection conn = getConnOfSpringCtx(ds);
 		if (conn == null) {
 			conn = DataSourceUtils.getConnection(ds);
@@ -142,8 +142,7 @@ public class DbConnection {
 		}
 	}
 
-	public static int update(DataSource ds, String sql, Object[] params)
-			throws SQLException {
+	public static int update(DataSource ds, String sql, Object[] params) throws SQLException {
 		Connection conn = getConnOfSpringCtx(ds);
 		if (conn == null) {
 			conn = DataSourceUtils.getConnection(ds);
@@ -202,6 +201,24 @@ public class DbConnection {
 			q = null;
 		}
 		return generatedKeys;
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public static int updateBatch(DataSource ds, TTableProps tp, GsonRows g, SQLCallback cb) throws SQLException {
+		Connection conn = getConnOfSpringCtx(ds);
+		if (conn == null) {
+			conn = DataSourceUtils.getConnection(ds);
+			try {
+				String sql = cb.getSql(tp, g, conn);
+				return updateBatchConn(conn, sql, g.getData());
+			} finally {
+				DataSourceUtils.releaseConnection(conn, ds);
+				conn = null;
+			}
+		} else {
+			String sql = cb.getSql(tp, g, conn);
+			return updateConn(conn, sql, g.getData());
+		}
 	}
 
 	public static int updateBatch(DataSource ds, String sql, Object[][] params)

@@ -219,6 +219,16 @@ public class BasicDAO {
 	}
 	
 	@SuppressWarnings({ "rawtypes" })
+	public int insertIgnoreBatch(List list) throws SQLException {
+		return SqlLoadUtils.insertIgnoreBatch(getCurrentDataSource(), this.getClass(), list);		
+	}
+	
+	@SuppressWarnings({ "rawtypes" })
+	public int insertIgnoreBatch(List list, PropAdapt pa) throws SQLException {
+		return SqlLoadUtils.insertIgnoreBatch(getCurrentDataSource(), this.getClass(), list);				
+	}
+	
+	@SuppressWarnings({ "rawtypes" })
 	public int updateBatch(List list) throws SQLException {
 		return SqlLoadUtils.updateBatch(getCurrentDataSource(), this.getClass(), list);		
 	}
