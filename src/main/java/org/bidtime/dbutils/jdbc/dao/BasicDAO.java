@@ -215,7 +215,7 @@ public class BasicDAO {
 	
 	@SuppressWarnings({ "rawtypes" })
 	public int insertBatch(List list, PropAdapt pa) throws SQLException {
-		return SqlLoadUtils.insertBatch(getCurrentDataSource(), this.getClass(), list);				
+		return SqlLoadUtils.insertBatch(getCurrentDataSource(), this.getClass(), list, pa);				
 	}
 	
 	@SuppressWarnings({ "rawtypes" })
