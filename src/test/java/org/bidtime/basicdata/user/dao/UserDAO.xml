@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<classes>
+  <class package="" name="User" table="t_user">
+	<id name="userid" column="userid" length="20" generator="identity" />
+	<property name="usercode" column="usercode" length="20" not-null="true" />
+	<property name="username" column="username" length="50" not-null="true" />
+	<property name="bmi_scope" column="bmi_scope" length="50" not-null="true" />
+	<property name="createTime" column="createTime" length="50" not-null="true" />
+  </class>
+  
+  <!-- sql -->
+  <sql>
+	  
+	  <id name="selectSqlOfAll">
+	  	<![CDATA[
+	  		select
+	  			userId,
+	  			userCode,
+	  			username,
+	  			bmi_scope
+	  		from t_user
+	  		where true=true
+	  		<<and userid=#id#>>
+	  		<<and usercode=#code#>>
+	  		<<and username like #name#>>
+	  		{order by userid=#idSort#, usercode=#codeSort#, username=#nameSort#}
+	  	]]>
+	  </id>
+	  
+	  <id name="selectSqlOfId">
+	  	<![CDATA[
+	  		select 
+	  			userId,
+	  			userCode,
+	  			username 
+	  		from t_user
+	  		where true=true
+	  		<<and userid=#id#>>
+	  		<<and usercode=#code#>>
+	  		<<and username like #name#>>
+	  		{order by userid=#idSort#, usercode=#codeSort#, username=#nameSort#}
+	  	]]>
+	  </id>
+
+  </sql>
+</classes>

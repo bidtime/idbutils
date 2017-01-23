@@ -32,3 +32,20 @@ CREATE TABLE `t_duty` (
 
 INSERT INTO `t_duty` (`id`, `code`, `name`) VALUES (1, 'D-1', '技术部');
 INSERT INTO `t_duty` (`id`, `code`, `name`) VALUES (2, 'D-2', '人事部');
+
+-- ----------------------------
+
+DROP TABLE IF EXISTS `t_user`;
+CREATE TABLE `t_user` (
+  `userid` int(11) NOT NULL AUTO_INCREMENT,
+  `usercode` varchar(20) DEFAULT NULL,
+  `username` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`userId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT;
+
+-- ----------------------------
+-- Records of t_user
+-- ----------------------------
+
+INSERT INTO `t_user` (`userid`, `usercode`, `username`) VALUES (1, 'U-1', 'jss');
+INSERT INTO `t_user` (`userid`, `usercode`, `username`) VALUES (2, 'U-2', 'lb');

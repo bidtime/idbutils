@@ -9,8 +9,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.dbutils.handlers.BeanHandler;
-import org.bidtime.basicdata.duty.bean.Duty;
-import org.bidtime.basicdata.duty.service.DutyService;
+import org.bidtime.basicdata.user.bean.User;
+import org.bidtime.basicdata.user.service.UserService;
 import org.bidtime.dbutils.gson.ResultDTO;
 import org.bidtime.dbutils.jdbc.rs.handle.BeanDTOHandler;
 import org.bidtime.dbutils.jdbc.rs.handle.BeanListDTOHandler;
@@ -22,42 +22,42 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Created by bidtim on 2015/9/23.
+ * Created by bidtime on 2015/9/23.
  */
-public class DutyTest extends BasicTest {
+public class UserTest extends BasicTest {
 
 	@Autowired
-	protected DutyService service;
+	protected UserService service;
 
 	@Test
 	public void test_insert() throws SQLException {
-		Duty duty = new Duty();
-		duty.setName("销售部");
+		User duty = new User();
+		duty.setUserName("user");
 		int n = service.insert(duty);
 		System.out.println("insert: " + n);
 	}
 
 	@Test
 	public void test_insertIgnore() throws SQLException {
-		Duty duty = new Duty();
-		duty.setId(3L);
-		duty.setCode("D-3");
-		duty.setName("销售部");
+		User duty = new User();
+		duty.setUserId(3L);
+		duty.setUserCode("u-3");
+		duty.setUserName("user");
 		int n = service.insertIgnore(duty);
 		System.out.println("insert: " + n);
 	}
 
 	@Test
 	public void test_insertIgnoreList() throws SQLException {
-		List<Duty> list = new ArrayList<Duty>();
+		List<User> list = new ArrayList<User>();
 		//
-		Duty duty1 = new Duty();
-		duty1.setName("1 dept");
+		User duty1 = new User();
+		duty1.setUserName("1 user");
 		list.add(duty1);
 		//
-		Duty duty2 = new Duty();
-		duty2.setName("2 dept");
-		duty2.setCode("002");
+		User duty2 = new User();
+		duty2.setUserName("2 user");
+		duty2.setUserCode("002");
 		list.add(duty2);
 		//
 		int n = service.insertIgnore(list);
@@ -66,15 +66,15 @@ public class DutyTest extends BasicTest {
 
 	@Test
 	public void test_insertList() throws SQLException {
-		List<Duty> list = new ArrayList<Duty>();
+		List<User> list = new ArrayList<User>();
 		//
-		Duty duty1 = new Duty();
-		duty1.setName("1 dept");
+		User duty1 = new User();
+		duty1.setUserName("1 user");
 		list.add(duty1);
 		//
-		Duty duty2 = new Duty();
-		duty2.setName("2 dept");
-		duty2.setCode("002");
+		User duty2 = new User();
+		duty2.setUserName("2 user");
+		duty2.setUserCode("002");
 		list.add(duty2);
 		//
 		int n = service.insert(list);
@@ -83,17 +83,17 @@ public class DutyTest extends BasicTest {
 
 	@Test
 	public void test_updateList() throws SQLException {
-		List<Duty> list = new ArrayList<Duty>();
+		List<User> list = new ArrayList<User>();
 		//
-		Duty duty1 = new Duty();
-		duty1.setId(7L);
-		duty1.setName("11 dept");
+		User duty1 = new User();
+		duty1.setUserId(7L);
+		duty1.setUserName("11 user");
 		list.add(duty1);
 		//
-		Duty duty2 = new Duty();
-		duty2.setId(8L);
-		duty2.setName("22 dept");
-		duty2.setCode("022");
+		User duty2 = new User();
+		duty2.setUserId(8L);
+		duty2.setUserName("22 user");
+		duty2.setUserCode("022");
 		list.add(duty2);
 		//
 		int n = service.update(list);
@@ -102,21 +102,21 @@ public class DutyTest extends BasicTest {
 
 	@Test
 	public void test_insertForPK() throws SQLException {
-		Duty duty = new Duty();
-		duty.setName("销售部");
-		Long id = service.insertForPK(duty);
+		User u = new User();
+		u.setUserName("user");
+		Long id = service.insertForPK(u);
 		System.out.println("insert: pk-> " + id);
 	}
 
 	@Test
 	public void test_insertForPK_all() throws SQLException {
-		Duty duty = new Duty();
-		duty.setName("销售部");
+		User duty = new User();
+		duty.setUserName("user");
 		Long id = service.insertForPK(duty);
 		System.out.println("insert: pk -> " + id);
 		//
-		duty.setId(id);
-		duty.setName("销售部-");
+		duty.setUserId(id);
+		duty.setUserName("user-");
 		//
 		int nUpdate = service.update(duty);
 		System.out.println("update: " + nUpdate);
@@ -127,36 +127,36 @@ public class DutyTest extends BasicTest {
 
 	@Test
 	public void test_update() throws SQLException {
-		Duty duty = new Duty();
-		duty.setId(7L);
-		duty.setName("销售部-");
+		User duty = new User();
+		duty.setUserId(7L);
+		duty.setUserName("user-");
 		int n = service.update(duty);
 		System.out.println("update: " + n);
 	}
 
 	@Test
 	public void test_delete() throws SQLException {
-		Duty duty = new Duty();
-		duty.setId(3L);
+		User duty = new User();
+		duty.setUserId(3L);
 		int n = service.delete(duty);
 		System.out.println("update: " + n);
 	}
 
 	@Test
 	public void test_delete_heads() throws SQLException {
-		Duty duty = new Duty();
-		duty.setId(3L);
-		duty.setCode("e");
-		int n = service.delete(duty, new String[]{"dutycode", "dutyid"});
+		User duty = new User();
+		duty.setUserId(3L);
+		duty.setUserCode("e");
+		int n = service.delete(duty, new String[]{"usercode", "userid"});
 		System.out.println("update: " + n);
 	}
 
 	@Test
 	public void test_deleteMap() throws SQLException {
 		Map<String, Object> map = new HashMap<>();
-		map.put("dutyid", 3L);
-		map.put("dutycode", "e");
-		int n = service.delete(map, new String[]{"dutyid", "dutycode"});
+		map.put("userid", 3L);
+		map.put("usercode", "e");
+		int n = service.delete(map, new String[]{"userid", "usercode"});
 		System.out.println("update: " + n);
 	}
 
@@ -177,16 +177,16 @@ public class DutyTest extends BasicTest {
 
 	@Test
 	public void test_getBeanDTOHandler() throws SQLException {
-		BeanDTOHandler<Duty> h = new BeanDTOHandler<Duty>(Duty.class);
-		ResultDTO<Duty> dto = service.list(h);
-		print(dto);		
+		BeanDTOHandler<User> h = new BeanDTOHandler<User>(User.class);
+		ResultDTO<User> dto = service.list(h);
+		print(dto);
 	}
 
 	@Test
 	public void test_info_dto() throws SQLException {
-		BeanDTOHandler<Duty> h = new BeanDTOHandler<Duty>(Duty.class);
-		ResultDTO<Duty> dto = service.info(h, 1);
-		print(dto);		
+		BeanDTOHandler<User> h = new BeanDTOHandler<User>(User.class);
+		ResultDTO<User> dto = service.info(h, 1);
+		print(dto);
 	}
 
 	@Test
@@ -198,7 +198,7 @@ public class DutyTest extends BasicTest {
 		    }
 		});
 		ResultDTO<Set<Long>> dto = service.list(h);
-		print(dto);		
+		print(dto);
 	}
 
 	@Test
@@ -210,34 +210,34 @@ public class DutyTest extends BasicTest {
 		    }
 		});
 		Set<Long> dto = service.list(h);
-		print(dto);		
+		print(dto);
 	}
 
 	@Test
 	public void test_list() throws SQLException {
-		BeanListDTOHandler<Duty> h = new BeanListDTOHandler<Duty>(Duty.class);
-		ResultDTO<List<Duty>> dto = service.list(h);
-		print(dto);		
+		BeanListDTOHandler<User> h = new BeanListDTOHandler<User>(User.class);
+		ResultDTO<List<User>> dto = service.list(h);
+		print(dto);
 	}
 	
 	@Test
 	public void test_set() throws SQLException {
-		ColumnSetHandler<String> h = new ColumnSetHandler<>("code");
+		ColumnSetHandler<String> h = new ColumnSetHandler<>("usercode");
 		Set<String> dto = service.list(h);
-		print(dto);		
+		print(dto);
 	}
 	
 	@Test
 	public void test_set_dto() throws SQLException {
-		ColumnSetDTOHandler<String> h = new ColumnSetDTOHandler<>("code");
+		ColumnSetDTOHandler<String> h = new ColumnSetDTOHandler<>("usercode");
 		ResultDTO<Set<String>> dto = service.list(h);
-		print(dto);		
+		print(dto);
 	}
 
 	@Test
 	public void test_info_bean() throws SQLException {
-		BeanHandler<Duty> h = new BeanHandler<Duty>(Duty.class);
-		Duty dto = service.info(h, 1);
+		BeanHandler<User> h = new BeanHandler<User>(User.class);
+		User dto = service.info(h, 1);
 		print(dto);
 	}
 	
