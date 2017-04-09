@@ -117,23 +117,23 @@ public class TableFieldXmlsParser implements ApplicationContextAware {
 		}
 	}
 
-	protected void loadInit(String pack, String sSufix, boolean recursive) {
-		List<String> list = PackageUtils.getRelationFilesJar(pack, sSufix,
-				recursive);
-		try {
-			for (String s: list) {
-				try {
-					loadClass(s);
-				} catch (IOException e) {
-					logger.error("loadInit:", e);
-				}
-			}
-		} catch (Exception e) {
-			logger.error("loadInit:", e);
-		} finally {
-			list = null;
-		}
-	}
+//	protected void loadInit(String pack, String sSufix, boolean recursive) {
+//		List<String> list = PackageUtils.getRelationFilesJar(pack, sSufix,
+//				recursive);
+//		try {
+//			for (String s: list) {
+//				try {
+//					loadClass(s);
+//				} catch (IOException e) {
+//					logger.error("loadInit:", e);
+//				}
+//			}
+//		} catch (Exception e) {
+//			logger.error("loadInit:", e);
+//		} finally {
+//			list = null;
+//		}
+//	}
 
 	protected void autoLoadInit(String pack, String sSufix, boolean recursive) {
 		List<String> list = PackageUtils.autoGetRelationFilesRootOrJar(pack, sSufix,
