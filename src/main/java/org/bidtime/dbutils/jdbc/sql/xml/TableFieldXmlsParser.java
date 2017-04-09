@@ -111,7 +111,10 @@ public class TableFieldXmlsParser implements ApplicationContextAware {
 	
 	public void init() {
 		//loadInit(packageRoot, extName, recursive);
-		autoLoadInit(packageRoot, extName, recursive);
+		String[] paths = packageRoot.split(",");
+		for (String s : paths) {
+			autoLoadInit(s.trim(), extName, recursive);
+		}
 	}
 
 	protected void loadInit(String pack, String sSufix, boolean recursive) {

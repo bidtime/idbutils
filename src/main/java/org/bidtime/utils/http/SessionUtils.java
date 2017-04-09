@@ -68,35 +68,6 @@ public class SessionUtils {
 		String sessionId = getNewSessionIdOfConn(conn);
 		setSessionIdOfUrl(sHostPortContext, sessionId);
 	}
-	
-//	@SuppressWarnings({ "unused", "rawtypes" })
-//	public static void listMapSession() {
-//		 int size = listHostPath.size();
-//		 Set keysSet = listHostPath.keySet();			
-//		 Iterator iterator = keysSet.iterator();			
-//		 while(iterator.hasNext()) {
-//			Object key = iterator.next();//key				
-//			Object value = listHostPath.get(key);//value
-//			logger.info( (String)(key) + " : " + (String)(value));
-//		}
-//	}
-	
-//	private static String autoSetSessionIdOfUrl(String sHostPath, String sSessionId) {
-//		String sResult = getSessionIdOfUrl(sHostPath);
-//		if (sResult == null) {
-//			setSessionIdOfUrl(sHostPath, sSessionId);
-//		}
-//		return sResult;
-//	}
-	
-//	public static Integer getNotLoginOfHead(HttpURLConnection conn) {
-//		List<String> vs = conn.getHeaderFields().get(UserHeadState.NOT_LOGININ);
-//		if (vs != null && vs.size()>0) {
-//			return Integer.valueOf(vs.get(0));
-//		} else {
-//			return null;
-//		}
-//	}
 
 	private static String getNewSessionIdOfConn(HttpURLConnection conn) {
 		// 打印请求头信息
