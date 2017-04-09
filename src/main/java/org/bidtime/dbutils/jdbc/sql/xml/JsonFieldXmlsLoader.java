@@ -31,33 +31,13 @@ public class JsonFieldXmlsLoader extends TableFieldXmlsParser {
 	/**
 	 * The Singleton instance of this class.
 	 */
-	private volatile static JsonFieldXmlsLoader instance = null;
-
-	/**
-	 * Return an instance of this class.
-	 * 
-	 * @return The Singleton instance.
-	 */
-	public synchronized static JsonFieldXmlsLoader getInstance() {
-//		if (instance == null) {
-//			synchronized (JsonFieldXmlsLoader.class) {
-//				if (instance == null) {
-//					instance = (JsonFieldXmlsLoader)SpringContextUtils.getBean("jsonFieldXmlsLoader");
-//				}
-//			}
-//		}
-		return instance;
-	}
+//	private volatile static JsonFieldXmlsLoader instance = null;
 	
-	@Override
-	public void init() {
-		super.init();
-		instance = this;
-	}
-	
-	public static void setInstance(JsonFieldXmlsLoader u) {
-		instance = u;
-	}
+//	@Override
+//	public void init() {
+//		super.init();
+////		instance = this;
+//	}
 
 	public JsonFieldXmlsLoader(String path) {
 		super(path);
@@ -75,14 +55,14 @@ public class JsonFieldXmlsLoader extends TableFieldXmlsParser {
 		super(path, ext, recu);
 	}
 	
-	public static TTableProps getTableProps(Object o) throws SQLException {
-		return instance.get(o.getClass());
-	}
-	
-	@SuppressWarnings("rawtypes")
-	public static TTableProps getTableProps(Class cls) throws SQLException {
-		return instance.get(cls);
-	}
+//	public static TTableProps get(Object o) throws SQLException {
+//		return get(o.getClass());
+//	}
+
+//	@SuppressWarnings("rawtypes")
+//	public static TTableProps get(Class cls) throws SQLException {
+//		return get(cls);
+//	}
 	
 //	@SuppressWarnings("rawtypes")
 //	public static String getSqlOfId(Class clazz, String id) throws SQLException {
@@ -102,7 +82,7 @@ public class JsonFieldXmlsLoader extends TableFieldXmlsParser {
 	
 	@SuppressWarnings("rawtypes")
 	public static String getSqlOfId(Class clazz, String id, String colId) throws SQLException {
-		TTableProps tp = getTableProps(clazz);
+		TTableProps tp = get(clazz);
 		if (tp != null) {
 			String sql = null;
 			if (colId == null) {

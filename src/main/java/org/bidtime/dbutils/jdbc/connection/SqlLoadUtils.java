@@ -43,7 +43,7 @@ public class SqlLoadUtils {
 	@SuppressWarnings("rawtypes")
 	public static int delete(DataSource ds, Class clazz, Object[] params)
 			throws SQLException {
-		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
+		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
 		String sql = tp.getDeleteSql(tp.getTableName(), params);
 		return DbConnection.update(ds, sql, params);
 	}
@@ -51,7 +51,7 @@ public class SqlLoadUtils {
 	@SuppressWarnings("rawtypes")
 	public static int delete(DataSource ds, Class clazz, String fld, Object[] params)
 			throws SQLException {
-		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
+		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
 		String sql = tp.getDeleteSql(tp.getTableName(), new String[]{fld}, params);
 		return DbConnection.update(ds, sql, params);
 	}
@@ -59,7 +59,7 @@ public class SqlLoadUtils {
 	@SuppressWarnings("rawtypes")
 	public static int delete(DataSource ds, Class clazz, String[] flds, Object[] params)
 			throws SQLException {
-		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
+		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
 		String sql = tp.getDeleteSql(tp.getTableName(), flds, params);
 		return DbConnection.update(ds, sql, params);
 	}
@@ -75,7 +75,7 @@ public class SqlLoadUtils {
 		if (o == null) {
 			return 0;
 		}
-		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
+		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
 		return delete(ds, tp.getTableName(), o, tp.getFieldPK());
 	}
 
@@ -85,7 +85,7 @@ public class SqlLoadUtils {
 		if (o == null) {
 			return 0;
 		}
-		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
+		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
 		return delete(ds, tp.getTableName(), o, heads);
 	}
 
@@ -95,7 +95,7 @@ public class SqlLoadUtils {
 		if (o == null) {
 			return 0;
 		}
-		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
+		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
 		return delete(ds, tp.getTableName(), o, tp.getFieldPK());
 	}
 
@@ -139,7 +139,7 @@ public class SqlLoadUtils {
 		if (o == null) {
 			return 0;
 		}
-		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
+		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
 		return delete(ds, tp.getTableName(), o, heads);
 	}
 	
@@ -148,7 +148,7 @@ public class SqlLoadUtils {
 		if (object == null) {
 			return 0;
 		}
-		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
+		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
 		GsonRow g = null;
 		try {
 			if (object instanceof Map) {
@@ -167,7 +167,7 @@ public class SqlLoadUtils {
 		if (object == null) {
 			return 0;
 		}
-		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
+		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
 		GsonRow g = null;
 		try {
 			if (object instanceof Map) {
@@ -219,7 +219,7 @@ public class SqlLoadUtils {
 		GsonRows g = null;
 		List<String> listJsonPk = new ArrayList<String>();
 		try {
-			TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
+			TTableProps tp = JsonFieldXmlsLoader.get(clazz);
 			if (o instanceof Map) {
 				g = tp.mapsToRows((List<Map<String, Object>>)list);
 			} else {
@@ -246,7 +246,7 @@ public class SqlLoadUtils {
 		}
 		GsonRows g = null;
 		try {
-			TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
+			TTableProps tp = JsonFieldXmlsLoader.get(clazz);
 			if (list.get(0) instanceof Map) {
 				g = tp.mapsToRows((List<Map<String, Object>>)list);
 			} else {
@@ -266,7 +266,7 @@ public class SqlLoadUtils {
 		if (g == null) {
 			return 0;
 		}
-		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
+		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
 		if (!tp.isNonePkInc()) {
 			g.delHead(tp.getFieldPK());
 		}
@@ -280,7 +280,7 @@ public class SqlLoadUtils {
 		if (g == null) {
 			return 0;
 		}
-		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
+		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
 		if (!tp.isNonePkInc()) {
 			g.delHead(tp.getFieldPK());
 		}
@@ -300,7 +300,7 @@ public class SqlLoadUtils {
 		if (object == null) {
 			return 0;
 		}
-		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
+		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
 		GsonRow g = null;
 		try {
 			if (object instanceof Map) {
@@ -325,7 +325,7 @@ public class SqlLoadUtils {
 		if (list == null || list.isEmpty()) {
 			return 0;
 		}
-		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
+		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
 		int n = 0;
 		for (Object o : list) {
 			GsonRow g = null;
@@ -361,7 +361,7 @@ public class SqlLoadUtils {
 		if (object == null) {
 			return 0;
 		}
-		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
+		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
 		GsonRow g = null;
 		try {
 			if (object instanceof Map) {
@@ -387,7 +387,7 @@ public class SqlLoadUtils {
 		if (list == null || list.isEmpty()) {
 			return 0;
 		}
-		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
+		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
 		int n = 0;
 		for (Object o : list) {
 			GsonRow g = null;
@@ -429,7 +429,7 @@ public class SqlLoadUtils {
 		if (object == null) {
 			return 0;
 		}
-		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
+		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
 		GsonRow g = null;
 		try {
 			if (object instanceof Map) {
@@ -455,7 +455,7 @@ public class SqlLoadUtils {
 		if (list == null || list.isEmpty()) {
 			return 0;
 		}
-		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
+		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
 		int n = 0;
 		for (Object o : list) {
 			GsonRow g = null;
@@ -492,7 +492,7 @@ public class SqlLoadUtils {
 		if (list == null || list.isEmpty()) {
 			return 0;
 		}
-		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
+		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
 		int n = 0;
 		GsonRows g = null;
 		try {
@@ -525,7 +525,7 @@ public class SqlLoadUtils {
 		if (list == null || list.isEmpty()) {
 			return 0;
 		}
-		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
+		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
 		int n = 0;
 		GsonRows rows = null;
 		try {
@@ -552,7 +552,7 @@ public class SqlLoadUtils {
 		if (list == null || list.isEmpty()) {
 			return 0;
 		}
-		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
+		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
 		int n = 0;
 		GsonRows rows = null;
 		try {
@@ -578,7 +578,7 @@ public class SqlLoadUtils {
 		if (g == null) {
 			return 0;
 		}
-		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
+		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
 		if (!tp.isNonePkInc()) {
 			g.delHead(tp.getFieldPK());
 		}
@@ -595,7 +595,7 @@ public class SqlLoadUtils {
 		if (g == null) {
 			return null;
 		}
-		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
+		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
 		if (!tp.isNonePkInc()) {
 			g.delHead(tp.getFieldPK());
 		}
@@ -616,7 +616,7 @@ public class SqlLoadUtils {
 		if (o == null) {
 			return null;
 		}
-		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
+		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
 		GsonRow g = null;
 		try {
 			if (o instanceof Map) {
@@ -684,7 +684,7 @@ public class SqlLoadUtils {
 		if (g == null) {
 			return 0;
 		}
-		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
+		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
 		if (!tp.isNonePkInc()) {
 			g.delHead(tp.getFieldPK());
 		}
@@ -701,7 +701,7 @@ public class SqlLoadUtils {
 		if (g == null) {
 			return null;
 		}
-		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
+		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
 		if (!tp.isNonePkInc()) {
 			g.delHead(tp.getFieldPK());
 		}
@@ -714,7 +714,7 @@ public class SqlLoadUtils {
 	@SuppressWarnings("rawtypes")
 	public static int update(DataSource ds, Class clazz,
 			GsonRows g) throws SQLException {
-		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
+		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
 		String[] heads = tp.getFieldPK();
 		return update(ds, clazz, g, heads);
 	}
@@ -725,7 +725,7 @@ public class SqlLoadUtils {
 		if (g == null) {
 			return 0;
 		}
-		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
+		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
 		g.moveToEnd(heads);
 		String sql = tp.getUpdateSqlHead(tp.getTableName(), g.getHead(), heads);
 		return DbConnection.updateBatch(ds, sql, g.getData());
@@ -742,7 +742,7 @@ public class SqlLoadUtils {
 		if (o == null) {
 			return 0;
 		}
-		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
+		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
 		String[] heads = tp.getFieldPK();
 		return update(ds, tp, o, heads, pa);
 	}
@@ -759,7 +759,7 @@ public class SqlLoadUtils {
 		if (o == null) {
 			return 0;
 		}
-		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
+		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
 		return update(ds, tp, o, heads, pa);
 	}
 
@@ -775,7 +775,7 @@ public class SqlLoadUtils {
 		if (list == null || list.isEmpty()) {
 			return 0;
 		}
-		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
+		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
 		String[] heads = tp.getFieldPK();
 		int n = 0;
 		for (Object o : list) {
@@ -797,7 +797,7 @@ public class SqlLoadUtils {
 			return 0;
 		}
 		int n = 0;
-		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
+		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
 		for (Object o : list) {
 			n += update(ds, tp, o, heads, pa);
 		}
@@ -826,7 +826,7 @@ public class SqlLoadUtils {
 		if (g == null) {
 			return 0;
 		}
-		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
+		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
 		String heads[] = tp.getFieldPK();
 		return update(ds, tp, g, heads, PropAdapt.NOTNULL);
 	}
@@ -837,7 +837,7 @@ public class SqlLoadUtils {
 		if (g == null) {
 			return 0;
 		}
-		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
+		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
 		return update(ds, tp, g, heads, PropAdapt.NOTNULL);
 	}
 
@@ -1018,7 +1018,7 @@ public class SqlLoadUtils {
 		} else if ( !isJavaSimpleClazz(o) ) {
 			throw new SQLException("primary key type is error");
 		}
-		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
+		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
 		String sql = getSqlOfId(clazz, sqlId, colId);
 		Map<String, Object> params = SqlParser.getMapOfFieldPK(sql, tp.getSetPk());
 		if (params == null || params.isEmpty()) {

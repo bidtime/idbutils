@@ -30,7 +30,7 @@ public class TableFieldXmlsParser implements ApplicationContextAware {
 	private static final Logger logger = LoggerFactory
 			.getLogger(TableFieldXmlsParser.class);
 	
-	private static ApplicationContext ctx;  
+	private static ApplicationContext ctx;
     
 	/** 
      * 此方法可以把ApplicationContext对象inject到当前类中作为一个静态成员变量。 
@@ -57,7 +57,7 @@ public class TableFieldXmlsParser implements ApplicationContextAware {
 	/**
 	 * Maps query set names to Maps of their queries.
 	 */
-	private final Map<String, TTableProps> queries = new HashMap<String, TTableProps>();
+	private static final Map<String, TTableProps> QUERIES = new HashMap<String, TTableProps>();
 
 	/**
 	 * TableFieldXmlsParser constructor.
@@ -164,8 +164,7 @@ public class TableFieldXmlsParser implements ApplicationContextAware {
 	 *             if the ClassLoader can't find a file at the given path.
 	 * @return Map of query names to SQL values
 	 */
-	public synchronized TTableProps load(String path)
-			throws IOException {
+	public synchronized TTableProps load(String path) throws IOException {
 		return load(path, path);
 	}
 	
@@ -192,8 +191,7 @@ public class TableFieldXmlsParser implements ApplicationContextAware {
 	 * 替换成com.eb.business.User
 	 * 以方便类中取此sql
 	 */
-	protected TTableProps loadClass(String path)
-			throws IOException {
+	protected TTableProps loadClass(String path) throws IOException {
 		String sPackCom = null;
 		char c = path.charAt(0);
 		if (c=='/') {
@@ -212,7 +210,7 @@ public class TableFieldXmlsParser implements ApplicationContextAware {
 	private TTableProps load(String sKey, String path)
 			throws IOException {
 		TTableProps queryMap = this.loadMapOfPath(path);
-		this.queries.put(sKey, queryMap);
+		QUERIES.put(sKey, queryMap);
 		return queryMap;
 	}
 
@@ -229,7 +227,7 @@ public class TableFieldXmlsParser implements ApplicationContextAware {
 	 * @since DbUtils 1.1
 	 * @return Map of query names to SQL values
 	 */
-	protected TTableProps loadMapOfPath(String path) throws IOException {
+	private TTableProps loadMapOfPath(String path) throws IOException {
 		// Findbugs flags getClass().getResource as a bad practice; maybe we
 		// should change the API?
 		// Copy to HashMap for better performance
@@ -248,21 +246,21 @@ public class TableFieldXmlsParser implements ApplicationContextAware {
 	 * @param path
 	 *            The path that the queries were loaded from.
 	 */
-	public synchronized void unload(String path) {
-		this.queries.remove(path);
+	public static synchronized void unload(String path) {
+		QUERIES.remove(path);
 	}
 
-	public TTableProps get(Object o) throws SQLException {
-		return get(o.getClass());
-	}
+//	public static TTableProps get(Object o) throws SQLException {
+//		return get(o.getClass());
+//	}
 	
 	@SuppressWarnings("rawtypes")
-	public TTableProps get(Class cls) throws SQLException {
+	public static TTableProps get(Class cls) throws SQLException {
 		return get(cls.getName());
 	}
 
-	public TTableProps get(String path) throws SQLException {
-		TTableProps q = this.queries.get(path);
+	public static TTableProps get(String path) throws SQLException {
+		TTableProps q = QUERIES.get(path);
 		if (q != null) {
 			return q;
 		} else {

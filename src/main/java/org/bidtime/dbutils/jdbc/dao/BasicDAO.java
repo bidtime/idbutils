@@ -85,7 +85,7 @@ public class BasicDAO {
 	}
 
 	public String getTableName() throws Exception {
-		TTableProps tp = JsonFieldXmlsLoader.getTableProps(this);
+		TTableProps tp = JsonFieldXmlsLoader.get(this.getClass());
 		return tp != null ? tp.getTableName() : null;
 	}
 
