@@ -217,7 +217,7 @@ public class DbConnection {
 			}
 		} else {
 			String sql = cb.getSql(tp, g, conn);
-			return updateConn(conn, sql, g.getData());
+			return updateBatchConn(conn, sql, g.getData());
 		}
 	}
 
