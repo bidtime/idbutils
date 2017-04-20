@@ -21,10 +21,10 @@ public class UserService {
 	@Autowired
 	private UserDAO dao;
 
-//	public UserDAO getDao() {
-//		return dao;
-//	}
-//
+	public UserDAO getDao() {
+		return dao;
+	}
+	
 //	public void setDao(UserDAO dao) {
 //		this.dao = dao;
 //	}

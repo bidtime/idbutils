@@ -238,6 +238,33 @@ public class BasicDAO {
 		return SqlLoadUtils.updateBatch(getCurrentDataSource(), this.getClass(), list);				
 	}
 	
+	// isExists
+
+	public boolean isExists(Number... ids) throws SQLException {
+		return SqlLoadUtils.isExists(getCurrentDataSource(), this.getClass(),
+				ids);
+	}
+
+	public boolean isExists(String... ids) throws SQLException {
+		return SqlLoadUtils.isExists(getCurrentDataSource(), this.getClass(),
+				ids);
+	}
+
+	public boolean isExists(String fld, Object... ids) throws SQLException {
+		return SqlLoadUtils.isExists(getCurrentDataSource(), this.getClass(),
+				fld, ids);
+	}
+
+	public boolean isExists(Object o) throws SQLException {
+		return SqlLoadUtils.isExists(getCurrentDataSource(), this.getClass(),
+				o);
+	}
+
+	public boolean isExists(Object o, String[] heads) throws SQLException {
+		return SqlLoadUtils.isExists(getCurrentDataSource(), this.getClass(),
+				o, heads);
+	}
+	
 	// delete
 
 	public int delete(Object[] ids) throws SQLException {

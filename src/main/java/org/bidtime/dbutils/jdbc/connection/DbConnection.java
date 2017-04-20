@@ -96,7 +96,7 @@ public class DbConnection {
 		}
 	}
 
-	public static <T> T insert(DataSource ds, String sql, ResultSetHandler<T> rsh, Object[] params)
+	public static <T> T insert(DataSource ds, String sql, ResultSetHandler<T> rsh, Object... params)
 			throws SQLException {
 		Connection conn = getConnOfSpringCtx(ds);
 		if (conn == null) {
@@ -112,7 +112,7 @@ public class DbConnection {
 		}
 	}
 	
-	private static <T> T insertConn(Connection conn, String sql, ResultSetHandler<T> rsh, Object[] params)
+	private static <T> T insertConn(Connection conn, String sql, ResultSetHandler<T> rsh, Object... params)
 			throws SQLException {
 		T generatedKeys = null;
 		QueryRunnerEx q = new QueryRunnerEx();
@@ -142,7 +142,7 @@ public class DbConnection {
 		}
 	}
 
-	public static int update(DataSource ds, String sql, Object[] params) throws SQLException {
+	public static int update(DataSource ds, String sql, Object... params) throws SQLException {
 		Connection conn = getConnOfSpringCtx(ds);
 		if (conn == null) {
 			conn = DataSourceUtils.getConnection(ds);
@@ -157,7 +157,7 @@ public class DbConnection {
 		}
 	}
 	
-	private static int updateConn(Connection conn, String sql, Object[] params)
+	private static int updateConn(Connection conn, String sql, Object... params)
 			throws SQLException {
 		QueryRunnerEx q = new QueryRunnerEx();
 		int nResult = 0;

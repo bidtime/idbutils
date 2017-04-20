@@ -37,34 +37,140 @@ public class SqlLoadUtils {
 	private static String getSqlOfId(Class clazz, String id, String colId) throws SQLException {
 		return JsonFieldXmlsLoader.getSqlOfId(clazz, id, colId);
 	}
+	
+	// isExists
+	
+	private static boolean isExists(DataSource ds, String sql, Object... params) throws SQLException {
+		ScalarHandler<Long> h = new ScalarHandler<>();
+		Long n = DbConnection.query(ds, sql, params, 0, 1, h);
+		if (n == null) {
+			return false;
+		} else {
+			return (n == 1) ? true : false;
+		}
+	}
+	
+	@SuppressWarnings("rawtypes")
+	public static boolean isExists(DataSource ds, Class clazz, Number... params) 
+			throws SQLException {
+		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
+		String sql = tp.getExistsSql(tp.getTableName(), (Object[])params);
+		return isExists(ds, sql, (Object[])params);
+	}
+	
+	@SuppressWarnings("rawtypes")
+	public static boolean isExists(DataSource ds, Class clazz, String... params) 
+			throws SQLException {
+		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
+		String sql = tp.getExistsSql(tp.getTableName(), (Object[])params);
+		return isExists(ds, sql, (Object[])params);
+	}
+	
+	@SuppressWarnings("rawtypes")
+	public static boolean isExists(DataSource ds, Class clazz, String fld, Object... params)
+			throws SQLException {
+		return isExists(ds, clazz, new String[]{fld}, params);
+	}
+	
+	@SuppressWarnings("rawtypes")
+	public static boolean isExists(DataSource ds, Class clazz, String[] fld, Object[] params)
+			throws SQLException {
+		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
+		String sql = tp.getExistsSql(tp.getTableName(), fld, params);
+		return isExists(ds, sql, params);
+	}
+
+	private static boolean isExists(DataSource ds, String tblName, GsonRow o, String... heads)
+			throws SQLException {
+		if (o == null) {
+			return false;
+		}
+		GsonRow r = o.remain(heads);
+		try {
+			if (r == null || !r.isExistsData()) {
+				return false;
+			}
+			String sql = SqlUtils.getExistsSql(tblName, r.getHead(), r.getData());
+			return isExists(ds, sql, r.getData());
+		} finally {
+			r = null;
+		}
+	}
+	
+	@SuppressWarnings({ "rawtypes", "unchecked"})
+	public static boolean isExists(DataSource ds, Class clazz, Object object) throws SQLException {
+		if (object == null) {
+			return false;
+		}
+//		if (SqlLoadUtils.isJavaSimpleClazz(object.getClass())) {
+//			return isExists(ds, clazz, new Object[]{object});
+//		}
+		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
+		GsonRow g = null;
+		try {
+			if (object instanceof Map) {
+				g = tp.mapToRow((Map)object);
+			} else {
+				g = tp.clazzToRow(object, PropAdapt.NOTNULL);
+			}
+			return isExists(ds, tp.getTableName(), g, tp.getFieldPK());
+		} finally {
+			g = null;
+		}
+	}
+	
+	@SuppressWarnings({ "rawtypes", "unchecked"})
+	public static boolean isExists(DataSource ds, Class clazz, Object object, String... heads) throws SQLException {
+		if (object == null) {
+			return false;
+		}
+		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
+		GsonRow g = null;
+		try {
+			if (object instanceof Map) {
+				g = tp.mapToRow((Map)object);
+			} else {
+				g = tp.clazzToRow(object, PropAdapt.NOTNULL);
+			}
+			return isExists(ds, tp.getTableName(), g, heads);
+		} finally {
+			g = null;
+		}
+	}
 
 	//delete
 	
 	@SuppressWarnings("rawtypes")
-	public static int delete(DataSource ds, Class clazz, Object[] params)
+	public static int delete(DataSource ds, Class clazz, Number... params)
 			throws SQLException {
 		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
-		String sql = tp.getDeleteSql(tp.getTableName(), params);
-		return DbConnection.update(ds, sql, params);
+		String sql = tp.getDeleteSql(tp.getTableName(), (Object[])params);
+		return DbConnection.update(ds, sql, (Object[])params);
 	}
 	
 	@SuppressWarnings("rawtypes")
-	public static int delete(DataSource ds, Class clazz, String fld, Object[] params)
+	public static int delete(DataSource ds, Class clazz, String... params)
 			throws SQLException {
 		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
-		String sql = tp.getDeleteSql(tp.getTableName(), new String[]{fld}, params);
-		return DbConnection.update(ds, sql, params);
+		String sql = tp.getDeleteSql(tp.getTableName(), (Object[])params);
+		return DbConnection.update(ds, sql, (Object[])params);
 	}
 	
 	@SuppressWarnings("rawtypes")
-	public static int delete(DataSource ds, Class clazz, String[] flds, Object[] params)
+	public static int delete(DataSource ds, Class clazz, String fld, Object... params)
+			throws SQLException {
+		return delete(ds, clazz, new String[]{fld}, params);
+	}
+	
+	@SuppressWarnings("rawtypes")
+	public static int delete(DataSource ds, Class clazz, String[] flds, Object... params)
 			throws SQLException {
 		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
 		String sql = tp.getDeleteSql(tp.getTableName(), flds, params);
 		return DbConnection.update(ds, sql, params);
 	}
 	
-	public static int delete(DataSource ds, String tblName, String[] flds, Object[] params)
+	public static int delete(DataSource ds, String tblName, String[] flds, Object... params)
 			throws SQLException {
 		String sql = SqlUtils.getDeleteSql(tblName, flds, params);
 		return DbConnection.update(ds, sql, params);
@@ -80,8 +186,8 @@ public class SqlLoadUtils {
 	}
 
 	@SuppressWarnings("rawtypes")
-	public static int delete(DataSource ds, Class clazz,
-			GsonRow o, String[] heads) throws SQLException {
+	public static int delete(DataSource ds, Class clazz, GsonRow o,	String... heads)
+			throws SQLException {
 		if (o == null) {
 			return 0;
 		}
@@ -90,8 +196,7 @@ public class SqlLoadUtils {
 	}
 
 	@SuppressWarnings("rawtypes")
-	public static int delete(DataSource ds, Class clazz,
-			GsonRows o) throws SQLException {
+	public static int delete(DataSource ds, Class clazz, GsonRows o) throws SQLException {
 		if (o == null) {
 			return 0;
 		}
@@ -100,7 +205,7 @@ public class SqlLoadUtils {
 	}
 
 	private static int delete(DataSource ds, String tblName,
-			GsonRow o, String[] heads) throws SQLException {
+			GsonRow o, String... heads) throws SQLException {
 		if (o == null) {
 			return 0;
 		}
@@ -163,7 +268,7 @@ public class SqlLoadUtils {
 	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked"})
-	public static int delete(DataSource ds, Class clazz, Object object, String[] heads) throws SQLException {
+	public static int delete(DataSource ds, Class clazz, Object object, String... heads) throws SQLException {
 		if (object == null) {
 			return 0;
 		}
@@ -183,7 +288,7 @@ public class SqlLoadUtils {
 	
     private static boolean isJavaSimpleClazz(Class<?> type) {
         boolean result = false;
-        if (type == null) {					//要转换成json.null
+        if (type == null) {
             result = false;
         } else if (type.equals(String.class) || type.equals(Number.class) ||
                 type.equals(StringBuilder.class) || type.equals(StringBuffer.class) ||

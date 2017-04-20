@@ -2,6 +2,7 @@ package org.bidtime.test.basic;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -245,6 +246,29 @@ public class UserTest extends BasicTest {
 	public void findIdByCode() throws SQLException {
 		List<Long> dto = service.findIdByCode("01");
 		print(dto);
+	}
+
+	@Test
+	public void test_isExists() throws SQLException {
+		//Boolean dto = service.getDao().isExists(1);
+		User u = new User();
+		u.setUserId(10L);
+		Boolean dto = service.getDao().isExists(u);
+		print(dto);
+	}
+	
+	@Test
+	public void test_object_string() throws Exception {
+		Object[] objs = {"1","2","3"};	
+		String[] strs = Arrays.asList( objs ).toArray( new String[0] );
+		System.out.println(strs.toString());
+	}
+	
+	@Test
+	public void test_string_object() throws Exception {
+		String[] objs = {"1","2","3"};	
+		Object[] strs = (Object[])objs;
+		System.out.println(strs.toString());
 	}
 
 }

@@ -200,6 +200,17 @@ public class SqlUtils {
 		return sql.toString();
 	}
 
+	public static String getExistsOfTable(String tableName, String sWhereSql) {
+		StringBuilder sql = new StringBuilder();
+		sql.append("select 1 from ");
+		sql.append(tableName);
+		if (StringUtils.isNotEmpty(sWhereSql)) {
+			sql.append(" where ");
+			sql.append(sWhereSql);
+		}
+		return sql.toString();
+	}
+
 	public static String getCountSql(String sql) {
 		return "select count(*) from (" + sql + ")a";
 	}
@@ -256,7 +267,7 @@ public class SqlUtils {
 	/*
 	 * 获取可以执行的delete sql
 	 */
-	public static String getDeleteSql(String tableName, Object[] listPK) {
+	public static String getDeleteSql(String tableName, String... listPK) {
 		String sWhereSql = getWhereSqlOfListObject(listPK);
 		return getDeleteOfTable(tableName, sWhereSql);
 	}
@@ -265,7 +276,7 @@ public class SqlUtils {
 	 * 获取可以执行的delete sql
 	 */
 	public static String getDeleteSql(String tableName, Object[] listPK,
-			Object[] pks) {
+			Object... pks) {
 		StringBuilder sWhereSql = new StringBuilder();
 		for (int i = 0; i < pks.length; i++) {
 			if (i == 0) {
@@ -276,6 +287,23 @@ public class SqlUtils {
 			}
 		}
 		return getDeleteOfTable(tableName, sWhereSql.toString());
+	}
+
+	/*
+	 * 获取 select 1 from
+	 */
+	public static String getExistsSql(String tableName, Object[] listPK,
+			Object... pks) {
+		StringBuilder sWhereSql = new StringBuilder();
+		for (int i = 0; i < pks.length; i++) {
+			if (i == 0) {
+				sWhereSql.append(getWhereSqlOfListObject(listPK));
+			} else {
+				sWhereSql.append(" or ");
+				sWhereSql.append(getWhereSqlOfListObject(listPK));
+			}
+		}
+		return getExistsOfTable(tableName, sWhereSql.toString());
 	}
 
 	public static final int getObjectType(Object param) {

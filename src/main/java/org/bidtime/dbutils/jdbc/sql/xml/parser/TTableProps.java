@@ -208,11 +208,19 @@ public class TTableProps {
 		return set;
 	}
 
-	public String getDeleteSql(String tblName, Object[] ids) {
+	public String getExistsSql(String tblName, Object... ids) {
+		return SqlUtils.getExistsSql(tblName, getFieldPK(), ids);
+	}
+
+	public String getExistsSql(String tblName, String[] flds, Object... ids) {
+		return SqlUtils.getExistsSql(tblName, flds, ids);
+	}
+
+	public String getDeleteSql(String tblName, Object... ids) {
 		return SqlUtils.getDeleteSql(tblName, getFieldPK(), ids);
 	}
 
-	public String getDeleteSql(String tblName, String[] flds, Object[] ids) {
+	public String getDeleteSql(String tblName, String[] flds, Object... ids) {
 		return SqlUtils.getDeleteSql(tblName, flds, ids);
 	}
 
