@@ -138,7 +138,7 @@ public class UserTest extends BasicTest {
 	@Test
 	public void test_delete() throws SQLException {
 		User duty = new User();
-		duty.setUserId(3L);
+		duty.setUserId(2L);
 		int n = service.delete(duty);
 		System.out.println("update: " + n);
 	}
