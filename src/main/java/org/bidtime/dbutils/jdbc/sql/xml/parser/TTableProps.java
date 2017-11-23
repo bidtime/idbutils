@@ -3,12 +3,15 @@ package org.bidtime.dbutils.jdbc.sql.xml.parser;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
+import javax.sql.DataSource;
+
+import org.apache.commons.lang3.StringUtils;
 import org.bidtime.dbutils.gson.ClazzMapCallback;
 import org.bidtime.dbutils.gson.GsonEbUtils;
 import org.bidtime.dbutils.gson.PropAdapt;
@@ -16,9 +19,8 @@ import org.bidtime.dbutils.gson.dataset.GsonRow;
 import org.bidtime.dbutils.gson.dataset.GsonRows;
 import org.bidtime.dbutils.jdbc.sql.ArrayUtils;
 import org.bidtime.dbutils.jdbc.sql.SqlUtils;
+import org.bidtime.utils.comm.CaseInsensitiveHashMap;
 import org.bidtime.utils.comm.CaseInsensitiveHashSet;
-import org.bidtime.utils.comm.SimpleHashMap;
-import org.bidtime.utils.comm.SimpleHashSet;
 
 public class TTableProps {
 
@@ -54,14 +56,16 @@ public class TTableProps {
 		this.existDefault = existDefault;
 	}
 
-	private Map<String, ColumnPro> mapPropertyColumn = new SimpleHashMap<ColumnPro>();
-	private Map<String, String> mapColumnDescript = new SimpleHashMap<String>();
-	public Map<String, String> getMapColumnDescript() {
-		return mapColumnDescript;
-	}
-
-	public void setMapColumnDescript(Map<String, String> mapColumnDescript) {
-		this.mapColumnDescript = mapColumnDescript;
+	private Map<String, ColumnPro> mapPropertyColumn = new CaseInsensitiveHashMap<ColumnPro>();
+	
+	// default mapConvert
+	private Map<String, String> mapDefaultBeanColumn = new CaseInsensitiveHashMap<String>();
+	
+	// user define mapConvert
+	private Map<String, Map<String, String>> mapBeanConvert = new HashMap<String, Map<String, String>>();
+	
+	public void addToMapBeanConvert(String id, Map<String, String> map) {
+		mapBeanConvert.put(id, map);
 	}
 
 	private Map<String, SqlHeadCountPro> mapSqlHeadPro = new HashMap<String, SqlHeadCountPro>();
@@ -72,6 +76,32 @@ public class TTableProps {
 			return p.getSql();
 		} else {
 			return null;
+		}
+	}
+	
+	public Object execute(DataSource ds, String sqlId, Object[] args_old) throws Exception {
+		SqlHeadCountPro p = mapSqlHeadPro.get(sqlId);
+		if (p == null) {
+			if ("insert".equals(sqlId)) {
+				return SqlExecute.insert(ds, this, args_old);
+			} else if ("update".equals(sqlId)) {
+				return SqlExecute.update(ds, this, args_old);
+			} else if ("delete".equals(sqlId)) {
+				return SqlExecute.delete(ds, this, args_old);
+			} 
+	    	throw new Exception("invoke:" + this.getClass() + ", " + sqlId + " method not exists");
+	    }
+		return p.execute(ds, args_old, getMapConvertId(p));
+	}
+	
+	public Map<String, String> getMapConvertId(SqlHeadCountPro p) {
+		String mapCC = p.getMapConvert();
+		if (mapCC == null) {
+			return null;
+		} else if (mapCC.equals("default")) {
+			return this.mapDefaultBeanColumn;
+		} else {
+			return this.mapBeanConvert.get(mapCC);
 		}
 	}
 	
@@ -137,7 +167,7 @@ public class TTableProps {
 	private String getInsertSqlOfJsonHead(String tblName, String[] jsonHead) {
 		List<String> listColumn=new ArrayList<String>();
 		for (String sIdx: jsonHead) {
-			if (mapColumnDescript.containsKey(sIdx)) {
+			if (mapDefaultBeanColumn.containsKey(sIdx)) {
 				listColumn.add(sIdx);
 			}
 		}
@@ -147,7 +177,7 @@ public class TTableProps {
 	private String getInsertSqlOfJsonHead(String tblName, String[] jsonHead, String insSql) {
 		List<String> listColumn=new ArrayList<String>();
 		for (String sIdx: jsonHead) {
-			if (mapColumnDescript.containsKey(sIdx)) {
+			if (mapDefaultBeanColumn.containsKey(sIdx)) {
 				listColumn.add(sIdx);
 			}
 		}
@@ -155,7 +185,7 @@ public class TTableProps {
 	}
 
 	public String getUpdateSqlHead(String tblName, String[] jsonAllHead, String[] jsonPkHead) {
-		Set<String> set = new SimpleHashSet(Arrays.asList(jsonPkHead));
+		Set<String> set = new CaseInsensitiveHashSet(Arrays.asList(jsonPkHead));
 		try {
 			return getUpdateSqlHead(tblName, jsonAllHead, set);
 		} finally {
@@ -208,19 +238,15 @@ public class TTableProps {
 		return set;
 	}
 
-	public String getExistsSql(String tblName, Object... ids) {
-		return SqlUtils.getExistsSql(tblName, getFieldPK(), ids);
-	}
-
-	public String getExistsSql(String tblName, String[] flds, Object... ids) {
-		return SqlUtils.getExistsSql(tblName, flds, ids);
-	}
-
-	public String getDeleteSql(String tblName, Object... ids) {
+	public String getDeleteSql(String tblName, Object[] ids) {
 		return SqlUtils.getDeleteSql(tblName, getFieldPK(), ids);
 	}
 
-	public String getDeleteSql(String tblName, String[] flds, Object... ids) {
+	public String getDeleteSql(String tblName, Collection<?> ids) {
+		return SqlUtils.getDeleteSql(tblName, getFieldPK(), ids);
+	}
+
+	public String getDeleteSql(String tblName, String[] flds, Object[] ids) {
 		return SqlUtils.getDeleteSql(tblName, flds, ids);
 	}
 
@@ -339,7 +365,7 @@ public class TTableProps {
 
 	public void addColsCommonPro(String sJsonColumn, ColumnPro p) {
 		if (StringUtils.isNotEmpty(sJsonColumn)) {
-			this.mapColumnDescript.put(p.getColumn(), sJsonColumn);
+			this.mapDefaultBeanColumn.put(p.getColumn(), sJsonColumn);
 			this.mapPropertyColumn.put(sJsonColumn, p);
 			if (p.getDefaultValue() != null && p.getNotNull()) {
 				if (listDefault == null) {
@@ -355,7 +381,7 @@ public class TTableProps {
 
 	public void addColsPkPro(String sJsonColumn, ColumnPro p) {
 		if (StringUtils.isNotEmpty(sJsonColumn)) {
-			this.mapColumnDescript.put(p.getColumn(), sJsonColumn);
+			this.mapDefaultBeanColumn.put(p.getColumn(), sJsonColumn);
 			this.mapPropertyColumn.put(sJsonColumn, p);
 			if (!p.getIdentity() && !this.nonePkInc) {
 				nonePkInc = true;

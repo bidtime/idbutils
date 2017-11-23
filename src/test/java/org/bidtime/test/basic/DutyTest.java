@@ -3,20 +3,13 @@ package org.bidtime.test.basic;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.commons.dbutils.handlers.BeanHandler;
+import org.apache.commons.dbutils.handlers.BeanListHandler;
 import org.bidtime.basicdata.duty.bean.Duty;
 import org.bidtime.basicdata.duty.service.DutyService;
-import org.bidtime.dbutils.gson.ResultDTO;
-import org.bidtime.dbutils.jdbc.rs.handle.BeanDTOHandler;
-import org.bidtime.dbutils.jdbc.rs.handle.BeanListDTOHandler;
-import org.bidtime.dbutils.jdbc.rs.handle.ColumnSetDTOHandler;
-import org.bidtime.dbutils.jdbc.rs.handle.ColumnSetHandler;
-import org.bidtime.dbutils.jdbc.rs.handle.cb.SetCallback;
 import org.bidtime.test.BasicTest;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -175,69 +168,76 @@ public class DutyTest extends BasicTest {
 		System.out.println("update: " + n);
 	}
 
-	@Test
-	public void test_getBeanDTOHandler() throws SQLException {
-		BeanDTOHandler<Duty> h = new BeanDTOHandler<Duty>(Duty.class);
-		ResultDTO<Duty> dto = service.list(h);
-		print(dto);		
-	}
-
-	@Test
-	public void test_info_dto() throws SQLException {
-		BeanDTOHandler<Duty> h = new BeanDTOHandler<Duty>(Duty.class);
-		ResultDTO<Duty> dto = service.info(h, 1);
-		print(dto);		
-	}
-
-	@Test
-	public void test_column_set_dto() throws SQLException {	
-		ColumnSetDTOHandler<Long> h = new ColumnSetDTOHandler<>(new SetCallback<Long>() {
-		    @Override
-		    public Set<Long> callback() {
-		    	return new HashSet<Long>();
-		    }
-		});
-		ResultDTO<Set<Long>> dto = service.list(h);
-		print(dto);		
-	}
-
-	@Test
-	public void test_column_set() throws SQLException {	
-		ColumnSetHandler<Long> h = new ColumnSetHandler<>(new SetCallback<Long>() {
-		    @Override
-		    public Set<Long> callback() {
-		    	return new HashSet<Long>();
-		    }
-		});
-		Set<Long> dto = service.list(h);
-		print(dto);		
-	}
-
-	@Test
-	public void test_list() throws SQLException {
-		BeanListDTOHandler<Duty> h = new BeanListDTOHandler<Duty>(Duty.class);
-		ResultDTO<List<Duty>> dto = service.list(h);
-		print(dto);		
-	}
-	
-	@Test
-	public void test_set() throws SQLException {
-		ColumnSetHandler<String> h = new ColumnSetHandler<>("code");
-		Set<String> dto = service.list(h);
-		print(dto);		
-	}
-	
-	@Test
-	public void test_set_dto() throws SQLException {
-		ColumnSetDTOHandler<String> h = new ColumnSetDTOHandler<>("code");
-		ResultDTO<Set<String>> dto = service.list(h);
-		print(dto);		
-	}
+//	@Test
+//	public void test_getBeanDTOHandler() throws SQLException {
+//		BeanDTOHandler<Duty> h = new BeanDTOHandler<Duty>(Duty.class);
+//		ResultDTO<Duty> dto = service.list(h);
+//		print(dto);		
+//	}
+//
+//	@Test
+//	public void test_info_dto() throws SQLException {
+//		BeanDTOHandler<Duty> h = new BeanDTOHandler<Duty>(Duty.class);
+//		ResultDTO<Duty> dto = service.info(h, 1);
+//		print(dto);		
+//	}
+//
+//	@Test
+//	public void test_column_set_dto() throws SQLException {	
+//		ColumnSetDTOHandler<Long> h = new ColumnSetDTOHandler<>(new SetCallback<Long>() {
+//		    @Override
+//		    public Set<Long> callback() {
+//		    	return new HashSet<Long>();
+//		    }
+//		});
+//		ResultDTO<Set<Long>> dto = service.list(h);
+//		print(dto);		
+//	}
+//
+//	@Test
+//	public void test_column_set() throws SQLException {	
+//		ColumnSetHandler<Long> h = new ColumnSetHandler<>(new SetCallback<Long>() {
+//		    @Override
+//		    public Set<Long> callback() {
+//		    	return new HashSet<Long>();
+//		    }
+//		});
+//		Set<Long> dto = service.list(h);
+//		print(dto);		
+//	}
+//
+//	@Test
+//	public void test_list() throws SQLException {
+//		BeanListDTOHandler<Duty> h = new BeanListDTOHandler<Duty>(Duty.class);
+//		ResultDTO<List<Duty>> dto = service.list(h);
+//		print(dto);		
+//	}
+//	
+//	@Test
+//	public void test_set() throws SQLException {
+//		ColumnSetHandler<String> h = new ColumnSetHandler<>("code");
+//		Set<String> dto = service.list(h);
+//		print(dto);		
+//	}
+//	
+//	@Test
+//	public void test_set_dto() throws SQLException {
+//		ColumnSetDTOHandler<String> h = new ColumnSetDTOHandler<>("code");
+//		ResultDTO<Set<String>> dto = service.list(h);
+//		print(dto);		
+//	}
 
 	@Test
 	public void test_info_bean() throws SQLException {
 		BeanHandler<Duty> h = new BeanHandler<Duty>(Duty.class);
-		Duty dto = service.info(h, 1);
+		Duty dto = service.info(h, 0);
+		print(dto);
+	}
+
+	@Test
+	public void test_info_list() throws SQLException {
+		BeanListHandler<Duty> h = new BeanListHandler<Duty>(Duty.class);
+		List<Duty> dto = service.list(h);
 		print(dto);
 	}
 	

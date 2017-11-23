@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.ConfigurableApplicationContext;
 
 /**
  * <code>TableFieldXmlsParser</code> is a registry for sets of queries so that multiple
@@ -30,13 +31,14 @@ public class TableFieldXmlsParser implements ApplicationContextAware {
 	private static final Logger logger = LoggerFactory
 			.getLogger(TableFieldXmlsParser.class);
 	
-	private static ApplicationContext ctx;
+	protected static ApplicationContext ctx;  
     
 	/** 
      * 此方法可以把ApplicationContext对象inject到当前类中作为一个静态成员变量。 
      * @param applicationContext ApplicationContext 对象. 
      * @throws BeansException 
      */
+	@Override
 	public void setApplicationContext(ApplicationContext ac) throws BeansException {
 		ctx = ac;
 	}
@@ -57,7 +59,7 @@ public class TableFieldXmlsParser implements ApplicationContextAware {
 	/**
 	 * Maps query set names to Maps of their queries.
 	 */
-	private static final Map<String, TTableProps> QUERIES = new HashMap<String, TTableProps>();
+	private final Map<String, TTableProps> queries = new HashMap<String, TTableProps>();
 
 	/**
 	 * TableFieldXmlsParser constructor.
@@ -83,7 +85,7 @@ public class TableFieldXmlsParser implements ApplicationContextAware {
 
 	private String packageRoot;
 	private String extName;
-	private Boolean recursive;
+	private Boolean recursive = true;
 	
 	public String getPackageRoot() {
 		return packageRoot;
@@ -110,11 +112,7 @@ public class TableFieldXmlsParser implements ApplicationContextAware {
 	}
 	
 	public void init() {
-		//loadInit(packageRoot, extName, recursive);
-		String[] paths = packageRoot.split(",");
-		for (String s : paths) {
-			autoLoadInit(s.trim(), extName, recursive);
-		}
+		autoLoadInit(this.packageRoot, extName, recursive);
 	}
 
 //	protected void loadInit(String pack, String sSufix, boolean recursive) {
@@ -136,6 +134,14 @@ public class TableFieldXmlsParser implements ApplicationContextAware {
 //	}
 
 	protected void autoLoadInit(String pack, String sSufix, boolean recursive) {
+		String[] args = org.springframework.util.StringUtils.tokenizeToStringArray(pack,
+				ConfigurableApplicationContext.CONFIG_LOCATION_DELIMITERS);
+		for (String s : args) {
+			autoLoadInitRaw(s, sSufix, recursive);
+		}
+	}
+	
+	private void autoLoadInitRaw(String pack, String sSufix, boolean recursive) {
 		List<String> list = PackageUtils.autoGetRelationFilesRootOrJar(pack, sSufix,
 				recursive);
 		try {
@@ -164,7 +170,7 @@ public class TableFieldXmlsParser implements ApplicationContextAware {
 	 *             if the ClassLoader can't find a file at the given path.
 	 * @return Map of query names to SQL values
 	 */
-	public synchronized TTableProps load(String path) throws IOException {
+	public synchronized TTableProps load(String path) throws Exception {
 		return load(path, path);
 	}
 	
@@ -191,7 +197,7 @@ public class TableFieldXmlsParser implements ApplicationContextAware {
 	 * 替换成com.eb.business.User
 	 * 以方便类中取此sql
 	 */
-	protected TTableProps loadClass(String path) throws IOException {
+	protected TTableProps loadClass(String path) throws Exception {
 		String sPackCom = null;
 		char c = path.charAt(0);
 		if (c=='/') {
@@ -204,14 +210,14 @@ public class TableFieldXmlsParser implements ApplicationContextAware {
 			sPackCom = sPackCom.substring(0,nPos);
 		}
 		sPackCom = sPackCom.replace('/', '.');
-		return load(sPackCom, path);
+		TTableProps tableProps = load(sPackCom, path);
+		this.queries.put(sPackCom, tableProps);
+		return tableProps;
 	}
 
-	private TTableProps load(String sKey, String path)
-			throws IOException {
-		TTableProps queryMap = this.loadMapOfPath(path);
-		QUERIES.put(sKey, queryMap);
-		return queryMap;
+	protected TTableProps load(String sKey, String path) throws Exception {
+		TTableProps tp = this.loadMapOfPath(path);
+		return tp;
 	}
 
 	/**
@@ -227,7 +233,7 @@ public class TableFieldXmlsParser implements ApplicationContextAware {
 	 * @since DbUtils 1.1
 	 * @return Map of query names to SQL values
 	 */
-	private TTableProps loadMapOfPath(String path) throws IOException {
+	protected TTableProps loadMapOfPath(String path) throws IOException {
 		// Findbugs flags getClass().getResource as a bad practice; maybe we
 		// should change the API?
 		// Copy to HashMap for better performance
@@ -246,21 +252,21 @@ public class TableFieldXmlsParser implements ApplicationContextAware {
 	 * @param path
 	 *            The path that the queries were loaded from.
 	 */
-	public static synchronized void unload(String path) {
-		QUERIES.remove(path);
+	public synchronized void unload(String path) {
+		this.queries.remove(path);
 	}
 
-//	public static TTableProps get(Object o) throws SQLException {
-//		return get(o.getClass());
-//	}
+	public TTableProps get(Object o) throws SQLException {
+		return get(o.getClass());
+	}
 	
 	@SuppressWarnings("rawtypes")
-	public static TTableProps get(Class cls) throws SQLException {
+	public TTableProps get(Class cls) throws SQLException {
 		return get(cls.getName());
 	}
 
-	public static TTableProps get(String path) throws SQLException {
-		TTableProps q = QUERIES.get(path);
+	public TTableProps get(String path) throws SQLException {
+		TTableProps q = this.queries.get(path);
 		if (q != null) {
 			return q;
 		} else {

@@ -147,7 +147,7 @@ public class BeanProcessorEx implements Serializable {
         PropertyDescriptor[] props = this.propertyDescriptors(type);
         ResultSetMetaData rsmd = rs.getMetaData();
         int[] columnToProperty = this.mapColumnsToProperties(rsmd, props, mapBeanProps);
-        return this.createBean(rs, type, props, columnToProperty);
+        return this.resultSetToBean(rs, type, props, columnToProperty);
     }
 
     /**
@@ -194,29 +194,29 @@ public class BeanProcessorEx implements Serializable {
     }
 	
 	@SuppressWarnings("rawtypes")
-	public void toBeanList(ResultSet rs, Class type, Collection results) throws SQLException {
-		toBeanList(rs, type, results, columnToPropertyOverrides);
+	public void toBeanList(ResultSet rs, Class type, Collection c) throws SQLException {
+		toBeanList(rs, type, c, columnToPropertyOverrides);
 	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public void toBeanList(ResultSet rs, Class type, Collection results, Map<String,String> mapBeanProps) throws SQLException {
+	public void toBeanList(ResultSet rs, Class type, Collection c, Map<String,String> mapBeanProps) throws SQLException {
         PropertyDescriptor[] props = propertyDescriptors(type);
         ResultSetMetaData rsmd = rs.getMetaData();
         int[] columnToProperty = mapColumnsToProperties(rsmd, props, mapBeanProps);
         do {
-            results.add(createBean(rs, type, props, columnToProperty));
+            c.add(resultSetToBean(rs, type, props, columnToProperty));
         } while (rs.next());
     }
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public static void toColumnCollection(ResultSet rs, Collection results, String columnName) throws SQLException {
+	public static void columnToCollection(ResultSet rs, Collection results, String columnName) throws SQLException {
         do {
             results.add(rs.getObject(columnName));
         } while (rs.next());
     }
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public static void toColumnCollection(ResultSet rs, Collection results, int columnIndex) throws SQLException {
+	public static void columnToCollection(ResultSet rs, Collection results, int columnIndex) throws SQLException {
         do {
             results.add(rs.getObject(columnIndex));
         } while (rs.next());
@@ -232,7 +232,7 @@ public class BeanProcessorEx implements Serializable {
      * @return An initialized object.
      * @throws SQLException if a database error occurs.
      */
-    private <T> T createBean(ResultSet rs, Class<T> type,
+    private <T> T resultSetToBean(ResultSet rs, Class<T> type,
             PropertyDescriptor[] props, int[] columnToProperty)
             throws SQLException {
         T bean = this.newInstance(type);
@@ -262,7 +262,6 @@ public class BeanProcessorEx implements Serializable {
      * @param value The value to pass into the setter.
      * @throws SQLException if an error occurs setting the property.
      */
-    @SuppressWarnings("unchecked")
 	private void callSetter(Object target, PropertyDescriptor prop, Object value)
             throws SQLException {
         Method setter = prop.getWriteMethod();
@@ -573,33 +572,34 @@ public class BeanProcessorEx implements Serializable {
 	
 	public GsonRows toGsonRows(ResultSet rs) throws SQLException {
 		ResultSetMetaData meta = rs.getMetaData();
-        int nCols = meta.getColumnCount();
-        String[] cols = new String[nCols];
-        for (int i = 0; i < nCols; i++) {
-        	cols[i] = meta.getColumnName(i + 1);
-        }
-        List<Object[]> list = new ArrayList<Object[]>();
-        do {
-        	Object[] val = new Object[nCols];
-	        for (int i = 0; i < nCols; i++) {
-	        	val[i] = rs.getObject(i + 1);
-	        }
-	        list.add(val);
-	    } while (rs.next());
-        return new GsonRows(cols, list);
+    int nCols = meta.getColumnCount();
+    String[] cols = new String[nCols];
+    for (int i = 0; i < nCols; i++) {
+    	cols[i] = meta.getColumnName(i + 1);
+    }
+    List<List<Object>> list = new ArrayList<>();
+    do {
+      List<Object> ll = new ArrayList<>();
+      for (int i = 0; i < nCols; i++) {
+        ll.add(rs.getObject(i + 1));
+      }
+      list.add(ll);
+    } while (rs.next());
+    //
+    return new GsonRows(cols, list);
 	}
 	
 	public GsonRow toGsonRow(ResultSet rs) throws SQLException {
 		ResultSetMetaData meta = rs.getMetaData();
-        int nCols = meta.getColumnCount();
-        String[] cols = new String[nCols];
-        for (int i = 0; i < nCols; i++) {
-        	cols[i] = meta.getColumnName(i + 1);
-        }
-        Object[] vals = new Object[nCols];
-        for (int i = 0; i < nCols; i++) {
-        	vals[i] = rs.getObject(i + 1);
-        }
+    int nCols = meta.getColumnCount();
+    String[] cols = new String[nCols];
+    for (int i = 0; i < nCols; i++) {
+    	cols[i] = meta.getColumnName(i + 1);
+    }
+    Object[] vals = new Object[nCols];
+    for (int i = 0; i < nCols; i++) {
+    	vals[i] = rs.getObject(i + 1);
+    }
 		return new GsonRow(cols, vals);
 	}
 	

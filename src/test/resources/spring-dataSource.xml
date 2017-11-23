@@ -9,6 +9,13 @@
 
 	<!-- 引入jdbc配置文件 -->
 	<context:property-placeholder location="classpath:data.properties" ignore-unresolvable="true"/>
+		
+    <bean id="jsonFieldXmlsLoader" class="org.bidtime.dbutils.jdbc.sql.xml.JsonFieldXmlsLoader"
+          init-method="init" lazy-init="false">
+        <property name="packageRoot" value="org.bidtime"/>
+        <property name="extName" value=".xml"/>
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
 
 	<!-- carvin数据源,c3p0 -->
 	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
@@ -44,5 +51,10 @@
     
 	<!-- 注解事务管理器 -->
 	<tx:annotation-driven transaction-manager="txManager"  />
-
+    
+	<bean class="org.bidtime.dbutils.jdbc.sql.xml.mapper.MaperXMLScanner">
+	    <property name="basePackage" value="org.bidtime" />
+	    <property name="jsonFieldXmlsLoaderName" value="jsonFieldXmlsLoader" />
+	</bean>
+    
 </beans>

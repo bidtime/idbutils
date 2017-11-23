@@ -4,9 +4,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
 
-import org.bidtime.dbutils.jdbc.rs.BeanAdapt;
-import org.bidtime.dbutils.jdbc.rs.BeanProcessorEx;
-
 /**
  * @author jss
  * 
@@ -18,39 +15,53 @@ import org.bidtime.dbutils.jdbc.rs.BeanProcessorEx;
 public class BeanListDTOHandler<T> extends AbstractListDTOHandler<T> {
 
 	public BeanListDTOHandler(Class<T> type) {
-		this(type, false);
+		super.setProp(type);
+	}
+
+	public BeanListDTOHandler(Class<T> type, int initilaSize) {
+		super.setProp(type, initilaSize);
+	}
+	
+	@SuppressWarnings("rawtypes")
+	public BeanListDTOHandler(Class<T> type, Class<Collection> listType) {
+		super.setProp(type, listType);
+	}
+	
+	@SuppressWarnings("rawtypes")
+	public BeanListDTOHandler(Class<T> type, Class<Collection> listType, int initilaSize) {
+		super.setProp(type, listType, initilaSize);
+	}
+	
+	public BeanListDTOHandler(Class<T> type, Collection<T> c) {
+		super.setProp(type, c);
 	}
 
 	public BeanListDTOHandler(Class<T> type, boolean countSql) {
-		this(type, countSql, BeanAdapt.AUTO);
+		this(type, 20);
 	}
 
-	public BeanListDTOHandler(Class<T> type, BeanAdapt beanAdapt) {
-		this(type, false, beanAdapt);
+	public BeanListDTOHandler(Class<T> type, int initilaSize, boolean countSql) {
+		this(type, null, initilaSize);
 	}
-
-//	public BeanListDTOHandler(Class<T> type, BeanProcessorEx convert,
-//			boolean countSql) {
-//		this(type, convert, countSql, BeanAdapt.AUTO);
-//	}
-
-	public BeanListDTOHandler(Class<T> type, boolean countSql, BeanAdapt beanAdapt) {
-		this(type, new BeanProcessorEx(), countSql, beanAdapt);
+	
+	@SuppressWarnings("rawtypes")
+	public BeanListDTOHandler(Class<T> type, Class<Collection> listType, boolean countSql) {
+		super.setProp(type, listType);
 	}
-
-	public BeanListDTOHandler(Class<T> type, BeanAdapt beanAdapt, boolean countSql) {
-		this(type, new BeanProcessorEx(), countSql, beanAdapt);
+	
+	@SuppressWarnings("rawtypes")
+	public BeanListDTOHandler(Class<T> type, Class<Collection> listType, int initilaSize, boolean countSql) {
+		super.setProp(type, listType, initilaSize);
 	}
-
-	public BeanListDTOHandler(Class<T> type, BeanProcessorEx convert,
-			boolean countSql, BeanAdapt beanAdapt) {
-		super.setProp(type, convert, countSql, beanAdapt);
+	
+	public BeanListDTOHandler(Class<T> type, Collection<T> c, boolean countSql) {
+		super.setProp(type, c);
 	}
 
 	@Override
-	protected void handleIt(ResultSet rs, Collection<T> c) throws SQLException {
+	protected void handleRow(ResultSet rs, Collection<T> c) throws SQLException {
 		//this.convert.toBean(rs, this.type, this.mapBeanPropColumns);
-		convert.toBeanList(rs, type, c, mapBeanPropColumns);
+		convert.toBeanList(rs, this.type, c, this.mapBeanPropColumns);
 	}
 
 }

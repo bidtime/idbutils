@@ -5,8 +5,6 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Map;
 
-import org.bidtime.dbutils.jdbc.rs.BeanProcessorEx;
-
 /**
  * @author jss
  * 
@@ -21,16 +19,16 @@ public class MapListDTOHandler extends AbstractListDTOHandler<Map<String, Object
 	}
 
 	public MapListDTOHandler(boolean countSql) {
-		this(new BeanProcessorEx(), countSql);
+		super.setProp(Map.class, countSql);
 	}
 
-	public MapListDTOHandler(BeanProcessorEx convert,
-			boolean countSql) {
-		super.setProp(Map.class, convert, countSql);
-	}
+//	public MapListDTOHandler(BeanProcessorEx convert,
+//			boolean countSql) {
+//		super.setProp(Map.class, convert, countSql);
+//	}
 	
     @Override
-    protected void handleIt(ResultSet rs, Collection<Map<String, Object>> c) throws SQLException {
+    protected void handleRow(ResultSet rs, Collection<Map<String, Object>> c) throws SQLException {
         this.convert.toMap(rs, this.mapBeanPropColumns);
     }
 

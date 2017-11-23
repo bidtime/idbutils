@@ -20,20 +20,6 @@ public class PackageUtils {
 	private static final Logger logger = LoggerFactory
 			.getLogger(PackageUtils.class);
 
-	/**
-	 * @param args
-	 */
-//	public static void main(String[] args) {
-//		List<String> list = PackageUtils.getRelationFilesRoot("com.eb", ".props", true);
-//		try {
-//			for (int i = 0; i < list.size(); i++) {
-//				System.out.println(list.get(i));
-//			}
-//		} finally {
-//			list = null;
-//		}
-//	}
-
 	private static void findAndAddClassesInPackageByFile(String packageName,
 			String packagePath, final boolean recursive, List<String> list,
 			final String sSufix) {

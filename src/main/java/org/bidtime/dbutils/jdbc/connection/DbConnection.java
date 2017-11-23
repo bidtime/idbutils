@@ -8,7 +8,6 @@ import javax.sql.DataSource;
 
 import org.apache.commons.dbutils.ResultSetHandler;
 import org.apache.commons.dbutils.handlers.ScalarHandler;
-import org.apache.commons.lang.StringUtils;
 import org.bidtime.dbutils.QueryRunnerEx;
 import org.bidtime.dbutils.gson.ResultDTO;
 import org.bidtime.dbutils.gson.dataset.GsonRow;
@@ -17,6 +16,8 @@ import org.bidtime.dbutils.jdbc.connection.ds.DataSourceTransactionHolder;
 import org.bidtime.dbutils.jdbc.connection.log.LogSpSql;
 import org.bidtime.dbutils.jdbc.dao.SQLCallback;
 import org.bidtime.dbutils.jdbc.dialect.CAutoFitSql;
+import org.bidtime.dbutils.jdbc.rs.handle.AbstractListDTOHandler;
+import org.bidtime.dbutils.jdbc.rs.handle.AbstractListHandler;
 import org.bidtime.dbutils.jdbc.rs.handle.ext.ResultSetDTOHandler;
 import org.bidtime.dbutils.jdbc.sql.SqlUtils;
 import org.bidtime.dbutils.jdbc.sql.xml.parser.TTableProps;
@@ -96,7 +97,7 @@ public class DbConnection {
 		}
 	}
 
-	public static <T> T insert(DataSource ds, String sql, ResultSetHandler<T> rsh, Object... params)
+	public static <T> T insert(DataSource ds, String sql, ResultSetHandler<T> rsh, Object[] params)
 			throws SQLException {
 		Connection conn = getConnOfSpringCtx(ds);
 		if (conn == null) {
@@ -112,7 +113,7 @@ public class DbConnection {
 		}
 	}
 	
-	private static <T> T insertConn(Connection conn, String sql, ResultSetHandler<T> rsh, Object... params)
+	private static <T> T insertConn(Connection conn, String sql, ResultSetHandler<T> rsh, Object[] params)
 			throws SQLException {
 		T generatedKeys = null;
 		QueryRunnerEx q = new QueryRunnerEx();
@@ -142,7 +143,7 @@ public class DbConnection {
 		}
 	}
 
-	public static int update(DataSource ds, String sql, Object... params) throws SQLException {
+	public static int update(DataSource ds, String sql, Object[] params) throws SQLException {
 		Connection conn = getConnOfSpringCtx(ds);
 		if (conn == null) {
 			conn = DataSourceUtils.getConnection(ds);
@@ -157,16 +158,16 @@ public class DbConnection {
 		}
 	}
 	
-	private static int updateConn(Connection conn, String sql, Object... params)
+	private static int updateConn(Connection conn, String sql, Object[] params)
 			throws SQLException {
 		QueryRunnerEx q = new QueryRunnerEx();
-		int nResult = 0;
+		int n = 0;
 		try {
-			nResult = q.update(conn, sql, params);
+			n = q.update(conn, sql, params);
 		} finally {
 			q = null;
 		}
-		return nResult;
+		return n;
 	}
 
 	public static <T> T insertBatch(DataSource ds, String sql, ResultSetHandler<T> rsh, Object[][] params)
@@ -217,7 +218,7 @@ public class DbConnection {
 			}
 		} else {
 			String sql = cb.getSql(tp, g, conn);
-			return updateBatchConn(conn, sql, g.getData());
+			return updateConn(conn, sql, g.getData());
 		}
 	}
 
@@ -392,9 +393,14 @@ public class DbConnection {
 			}
 			if (nPageSize != null) {
 				sql = CAutoFitSql.getSubSqlOfPage(conn, sql);
+				if (rsh instanceof AbstractListDTOHandler) {
+					((AbstractListDTOHandler)rsh).setInitialSize(nPageSize);
+				} else if (rsh instanceof AbstractListHandler) {
+					((AbstractListHandler)rsh).setInitialSize(nPageSize);					
+				}
 			}
 			t = qr.query(conn, sql, rsh, paramAll);
-			if (StringUtils.isNotEmpty(sqlCount)) { // total rows
+			if (sqlCount!=null && sqlCount.length()>0) { // total rows
 				bCountSql = true;
 				nTotalRows = ObjectComm.objectToLong(qr.query(conn,
 						sqlCount, new ScalarHandler<Long>(1),
@@ -403,6 +409,10 @@ public class DbConnection {
 		} finally {
 			qr = null;
 			if (t != null && bCountSql) {
+//				if (rsh instanceof ResultSetDTOHandler 
+//						&& ((ResultSetDTOHandler) rsh).isCountSql()) {
+//					((ResultSetDTOHandler) rsh).setLen(nTotalRows);
+//				}
 				if (t instanceof ResultDTO) {
 					((ResultDTO) t).setLen(nTotalRows);
 				}

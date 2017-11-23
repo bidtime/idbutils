@@ -1,5 +1,6 @@
 package org.bidtime.dbutils.gson.dataset;
 
+import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.SQLException;
@@ -19,40 +20,8 @@ public class GsonRows extends GsonData {
 	public GsonRows() {
 	}
 
-	public GsonRows(String[] head, List<Object[]> list) {
+	public GsonRows(String[] head, List<List<Object>> list) {
 		setHeadList(head, list);
-	}
-
-	public void setHeadList(String[] head, Object[][] array2) {
-		if (head == null) {
-			logger.warn("head is null");
-		} else if (array2 == null) {
-			logger.warn("data is null");
-		} else if (array2.length < 1) {
-			logger.warn("data size < 0");
-		} else {
-			Object[] oo = array2[0];
-			if (oo == null) {
-				logger.error("data is null");
-			} else if (oo.length < 1) {
-				logger.info("data length is 0");
-			} else {
-				if (head.length != oo.length) {
-					StringBuilder sb = new StringBuilder();
-					sb.append("head( ");
-					sb.append(head.length);
-					sb.append(" )");
-					sb.append(" and data( ");
-					sb.append(oo.length);
-					sb.append(" ) isn't mismatch.");
-					Exception e = new Exception(sb.toString());
-					logger.error("setHeadList:", e);
-				}
-			}
-		}
-		this.setHead(head);
-		this.setData(array2);
-		this.clearIndex();
 	}
 	
 	public void resetHeadList(String[] head, Object[][] array) {
@@ -68,7 +37,7 @@ public class GsonRows extends GsonData {
 		resetHeadList(head, array);
 	}
 	
-	public void setHeadList(String[] head, List<Object[]> list) {
+	public void setHeadList(String[] head, List<List<Object>> list) {
 		if (head == null) {
 			logger.error("head is null");
 		} else if (list == null) {
@@ -76,19 +45,19 @@ public class GsonRows extends GsonData {
 		} else if (list.size() < 1) {
 			logger.error("data size < 0");
 		} else {
-			Object[] oo = list.get(0);
+			List<Object> oo = list.get(0);
 			if (oo == null) {
 				logger.error("data is null");
-			} else if (oo.length < 1) {
+			} else if (oo.size() < 1) {
 				logger.info("data length is 0");
 			} else {
-				if (head.length != oo.length) {
+				if (head.length != oo.size()) {
 					StringBuilder sb = new StringBuilder();
 					sb.append("head( ");
 					sb.append(head.length);
 					sb.append(" )");
 					sb.append(" and data( ");
-					sb.append(oo.length);
+					sb.append(oo.size());
 					sb.append(" ) isn't mismatch.");
 					Exception e = new Exception(sb.toString());
 					logger.error("setHeadList:", e);
@@ -96,8 +65,7 @@ public class GsonRows extends GsonData {
 			}
 		}
 		this.setHead(head);
-		Object[][] array2 = (Object[][]) list
-				.toArray(new Object[list.size()][head.length]);
+		Object[][] array2 = listsToArrays(list, Object.class);
 		this.setData(array2);
 		this.clearIndex();
 	}
@@ -141,6 +109,25 @@ public class GsonRows extends GsonData {
 			return null;
 		}
 	}
+  
+	@SuppressWarnings("unchecked")
+	public static <T> T[][] listsToArrays(List<List<T>> src, Class<T> type) {
+    if (src == null || src.isEmpty()) {
+      return null;
+    }
+
+    // 初始化泛型二维数组
+    // JAVA中不允许这样初始化泛型二维数组： T[][] dest = new T[src.size()][];
+    T[][] dest = dest = (T[][]) Array.newInstance(type, src.size(), src.get(0).size());
+
+    for (int i = 0; i < src.size(); i++) {
+      for (int j = 0; j < src.get(i).size(); j++) {
+        dest[i][j] = src.get(i).get(j);
+      }
+    }
+
+    return dest;
+  }
 
 	public GsonRows(String[] head, Object[] objects) {
 		this.setHead(head);
@@ -276,11 +263,18 @@ public class GsonRows extends GsonData {
 		}
 	}
 
-	public void autoAddHeadData(String headName, Object o) {
-		if (this.getPosOfName(headName) < 0) {
-			addHeadData(headName, o);
-		}
-	}
+  public void autoAddHeadData(String headName, Object o) {
+    if (this.getPosOfName(headName) < 0) {
+      addHeadData(headName, o);
+    }
+  }
+
+  public void testAddHeadData(String headName, Object o) {
+    int idx = this.getPosOfName(headName);
+    if (idx >= 0) {
+      setColumnValue(idx, o);
+    }
+  }
 
 	public void addHead(String headName) {
 		addHeadData(headName, (Object)null, true);
@@ -439,16 +433,24 @@ public class GsonRows extends GsonData {
 		setHeadsValueOfObject(new String[] { arHead }, o);
 	}
 
-	public void setHeadsValueOfObject(String[] arHead, Object o) {
-		for (String head : arHead) {
-			int idx = getPosOfName(head);
-			if (idx > -1) {
-				for (int i = 0; i < this.getDataLen(); i++) {
-					this.setValue(i, idx, o);
-				}
-			}
-		}
-	}
+  public void setHeadsValueOfObject(String[] arHead, Object o) {
+    for (String head : arHead) {
+      int idx = getPosOfName(head);
+      if (idx > -1) {
+        for (int i = 0; i < this.getDataLen(); i++) {
+          this.setValue(i, idx, o);
+        }
+      }
+    }
+  }
+
+  public void setColumnValue(int idx, Object o) {
+    if (idx > -1) {
+      for (int i = 0; i < this.getDataLen(); i++) {
+        this.setValue(i, idx, o);
+      }
+    }
+  }
 
 	public void revHead(String[] arHead) throws Exception {
 		List<String> list = new ArrayList<String>();			

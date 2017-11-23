@@ -134,13 +134,15 @@ public class GsonEbUtils {
 				throw new SQLException("class to map error");
 			}
 			// 判断是哪种prop adapt
-			if (pa == PropAdapt.NOTNULL) {
-				if (retVal == null) {
-					continue;
-				}
-			} else if (pa == PropAdapt.NULL) {
-				if (retVal != null) {
-					continue;
+			if (pa != null) {
+				if (pa == PropAdapt.NOTNULL) {
+					if (retVal == null) {
+						continue;
+					}
+				} else if (pa == PropAdapt.NULL) {
+					if (retVal != null) {
+						continue;
+					}
 				}
 			}
 

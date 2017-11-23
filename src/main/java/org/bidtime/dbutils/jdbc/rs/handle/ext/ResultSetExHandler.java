@@ -3,9 +3,9 @@ package org.bidtime.dbutils.jdbc.rs.handle.ext;
 import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Map;
 
 import org.apache.commons.dbutils.ResultSetHandler;
-import org.bidtime.dbutils.jdbc.rs.BeanAdapt;
 import org.bidtime.dbutils.jdbc.rs.BeanProcessorEx;
 
 /**
@@ -17,55 +17,42 @@ import org.bidtime.dbutils.jdbc.rs.BeanProcessorEx;
 @SuppressWarnings("serial")
 public class ResultSetExHandler<T> implements ResultSetHandler<T>, Serializable {
 
-	protected Class<T> type;
+	protected Map<String, String> mapBeanPropColumns = null;
 
-	protected BeanProcessorEx convert = null;
+	@SuppressWarnings("rawtypes")
+	protected Class type;
 
-	//protected BeanProcessorEx ROW_PROCESSOR = new BeanProcessorEx();
+	static final protected BeanProcessorEx default_convert = new BeanProcessorEx();
+	
+	protected BeanProcessorEx convert;
 
-	protected boolean countSql = false;
-
-	public boolean isCountSql() {
-		return countSql;
-	}
-
-	public void setCountSql(boolean countSql) {
-		this.countSql = countSql;
-	}
-
-//	@SuppressWarnings({ "rawtypes" })
-//	public void setProp(Class type, BeanProcessorEx convert, boolean countSql) {
-//		setProp(type, convert, countSql, false);
-//	}
-
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public void setProp(Class type, BeanProcessorEx convert, boolean countSql,
-			BeanAdapt beanAdapt) {
-		this.type = type;
-		this.convert = convert;
-		this.countSql = countSql;
-	}
-
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public void setProp(Class type, BeanProcessorEx convert, boolean countSql) {
-		this.type = type;
-		this.convert = convert;
-		this.countSql = countSql;
-	}
-
-//	@SuppressWarnings("rawtypes")
-//	public void setProp(Class type, boolean countSql) {
-//		setProp(type, new BeanProcessorEx(), countSql);
-//	}
-//
-//	@SuppressWarnings("rawtypes")
-//	public void setProp(Class type) {
-//		setProp(type, false);
-//	}
-
+	@SuppressWarnings("unchecked")
 	@Override
 	public T handle(ResultSet rs) throws SQLException {
-		return rs.next() ? this.convert.toBean(rs, this.type) : null;
+		return rs.next() ? (T) this.convert.toBean(rs, this.type, mapBeanPropColumns) : null;
 	}
+
+	@SuppressWarnings({ "rawtypes" })
+	public void setProp(Class type) {
+		this.type = type;
+		this.convert = default_convert;
+	}
+
+	@SuppressWarnings({ "rawtypes" })
+	public void setProp(Class type, BeanProcessorEx convert) {
+		this.type = type;
+		this.convert = convert;
+	}
+
+	public void setMapBeanConvert(Map<String, String> mapConvert) {
+		this.mapBeanPropColumns = mapConvert;
+	}
+
+	//
+//	private Type getParams(int idx) {
+//		Type genType = getClass().getGenericSuperclass();
+//		Type[] params = ((ParameterizedType) genType).getActualTypeArguments();
+//		return params[idx];
+//	}
 
 }

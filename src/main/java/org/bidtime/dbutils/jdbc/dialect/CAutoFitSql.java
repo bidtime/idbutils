@@ -5,7 +5,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 public class CAutoFitSql {
 	
@@ -58,10 +58,10 @@ public class CAutoFitSql {
 		return dialect.getInsertIgnore();
 	}
 
-	public static String getReplace(Connection conn) throws SQLException {
-		Dialect dialect = getDialectOfConn(conn);
-		return dialect.getReplace();
-	}
+  public static String getReplace(Connection conn) throws SQLException {
+    Dialect dialect = getDialectOfConn(conn);
+    return dialect.getReplace();
+  }
 	
 //	public static String getLastIdSql(Connection conn) throws SQLException {
 //		Dialect dialect = getDialectOfConn(conn);

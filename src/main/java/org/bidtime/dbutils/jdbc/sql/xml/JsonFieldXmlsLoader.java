@@ -18,6 +18,9 @@ package org.bidtime.dbutils.jdbc.sql.xml;
 
 import java.sql.SQLException;
 
+import javax.sql.DataSource;
+
+import org.bidtime.dbutils.jdbc.sql.xml.binding.MethodRegistry;
 import org.bidtime.dbutils.jdbc.sql.xml.parser.TTableProps;
 
 /**
@@ -31,13 +34,41 @@ public class JsonFieldXmlsLoader extends TableFieldXmlsParser {
 	/**
 	 * The Singleton instance of this class.
 	 */
-//	private volatile static JsonFieldXmlsLoader instance = null;
+	private volatile static JsonFieldXmlsLoader instance = null;
 	
-//	@Override
-//	public void init() {
-//		super.init();
-////		instance = this;
-//	}
+	private final MethodRegistry methodRegistry = new MethodRegistry();
+	
+	private DataSource dataSource;
+
+	public DataSource getDataSource() {
+		return dataSource;
+	}
+
+	public void setDataSource(DataSource dataSource) {
+		this.dataSource = dataSource;
+	}
+
+	/**
+	 * Return an instance of this class.
+	 * 
+	 * @return The Singleton instance.
+	 */
+	public synchronized static JsonFieldXmlsLoader getInstance() {
+//		if (instance == null) {
+//			synchronized (JsonFieldXmlsLoader.class) {
+//				if (instance == null) {
+//					instance = (JsonFieldXmlsLoader)SpringContextUtils.getBean("jsonFieldXmlsLoader");
+//				}
+//			}
+//		}
+		return instance;
+	}
+
+	@Override
+	public void init() {
+		super.init();
+		instance = this;
+	}
 
 	public JsonFieldXmlsLoader(String path) {
 		super(path);
@@ -55,34 +86,33 @@ public class JsonFieldXmlsLoader extends TableFieldXmlsParser {
 		super(path, ext, recu);
 	}
 	
-//	public static TTableProps get(Object o) throws SQLException {
-//		return get(o.getClass());
-//	}
-
-//	@SuppressWarnings("rawtypes")
-//	public static TTableProps get(Class cls) throws SQLException {
-//		return get(cls);
-//	}
+	public static TTableProps getTableProps(Object o) throws SQLException {
+		return getInstance().get(o.getClass());
+	}
 	
-//	@SuppressWarnings("rawtypes")
-//	public static String getSqlOfId(Class clazz, String id) throws SQLException {
-//		TTableProps tp = getTableProps(clazz);
-//		if (tp != null) {
-//			String sql = tp.getSqlOfId(id);
-//			if (sql == null) {
-//				throw new SQLException("clz:" + clazz.getSimpleName()
-//						+ ",id:" + id + ", is none sql xml.");
-//			} else {
-//				return sql;
-//			}
-//		} else {
-//			throw new SQLException("clz:" + clazz.getSimpleName() + " is none sql xml.");
-//		}
-//	}
+	@SuppressWarnings("rawtypes")
+	public static TTableProps getTableProps(Class cls) throws SQLException {
+		return getInstance().get(cls);
+	}
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@Override
+	protected TTableProps load(String sKey, String path) throws Exception {
+		TTableProps tp = super.load(sKey, path);
+		Class clz = methodRegistry.getMapperByName(sKey);
+		if (clz == null) {
+			throw new Exception("class " + sKey + ", has not class");
+		}
+		if (!clz.isInterface()) {
+			throw new Exception("class " + sKey + ", is not interface");
+		}
+		methodRegistry.addMapper(clz);
+		return tp;
+	}
 	
 	@SuppressWarnings("rawtypes")
 	public static String getSqlOfId(Class clazz, String id, String colId) throws SQLException {
-		TTableProps tp = get(clazz);
+		TTableProps tp = getTableProps(clazz);
 		if (tp != null) {
 			String sql = null;
 			if (colId == null) {
@@ -104,5 +134,9 @@ public class JsonFieldXmlsLoader extends TableFieldXmlsParser {
 			throw new SQLException("clz:" + clazz.getSimpleName() + " is none sql xml.");
 		}
 	}
+	  
+	public <T> T getMapper(Class<T> type) throws Exception {
+	  return methodRegistry.getMapper(type, this);
+    }
 
 }

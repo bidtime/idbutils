@@ -27,6 +27,7 @@ public class DerbyDialect implements Dialect {
 		return "insert ignore into";
 	}
 	
+  @Override
 	public String getReplace() {
 		return "replace into";
 	}

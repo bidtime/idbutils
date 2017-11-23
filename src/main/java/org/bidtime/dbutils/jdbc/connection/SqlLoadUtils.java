@@ -27,185 +27,75 @@ import org.bidtime.dbutils.jdbc.sql.xml.parser.TTableProps;
 import org.bidtime.utils.basic.ArrayComm;
 
 public class SqlLoadUtils {
-
-//	@SuppressWarnings("rawtypes")
-//	private static String getSqlOfId(Class clazz, String id) throws SQLException {
-//		return JsonFieldXmlsLoader.getSqlOfId(clazz, id);
-//	}
-
+	
 	@SuppressWarnings("rawtypes")
-	private static String getSqlOfId(Class clazz, String id, String colId) throws SQLException {
+	private String getSqlOfId(Class clazz, String id, String colId) throws SQLException {
 		return JsonFieldXmlsLoader.getSqlOfId(clazz, id, colId);
-	}
-	
-	// isExists
-	
-	private static boolean isExists(DataSource ds, String sql, Object... params) throws SQLException {
-		ScalarHandler<Long> h = new ScalarHandler<>();
-		Long n = DbConnection.query(ds, sql, params, 0, 1, h);
-		if (n == null) {
-			return false;
-		} else {
-			return (n == 1) ? true : false;
-		}
-	}
-	
-	@SuppressWarnings("rawtypes")
-	public static boolean isExists(DataSource ds, Class clazz, Number... params) 
-			throws SQLException {
-		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
-		String sql = tp.getExistsSql(tp.getTableName(), (Object[])params);
-		return isExists(ds, sql, (Object[])params);
-	}
-	
-	@SuppressWarnings("rawtypes")
-	public static boolean isExists(DataSource ds, Class clazz, String... params) 
-			throws SQLException {
-		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
-		String sql = tp.getExistsSql(tp.getTableName(), (Object[])params);
-		return isExists(ds, sql, (Object[])params);
-	}
-	
-	@SuppressWarnings("rawtypes")
-	public static boolean isExists(DataSource ds, Class clazz, String fld, Object... params)
-			throws SQLException {
-		return isExists(ds, clazz, new String[]{fld}, params);
-	}
-	
-	@SuppressWarnings("rawtypes")
-	public static boolean isExists(DataSource ds, Class clazz, String[] fld, Object[] params)
-			throws SQLException {
-		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
-		String sql = tp.getExistsSql(tp.getTableName(), fld, params);
-		return isExists(ds, sql, params);
-	}
-
-	private static boolean isExists(DataSource ds, String tblName, GsonRow o, String... heads)
-			throws SQLException {
-		if (o == null) {
-			return false;
-		}
-		GsonRow r = o.remain(heads);
-		try {
-			if (r == null || !r.isExistsData()) {
-				return false;
-			}
-			String sql = SqlUtils.getExistsSql(tblName, r.getHead(), r.getData());
-			return isExists(ds, sql, r.getData());
-		} finally {
-			r = null;
-		}
-	}
-	
-	@SuppressWarnings({ "rawtypes", "unchecked"})
-	public static boolean isExists(DataSource ds, Class clazz, Object object) throws SQLException {
-		if (object == null) {
-			return false;
-		}
-//		if (SqlLoadUtils.isJavaSimpleClazz(object.getClass())) {
-//			return isExists(ds, clazz, new Object[]{object});
-//		}
-		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
-		GsonRow g = null;
-		try {
-			if (object instanceof Map) {
-				g = tp.mapToRow((Map)object);
-			} else {
-				g = tp.clazzToRow(object, PropAdapt.NOTNULL);
-			}
-			return isExists(ds, tp.getTableName(), g, tp.getFieldPK());
-		} finally {
-			g = null;
-		}
-	}
-	
-	@SuppressWarnings({ "rawtypes", "unchecked"})
-	public static boolean isExists(DataSource ds, Class clazz, Object object, String... heads) throws SQLException {
-		if (object == null) {
-			return false;
-		}
-		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
-		GsonRow g = null;
-		try {
-			if (object instanceof Map) {
-				g = tp.mapToRow((Map)object);
-			} else {
-				g = tp.clazzToRow(object, PropAdapt.NOTNULL);
-			}
-			return isExists(ds, tp.getTableName(), g, heads);
-		} finally {
-			g = null;
-		}
 	}
 
 	//delete
 	
 	@SuppressWarnings("rawtypes")
-	public static int delete(DataSource ds, Class clazz, Number... params)
+	public int delete(DataSource ds, Class clazz, Object[] params)
 			throws SQLException {
-		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
-		String sql = tp.getDeleteSql(tp.getTableName(), (Object[])params);
-		return DbConnection.update(ds, sql, (Object[])params);
+		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
+		String sql = tp.getDeleteSql(tp.getTableName(), params);
+		return DbConnection.update(ds, sql, params);
 	}
 	
 	@SuppressWarnings("rawtypes")
-	public static int delete(DataSource ds, Class clazz, String... params)
+	public int delete(DataSource ds, Class clazz, String fld, Object[] params)
 			throws SQLException {
-		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
-		String sql = tp.getDeleteSql(tp.getTableName(), (Object[])params);
-		return DbConnection.update(ds, sql, (Object[])params);
+		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
+		String sql = tp.getDeleteSql(tp.getTableName(), new String[]{fld}, params);
+		return DbConnection.update(ds, sql, params);
 	}
 	
 	@SuppressWarnings("rawtypes")
-	public static int delete(DataSource ds, Class clazz, String fld, Object... params)
+	public int delete(DataSource ds, Class clazz, String[] flds, Object[] params)
 			throws SQLException {
-		return delete(ds, clazz, new String[]{fld}, params);
-	}
-	
-	@SuppressWarnings("rawtypes")
-	public static int delete(DataSource ds, Class clazz, String[] flds, Object... params)
-			throws SQLException {
-		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
+		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
 		String sql = tp.getDeleteSql(tp.getTableName(), flds, params);
 		return DbConnection.update(ds, sql, params);
 	}
 	
-	public static int delete(DataSource ds, String tblName, String[] flds, Object... params)
+	public int delete(DataSource ds, String tblName, String[] flds, Object[] params)
 			throws SQLException {
 		String sql = SqlUtils.getDeleteSql(tblName, flds, params);
 		return DbConnection.update(ds, sql, params);
 	}
 
 	@SuppressWarnings("rawtypes")
-	public static int delete(DataSource ds, Class clazz, GsonRow o) throws SQLException {
+	public int delete(DataSource ds, Class clazz, GsonRow o) throws SQLException {
 		if (o == null) {
 			return 0;
 		}
-		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
+		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
 		return delete(ds, tp.getTableName(), o, tp.getFieldPK());
 	}
 
 	@SuppressWarnings("rawtypes")
-	public static int delete(DataSource ds, Class clazz, GsonRow o,	String... heads)
-			throws SQLException {
+	public int delete(DataSource ds, Class clazz,
+			GsonRow o, String[] heads) throws SQLException {
 		if (o == null) {
 			return 0;
 		}
-		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
+		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
 		return delete(ds, tp.getTableName(), o, heads);
 	}
 
 	@SuppressWarnings("rawtypes")
-	public static int delete(DataSource ds, Class clazz, GsonRows o) throws SQLException {
+	public int delete(DataSource ds, Class clazz,
+			GsonRows o) throws SQLException {
 		if (o == null) {
 			return 0;
 		}
-		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
+		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
 		return delete(ds, tp.getTableName(), o, tp.getFieldPK());
 	}
 
-	private static int delete(DataSource ds, String tblName,
-			GsonRow o, String... heads) throws SQLException {
+	private int delete(DataSource ds, String tblName,
+			GsonRow o, String[] heads) throws SQLException {
 		if (o == null) {
 			return 0;
 		}
@@ -221,7 +111,7 @@ public class SqlLoadUtils {
 		}
 	}
 
-	private static int delete(DataSource ds, String tblName,
+	private int delete(DataSource ds, String tblName,
 			GsonRows o, String[] heads) throws SQLException {
 		if (o == null) {
 			return 0;
@@ -239,21 +129,21 @@ public class SqlLoadUtils {
 	}
 
 	@SuppressWarnings("rawtypes")
-	public static int delete(DataSource ds, Class clazz,
+	public int delete(DataSource ds, Class clazz,
 			GsonRows o, String[] heads) throws SQLException {
 		if (o == null) {
 			return 0;
 		}
-		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
+		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
 		return delete(ds, tp.getTableName(), o, heads);
 	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked"})
-	public static int delete(DataSource ds, Class clazz, Object object) throws SQLException {
+	public int delete(DataSource ds, Class clazz, Object object) throws SQLException {
 		if (object == null) {
 			return 0;
 		}
-		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
+		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
 		GsonRow g = null;
 		try {
 			if (object instanceof Map) {
@@ -268,11 +158,11 @@ public class SqlLoadUtils {
 	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked"})
-	public static int delete(DataSource ds, Class clazz, Object object, String... heads) throws SQLException {
+	public int delete(DataSource ds, Class clazz, Object object, String[] heads) throws SQLException {
 		if (object == null) {
 			return 0;
 		}
-		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
+		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
 		GsonRow g = null;
 		try {
 			if (object instanceof Map) {
@@ -286,9 +176,9 @@ public class SqlLoadUtils {
 		}
 	}
 	
-    private static boolean isJavaSimpleClazz(Class<?> type) {
+    private boolean isJavaSimpleClazz(Class<?> type) {
         boolean result = false;
-        if (type == null) {
+        if (type == null) {					//要转换成json.null
             result = false;
         } else if (type.equals(String.class) || type.equals(Number.class) ||
                 type.equals(StringBuilder.class) || type.equals(StringBuffer.class) ||
@@ -311,7 +201,7 @@ public class SqlLoadUtils {
     }
 	
 	@SuppressWarnings({ "rawtypes", "unchecked"})
-	public static int delete(DataSource ds, Class clazz, List list) throws SQLException {
+	public int delete(DataSource ds, Class clazz, List list) throws SQLException {
 		if (list == null || list.isEmpty()) {
 			return 0;
 		}
@@ -324,7 +214,7 @@ public class SqlLoadUtils {
 		GsonRows g = null;
 		List<String> listJsonPk = new ArrayList<String>();
 		try {
-			TTableProps tp = JsonFieldXmlsLoader.get(clazz);
+			TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
 			if (o instanceof Map) {
 				g = tp.mapsToRows((List<Map<String, Object>>)list);
 			} else {
@@ -339,7 +229,7 @@ public class SqlLoadUtils {
 	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked"})
-	public static int delete(DataSource ds, Class clazz, List list, String[] heads) throws SQLException {
+	public int delete(DataSource ds, Class clazz, List list, String[] heads) throws SQLException {
 		if (list == null || list.isEmpty()) {
 			return 0;
 		}
@@ -351,7 +241,7 @@ public class SqlLoadUtils {
 		}
 		GsonRows g = null;
 		try {
-			TTableProps tp = JsonFieldXmlsLoader.get(clazz);
+			TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
 			if (list.get(0) instanceof Map) {
 				g = tp.mapsToRows((List<Map<String, Object>>)list);
 			} else {
@@ -366,12 +256,12 @@ public class SqlLoadUtils {
 	//insert
 	
 	@SuppressWarnings("rawtypes")
-	public static int insert(DataSource ds, Class clazz,
+	public int insert(DataSource ds, Class clazz,
 			GsonRow g) throws SQLException {
 		if (g == null) {
 			return 0;
 		}
-		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
+		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
 		if (!tp.isNonePkInc()) {
 			g.delHead(tp.getFieldPK());
 		}
@@ -380,12 +270,12 @@ public class SqlLoadUtils {
 	}
 
 	@SuppressWarnings("rawtypes")
-	public static int insert(DataSource ds, Class clazz,
+	public int insert(DataSource ds, Class clazz,
 			GsonRows g) throws SQLException {
 		if (g == null) {
 			return 0;
 		}
-		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
+		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
 		if (!tp.isNonePkInc()) {
 			g.delHead(tp.getFieldPK());
 		}
@@ -394,18 +284,18 @@ public class SqlLoadUtils {
 	}
 	
 	@SuppressWarnings({ "rawtypes"})
-	public static int insert(DataSource ds, Class clazz, Object object) throws SQLException {
+	public int insert(DataSource ds, Class clazz, Object object) throws SQLException {
 		return insert(ds, clazz, object, PropAdapt.NOTNULL);
 	}
 
 	// insert
 	
 	@SuppressWarnings({ "rawtypes", "unchecked"})
-	public static int insert(DataSource ds, Class clazz, Object object, PropAdapt pa) throws SQLException {
+	public int insert(DataSource ds, Class clazz, Object object, PropAdapt pa) throws SQLException {
 		if (object == null) {
 			return 0;
 		}
-		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
+		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
 		GsonRow g = null;
 		try {
 			if (object instanceof Map) {
@@ -421,16 +311,16 @@ public class SqlLoadUtils {
 	}
 
 	@SuppressWarnings({ "rawtypes" })
-	public static int insert(DataSource ds, Class clazz, List list) throws SQLException {
+	public int insert(DataSource ds, Class clazz, List list) throws SQLException {
 		return insert(ds, clazz, list, PropAdapt.NOTNULL);
 	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked"})
-	public static int insert(DataSource ds, Class clazz, List list, PropAdapt pa) throws SQLException {
+	public int insert(DataSource ds, Class clazz, List list, PropAdapt pa) throws SQLException {
 		if (list == null || list.isEmpty()) {
 			return 0;
 		}
-		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
+		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
 		int n = 0;
 		for (Object o : list) {
 			GsonRow g = null;
@@ -452,21 +342,21 @@ public class SqlLoadUtils {
 	// insertIgnore
 	
 	@SuppressWarnings({ "rawtypes"})
-	public static int insertIgnore(DataSource ds, Class clazz, Object object) throws SQLException {
+	public int insertIgnore(DataSource ds, Class clazz, Object object) throws SQLException {
 		return insertIgnore(ds, clazz, object, PropAdapt.NOTNULL);
 	}
 
 	@SuppressWarnings({ "rawtypes" })
-	public static int insertIgnore(DataSource ds, Class clazz, List list) throws SQLException {
+	public int insertIgnore(DataSource ds, Class clazz, List list) throws SQLException {
 		return insertIgnore(ds, clazz, list, PropAdapt.NOTNULL);
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked"})
-	public static int insertIgnore(DataSource ds, Class clazz, Object object, PropAdapt pa) throws SQLException {
+	public int insertIgnore(DataSource ds, Class clazz, Object object, PropAdapt pa) throws SQLException {
 		if (object == null) {
 			return 0;
 		}
-		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
+		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
 		GsonRow g = null;
 		try {
 			if (object instanceof Map) {
@@ -488,11 +378,11 @@ public class SqlLoadUtils {
 	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked"})
-	public static int insertIgnore(DataSource ds, Class clazz, List list, PropAdapt pa) throws SQLException {
+	public int insertIgnore(DataSource ds, Class clazz, List list, PropAdapt pa) throws SQLException {
 		if (list == null || list.isEmpty()) {
 			return 0;
 		}
-		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
+		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
 		int n = 0;
 		for (Object o : list) {
 			GsonRow g = null;
@@ -520,21 +410,21 @@ public class SqlLoadUtils {
 	// replace
 	
 	@SuppressWarnings({ "rawtypes"})
-	public static int replace(DataSource ds, Class clazz, Object object) throws SQLException {
+	public int replace(DataSource ds, Class clazz, Object object) throws SQLException {
 		return replace(ds, clazz, object, PropAdapt.NOTNULL);
 	}
 
 	@SuppressWarnings({ "rawtypes" })
-	public static int replace(DataSource ds, Class clazz, List list) throws SQLException {
+	public int replace(DataSource ds, Class clazz, List list) throws SQLException {
 		return replace(ds, clazz, list, PropAdapt.NOTNULL);
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked"})
-	public static int replace(DataSource ds, Class clazz, Object object, PropAdapt pa) throws SQLException {
+	public int replace(DataSource ds, Class clazz, Object object, PropAdapt pa) throws SQLException {
 		if (object == null) {
 			return 0;
 		}
-		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
+		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
 		GsonRow g = null;
 		try {
 			if (object instanceof Map) {
@@ -556,11 +446,11 @@ public class SqlLoadUtils {
 	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked"})
-	public static int replace(DataSource ds, Class clazz, List list, PropAdapt pa) throws SQLException {
+	public int replace(DataSource ds, Class clazz, List list, PropAdapt pa) throws SQLException {
 		if (list == null || list.isEmpty()) {
 			return 0;
 		}
-		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
+		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
 		int n = 0;
 		for (Object o : list) {
 			GsonRow g = null;
@@ -588,49 +478,107 @@ public class SqlLoadUtils {
 	// insertIgnoreBatch
 
 	@SuppressWarnings({ "rawtypes" })
-	public static int insertIgnoreBatch(DataSource ds, Class clazz, List list) throws SQLException {
+	public int insertIgnoreBatch(DataSource ds, Class clazz, List list) throws SQLException {
 		return insertIgnoreBatch(ds, clazz, list, PropAdapt.NOTNULL);
 	}
-	
-	@SuppressWarnings({ "rawtypes", "unchecked"})
-	public static int insertIgnoreBatch(DataSource ds, Class clazz, List list, PropAdapt pa) throws SQLException {
-		if (list == null || list.isEmpty()) {
-			return 0;
-		}
-		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
-		int n = 0;
-		GsonRows g = null;
-		try {
-			if (list.get(0) instanceof Map) {
-				g = tp.mapsToRows((List<Map<String, Object>>)list, true);
-			} else {
-				g = tp.clazzToRows(list, true, pa);
-			}
-			n += DbConnection.updateBatch(ds, tp, g, 
-					new SQLCallback<TTableProps, GsonRows, Connection>(){
-	            @Override  
-	            public String getSql(TTableProps tp, GsonRows g, Connection c) throws SQLException {
-	            	String insSql = CAutoFitSql.getInsertIgnore(c);
-		        	return tp.getInsertSql(g, true, insSql);
-		        }  
-			});
-		} finally {
-			g = null;
-		}
-		return n;
-	}
+  
+  @SuppressWarnings({ "rawtypes", "unchecked"})
+  public int insertIgnoreBatch(DataSource ds, Class clazz, List list, PropAdapt pa) throws SQLException {
+    if (list == null || list.isEmpty()) {
+      return 0;
+    }
+    TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
+    int n = 0;
+    GsonRows g = null;
+    try {
+      if (list.get(0) instanceof Map) {
+        g = tp.mapsToRows((List<Map<String, Object>>)list, true);
+      } else {
+        g = tp.clazzToRows(list, true, pa);
+      }
+      n += DbConnection.updateBatch(ds, tp, g, 
+          new SQLCallback<TTableProps, GsonRows, Connection>(){
+              @Override  
+              public String getSql(TTableProps tp, GsonRows g, Connection c) throws SQLException {
+                String insSql = CAutoFitSql.getInsertIgnore(c);
+              return tp.getInsertSql(g, true, insSql);
+            }  
+      });
+    } finally {
+      g = null;
+    }
+    return n;
+  }
+  
+  public int insertIgnoreBatch(DataSource ds, GsonRows g, String tblName) throws SQLException {
+    if (g == null || !g.isExistsData()) {
+      return 0;
+    }
+    int n = DbConnection.updateBatch(ds, null, g, 
+        new SQLCallback<TTableProps, GsonRows, Connection>(){
+            @Override  
+            public String getSql(TTableProps tp, GsonRows g, Connection c) throws SQLException {
+              String insSql = CAutoFitSql.getInsertIgnore(c);                
+              return SqlUtils.getInsertSql(tblName, g.getHead(), insSql);
+          }  
+    });
+    return n;
+  }
+  
+  public int repalceIgnoreBatch(DataSource ds, GsonRows g, String tblName) throws SQLException {
+    if (g == null || !g.isExistsData()) {
+      return 0;
+    }
+    int n = DbConnection.updateBatch(ds, null, g, 
+        new SQLCallback<TTableProps, GsonRows, Connection>(){
+            @Override  
+            public String getSql(TTableProps tp, GsonRows g, Connection c) throws SQLException {
+              String replSql = CAutoFitSql.getReplace(c);                
+              return SqlUtils.getInsertSql(tblName, g.getHead(), replSql);
+          }
+    });
+    return n;
+  }
+  
+  @SuppressWarnings({ "rawtypes", "unchecked", "null" })
+  public int insertIgnoreBatch(DataSource ds, List list, String tblName) throws SQLException {
+    if (list == null || list.isEmpty()) {
+      return 0;
+    }
+    TTableProps tp = null;
+    int n = 0;
+    GsonRows g = null;
+    try {
+      if (list.get(0) instanceof Map) {
+        g = tp.mapsToRows((List<Map<String, Object>>)list, true);
+      } else {
+        g = tp.clazzToRows(list, true, PropAdapt.NOTNULL);
+      }
+      n += DbConnection.updateBatch(ds, tp, g, 
+          new SQLCallback<TTableProps, GsonRows, Connection>(){
+              @Override  
+              public String getSql(TTableProps tp, GsonRows g, Connection c) throws SQLException {
+                String insSql = CAutoFitSql.getInsertIgnore(c);                
+                return SqlUtils.getInsertSql(tblName, g.getHead(), insSql);
+            }  
+      });
+    } finally {
+      g = null;
+    }
+    return n;
+  }
 
 	@SuppressWarnings({ "rawtypes" })
-	public static int insertBatch(DataSource ds, Class clazz, List list) throws SQLException {
+	public int insertBatch(DataSource ds, Class clazz, List list) throws SQLException {
 		return insertBatch(ds, clazz, list, PropAdapt.NOTNULL);
 	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked"})
-	public static int insertBatch(DataSource ds, Class clazz, List list, PropAdapt pa) throws SQLException {
+	public int insertBatch(DataSource ds, Class clazz, List list, PropAdapt pa) throws SQLException {
 		if (list == null || list.isEmpty()) {
 			return 0;
 		}
-		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
+		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
 		int n = 0;
 		GsonRows rows = null;
 		try {
@@ -648,16 +596,16 @@ public class SqlLoadUtils {
 	}
 
 	@SuppressWarnings({ "rawtypes" })
-	public static int updateBatch(DataSource ds, Class clazz, List list) throws SQLException {
+	public int updateBatch(DataSource ds, Class clazz, List list) throws SQLException {
 		return updateBatch(ds, clazz, list, PropAdapt.NOTNULL);
 	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked"})
-	public static int updateBatch(DataSource ds, Class clazz, List list, PropAdapt pa) throws SQLException {
+	public int updateBatch(DataSource ds, Class clazz, List list, PropAdapt pa) throws SQLException {
 		if (list == null || list.isEmpty()) {
 			return 0;
 		}
-		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
+		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
 		int n = 0;
 		GsonRows rows = null;
 		try {
@@ -678,12 +626,12 @@ public class SqlLoadUtils {
 	
 	//insertForPK
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public static int insertForPK(DataSource ds, Class clazz,
+	public int insertForPK(DataSource ds, Class clazz,
 			GsonRow g, String pk) throws SQLException {
 		if (g == null) {
 			return 0;
 		}
-		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
+		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
 		if (!tp.isNonePkInc()) {
 			g.delHead(tp.getFieldPK());
 		}
@@ -695,12 +643,12 @@ public class SqlLoadUtils {
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public static <T> T insertForPK(DataSource ds, Class clazz,
+	public <T> T insertForPK(DataSource ds, Class clazz,
 			GsonRow g) throws SQLException {
 		if (g == null) {
 			return null;
 		}
-		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
+		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
 		if (!tp.isNonePkInc()) {
 			g.delHead(tp.getFieldPK());
 		}
@@ -710,18 +658,18 @@ public class SqlLoadUtils {
 	}
 
 	@SuppressWarnings({ "rawtypes" })
-	public static <T> T insertForPK(DataSource ds, Class clazz,
+	public <T> T insertForPK(DataSource ds, Class clazz,
 			Object o) throws SQLException {
 		return insertForPK(ds, clazz, o, PropAdapt.NOTNULL);
 	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public static <T> T insertForPK(DataSource ds, Class clazz,
+	public <T> T insertForPK(DataSource ds, Class clazz,
 			Object o, PropAdapt pa) throws SQLException {
 		if (o == null) {
 			return null;
 		}
-		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
+		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
 		GsonRow g = null;
 		try {
 			if (o instanceof Map) {
@@ -738,36 +686,36 @@ public class SqlLoadUtils {
 	}	
 
 	@SuppressWarnings({ "rawtypes" })
-	public static <T> T insertForPK(DataSource ds, Class clazz,
+	public <T> T insertForPK(DataSource ds, Class clazz,
 			Object o, PKCallback cb) throws SQLException {
 		return insertForPK(ds, clazz, o, PropAdapt.NOTNULL, cb);
 	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public static <T> T insertForPK(DataSource ds, Class clazz,
+	public <T> T insertForPK(DataSource ds, Class clazz,
 			Object o, PropAdapt pa, PKCallback cb) throws SQLException {
 		T t = insertForPK(ds, clazz, o, pa);
 		if (t != null) {
 			Object u = cb.getIt(t);
-			int n = SqlLoadUtils.update(ds, clazz, u);
+			int n = this.update(ds, clazz, u);
 			cb.setResult(n);
 		}
 		return t;
 	}
 
 	@SuppressWarnings({ "rawtypes" })
-	public static <T> T insertForPK(DataSource ds, Class clazz,
+	public <T> T insertForPK(DataSource ds, Class clazz,
 			List list) throws SQLException {
 		return insertForPK(ds, clazz, list, PropAdapt.NOTNULL);
 	}
 	
 //	@SuppressWarnings({ "rawtypes", "unchecked" })
-//	public static <T> T insertForPK(DataSource ds, Class clazz,
+//	public <T> T insertForPK(DataSource ds, Class clazz,
 //			List list, PropAdapt pa) throws SQLException {
 //		if (list == null || list.isEmpty()) {
 //			return null;
 //		}
-//		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
+//		TTableProps tp = jsonFieldXmlsLoader.getTableProps(clazz);
 //		GsonRows g = null;
 //		try {
 //			if (list.get(0) instanceof Map) {
@@ -784,12 +732,12 @@ public class SqlLoadUtils {
 //	}
 
 	@SuppressWarnings({ "rawtypes" })
-	public static int insertForPK(DataSource ds, Class clazz,
+	public int insertForPK(DataSource ds, Class clazz,
 			GsonRows g, String pk) throws SQLException {
 		if (g == null) {
 			return 0;
 		}
-		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
+		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
 		if (!tp.isNonePkInc()) {
 			g.delHead(tp.getFieldPK());
 		}
@@ -801,12 +749,12 @@ public class SqlLoadUtils {
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public static <T> T insertForPK(DataSource ds, Class clazz,
+	public <T> T insertForPK(DataSource ds, Class clazz,
 			GsonRows g) throws SQLException {
 		if (g == null) {
 			return null;
 		}
-		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
+		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
 		if (!tp.isNonePkInc()) {
 			g.delHead(tp.getFieldPK());
 		}
@@ -817,70 +765,70 @@ public class SqlLoadUtils {
 	
 	// update
 	@SuppressWarnings("rawtypes")
-	public static int update(DataSource ds, Class clazz,
+	public int update(DataSource ds, Class clazz,
 			GsonRows g) throws SQLException {
-		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
+		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
 		String[] heads = tp.getFieldPK();
 		return update(ds, clazz, g, heads);
 	}
 
 	@SuppressWarnings("rawtypes")
-	public static int update(DataSource ds, Class clazz,
+	public int update(DataSource ds, Class clazz,
 			GsonRows g, String[] heads) throws SQLException {
 		if (g == null) {
 			return 0;
 		}
-		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
+		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
 		g.moveToEnd(heads);
 		String sql = tp.getUpdateSqlHead(tp.getTableName(), g.getHead(), heads);
 		return DbConnection.updateBatch(ds, sql, g.getData());
 	}
 
 	@SuppressWarnings({ "rawtypes" })
-	public static int update(DataSource ds, Class clazz, Object o) throws SQLException {
+	public int update(DataSource ds, Class clazz, Object o) throws SQLException {
 		return update(ds, clazz, o, PropAdapt.NOTNULL);
 	}
 	
 	@SuppressWarnings({ "rawtypes" })
-	public static int update(DataSource ds, Class clazz,
+	public int update(DataSource ds, Class clazz,
 			Object o, PropAdapt pa) throws SQLException {
 		if (o == null) {
 			return 0;
 		}
-		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
+		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
 		String[] heads = tp.getFieldPK();
 		return update(ds, tp, o, heads, pa);
 	}
 
 	@SuppressWarnings({ "rawtypes" })
-	public static int update(DataSource ds, Class clazz,
+	public int update(DataSource ds, Class clazz,
 			Object o, String[] heads) throws SQLException {
 		return update(ds, clazz, o, heads, PropAdapt.NOTNULL);
 	}
 	
 	@SuppressWarnings({ "rawtypes" })
-	public static int update(DataSource ds, Class clazz,
+	public int update(DataSource ds, Class clazz,
 			Object o, String[] heads, PropAdapt pa) throws SQLException {
 		if (o == null) {
 			return 0;
 		}
-		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
+		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
 		return update(ds, tp, o, heads, pa);
 	}
 
 	@SuppressWarnings({ "rawtypes" })
-	public static int update(DataSource ds, Class clazz,
+	public int update(DataSource ds, Class clazz,
 			List list) throws SQLException {
 		return update(ds, clazz, list, PropAdapt.NOTNULL);
 	}
 	
 	@SuppressWarnings({ "rawtypes" })
-	public static int update(DataSource ds, Class clazz,
+	public int update(DataSource ds, Class clazz,
 			List list, PropAdapt pa) throws SQLException {
 		if (list == null || list.isEmpty()) {
 			return 0;
 		}
-		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
+		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
 		String[] heads = tp.getFieldPK();
 		int n = 0;
 		for (Object o : list) {
@@ -890,19 +838,19 @@ public class SqlLoadUtils {
 	}
 
 	@SuppressWarnings({ "rawtypes" })
-	public static int update(DataSource ds, Class clazz,
+	public int update(DataSource ds, Class clazz,
 			List list, String[] heads) throws SQLException {
 		return update(ds, clazz, list, heads, PropAdapt.NOTNULL);
 	}
 	
 	@SuppressWarnings({ "rawtypes" })
-	public static int update(DataSource ds, Class clazz,
+	public int update(DataSource ds, Class clazz,
 			List list, String[] heads, PropAdapt pa) throws SQLException {
 		if (list == null || list.isEmpty()) {
 			return 0;
 		}
 		int n = 0;
-		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
+		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
 		for (Object o : list) {
 			n += update(ds, tp, o, heads, pa);
 		}
@@ -910,7 +858,7 @@ public class SqlLoadUtils {
 	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private static int update(DataSource ds, TTableProps tp,
+	private int update(DataSource ds, TTableProps tp,
 			Object o, String[] heads, PropAdapt pa) throws SQLException {
 		if (o == null) {
 			return 0;
@@ -927,34 +875,34 @@ public class SqlLoadUtils {
 	}
 
 	@SuppressWarnings("rawtypes")
-	public static int update(DataSource ds, Class clazz, GsonRow g) throws SQLException {
+	public int update(DataSource ds, Class clazz, GsonRow g) throws SQLException {
 		if (g == null) {
 			return 0;
 		}
-		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
+		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
 		String heads[] = tp.getFieldPK();
 		return update(ds, tp, g, heads, PropAdapt.NOTNULL);
 	}
 
 	@SuppressWarnings("rawtypes")
-	public static int update(DataSource ds, Class clazz,
+	public int update(DataSource ds, Class clazz,
 			GsonRow g, String[] heads) throws SQLException {
 		if (g == null) {
 			return 0;
 		}
-		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
+		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
 		return update(ds, tp, g, heads, PropAdapt.NOTNULL);
 	}
 
 	@SuppressWarnings("rawtypes")
-	public static int update(DataSource ds, Class clazz, String sqlId,
+	public int update(DataSource ds, Class clazz, String sqlId,
 			Object[] params) throws SQLException {
 		String sql = getSqlOfId(clazz, sqlId, null);
 		return DbConnection.update(ds, sql, params);
 	}
 
 	@SuppressWarnings("rawtypes")
-	public static int update(DataSource ds, Class clazz, String sqlId,
+	public int update(DataSource ds, Class clazz, String sqlId,
 			Map<String, ?> params) throws SQLException {
 		String sql = getSqlOfId(clazz, sqlId, null);
 		List<Object> paramList = new ArrayList<Object>();
@@ -964,58 +912,58 @@ public class SqlLoadUtils {
 
 	//updateBatch
 	@SuppressWarnings("rawtypes")
-	public static int updateBatch(DataSource ds, Class clazz, String sqlId,
+	public int updateBatch(DataSource ds, Class clazz, String sqlId,
 			Object[][] params) throws SQLException {
 		String sql = getSqlOfId(clazz, sqlId, null);
 		return DbConnection.updateBatch(ds, sql, params);
 	}
 
-	public static int updateSqlBatch(DataSource ds, String sql,
+	public int updateSqlBatch(DataSource ds, String sql,
 			Object[][] params) throws SQLException {
 		return DbConnection.updateBatch(ds, sql, params);
 	}
 
-	public static int updateSqlBatch(DataSource ds, String sql,
+	public int updateSqlBatch(DataSource ds, String sql,
 			List<Object[]> list) throws SQLException {
 		return DbConnection.updateBatch(ds, sql, ArrayComm.listToObjectArray(list));
 	}
 
-	public static int updateSqlBatch(DataSource ds, String sql,
+	public int updateSqlBatch(DataSource ds, String sql,
 			GsonRows rows) throws SQLException {
 		return DbConnection.updateBatch(ds, sql, rows.getData());
 	}
 
-	public static int updateSqlBatch(DataSource ds, String sql,
+	public int updateSqlBatch(DataSource ds, String sql,
 			GsonRow row) throws SQLException {
 		return DbConnection.update(ds, sql, row.getData());
 	}
 
 	//update sql
-	public static int updateSql(DataSource ds, String sql, Object[] params) throws SQLException {
+	public int updateSql(DataSource ds, String sql, Object[] params) throws SQLException {
 		return DbConnection.update(ds, sql, params);
 	}
 
-	public static int updateSql(DataSource ds, String sql) throws SQLException {
+	public int updateSql(DataSource ds, String sql) throws SQLException {
 		return DbConnection.update(ds, sql, (Object[])null);
 	}
 	
 	//call sp
 	@SuppressWarnings("rawtypes")
-	public static boolean callSP(DataSource ds, Class clazz, String sqlId,
+	public boolean callSP(DataSource ds, Class clazz, String sqlId,
 			Object[] in, Object[] out) throws SQLException {
 		String sProc = getSqlOfId(clazz, sqlId, null);
 		return DbConnection.callSP(ds, sProc, in, out);
 	}
 
 	@SuppressWarnings("rawtypes")
-	public static boolean callSpIn(DataSource ds, Class clazz, String sqlId,
+	public boolean callSpIn(DataSource ds, Class clazz, String sqlId,
 			Object[] in) throws SQLException {
 		String sProc = getSqlOfId(clazz, sqlId, null);
 		return DbConnection.callSP(ds, sProc, in, null);
 	}
 
 	@SuppressWarnings("rawtypes")
-	public static boolean callSpOut(DataSource ds, Class clazz,
+	public boolean callSpOut(DataSource ds, Class clazz,
 			String sqlId, Object[] out) throws SQLException {
 		String sProc = getSqlOfId(clazz, sqlId, null);
 		return DbConnection.callSP(ds, sProc, null, out);
@@ -1023,12 +971,12 @@ public class SqlLoadUtils {
 
 	//query
 	
-	public static <T> T querySql(DataSource ds, String sql, ResultSetHandler<T> rsh,
+	public <T> T querySql(DataSource ds, String sql, ResultSetHandler<T> rsh,
 			Map<String, ?> params) throws SQLException {
 		return querySql(ds, sql, rsh, params, null, null);
 	}
 
-	public static <T> T querySql(DataSource ds, String sql, ResultSetHandler<T> rsh,
+	public <T> T querySql(DataSource ds, String sql, ResultSetHandler<T> rsh,
 			Map<String, ?> params, Integer pageIdx, Integer pageSize) throws SQLException {
 		List<Object> paramList = new ArrayList<Object>();
 		sql = SqlParser.parse(sql, params, paramList);
@@ -1036,7 +984,7 @@ public class SqlLoadUtils {
 				pageIdx, pageSize, rsh);
 	}
 	
-	public static <T> T querySqlOne(DataSource ds, String sql, ResultSetHandler<T> rsh,
+	public <T> T querySqlOne(DataSource ds, String sql, ResultSetHandler<T> rsh,
 			Map<String, ?> params) throws SQLException {
 		return querySql(ds, sql, rsh, params, 0, 1);
 	}
@@ -1044,7 +992,7 @@ public class SqlLoadUtils {
 	// query
 
 	@SuppressWarnings("rawtypes")
-	public static <T> T query(DataSource ds, Class clazz, String sqlId, String colId,
+	public <T> T query(DataSource ds, Class clazz, String sqlId, String colId,
 			Map<String, ?> params, Integer pageIdx, Integer pageSize, 
 			ResultSetHandler<T> rsh) throws SQLException {
 		String sql = getSqlOfId(clazz, sqlId, colId);
@@ -1052,38 +1000,38 @@ public class SqlLoadUtils {
 	}
 
 	@SuppressWarnings("rawtypes")
-	public static <T> T query(DataSource ds, Class clazz, String sqlId, String colId,
+	public <T> T query(DataSource ds, Class clazz, String sqlId, String colId,
 			ResultSetHandler<T> rsh, Map<String, ?> params) throws SQLException {
 		return query(ds, clazz, sqlId, colId, params, null, null, rsh);
 	}
 
 	@SuppressWarnings("rawtypes")
-	public static <T> T queryOne(DataSource ds, Class clazz, String sqlId, String colId,
+	public <T> T queryOne(DataSource ds, Class clazz, String sqlId, String colId,
 			ResultSetHandler<T> rsh, Map<String, ?> params) throws SQLException {
 		return query(ds, clazz, sqlId, colId, params, 0, 1, rsh);
 	}
 	
 	@SuppressWarnings("rawtypes")
-	public static <T> T query(DataSource ds, Class clazz, String sqlId, 
+	public <T> T query(DataSource ds, Class clazz, String sqlId, 
 			Map<String, ?> params, Integer pageIdx, Integer pageSize, 
 			ResultSetHandler<T> rsh) throws SQLException {
 		return query(ds, clazz, sqlId, null, params, pageIdx, pageSize, rsh);
 	}
 
 	@SuppressWarnings("rawtypes")
-	public static <T> T query(DataSource ds, Class clazz, String sqlId, ResultSetHandler<T> rsh,
+	public <T> T query(DataSource ds, Class clazz, String sqlId, ResultSetHandler<T> rsh,
 			Map<String, ?> params) throws SQLException {
 		return query(ds, clazz, sqlId, params, null, null, rsh);
 	}
 
 	@SuppressWarnings("rawtypes")
-	public static <T> T queryOne(DataSource ds, Class clazz, String sqlId, ResultSetHandler<T> rsh,
+	public <T> T queryOne(DataSource ds, Class clazz, String sqlId, ResultSetHandler<T> rsh,
 			Map<String, ?> params) throws SQLException {
 		return query(ds, clazz, sqlId, params, 0, 1, rsh);
 	}
 	
 	@SuppressWarnings("rawtypes")
-	private static boolean isJavaSimpleClazz(Object o) throws SQLException {
+	private boolean isJavaSimpleClazz(Object o) throws SQLException {
 		boolean result = false;
 		if (o instanceof Map) {
 			result = false;
@@ -1115,7 +1063,7 @@ public class SqlLoadUtils {
 	// queryByPK
 	
 	@SuppressWarnings({ "rawtypes" })
-	public static <T> T queryByPK(DataSource ds, Class clazz, String sqlId, String colId,
+	public <T> T queryByPK(DataSource ds, Class clazz, String sqlId, String colId,
 			Object o, Integer pageIdx, Integer pageSize,
 			ResultSetHandler<T> rsh) throws SQLException {
 		if ( o == null ) {
@@ -1123,7 +1071,7 @@ public class SqlLoadUtils {
 		} else if ( !isJavaSimpleClazz(o) ) {
 			throw new SQLException("primary key type is error");
 		}
-		TTableProps tp = JsonFieldXmlsLoader.get(clazz);
+		TTableProps tp = JsonFieldXmlsLoader.getTableProps(clazz);
 		String sql = getSqlOfId(clazz, sqlId, colId);
 		Map<String, Object> params = SqlParser.getMapOfFieldPK(sql, tp.getSetPk());
 		if (params == null || params.isEmpty()) {
@@ -1169,32 +1117,32 @@ public class SqlLoadUtils {
 	}
 
 	@SuppressWarnings("rawtypes")
-	public static <T> T queryByPK(DataSource ds, Class clazz, String sqlId, String colId, ResultSetHandler<T> rsh,
+	public <T> T queryByPK(DataSource ds, Class clazz, String sqlId, String colId, ResultSetHandler<T> rsh,
 			Object o) throws SQLException {
 		return queryByPK(ds, clazz, sqlId, colId, o, null, null, rsh);
 	}
 
 	@SuppressWarnings("rawtypes")
-	public static <T> T queryByPKOne(DataSource ds, Class clazz, String sqlId, String colId, ResultSetHandler<T> rsh,
+	public <T> T queryByPKOne(DataSource ds, Class clazz, String sqlId, String colId, ResultSetHandler<T> rsh,
 			Object o) throws SQLException {
 		return queryByPK(ds, clazz, sqlId, colId, o, 0, 1, rsh);
 	}
 	
 	@SuppressWarnings({ "rawtypes" })
-	public static <T> T queryByPK(DataSource ds, Class clazz, String sqlId,
+	public <T> T queryByPK(DataSource ds, Class clazz, String sqlId,
 			Object o, Integer pageIdx, Integer pageSize,
 			ResultSetHandler<T> rsh) throws SQLException {
 		return queryByPK(ds, clazz, sqlId, null, o, pageIdx, pageSize, rsh);
 	}
 	
 	@SuppressWarnings("rawtypes")
-	public static <T> T queryByPK(DataSource ds, Class clazz, String sqlId, ResultSetHandler<T> rsh,
+	public <T> T queryByPK(DataSource ds, Class clazz, String sqlId, ResultSetHandler<T> rsh,
 			Object o) throws SQLException {
 		return queryByPK(ds, clazz, sqlId, o, null, null, rsh);
 	}
 
 	@SuppressWarnings("rawtypes")
-	public static <T> T queryByPKOne(DataSource ds, Class clazz, String sqlId, ResultSetHandler<T> rsh,
+	public <T> T queryByPKOne(DataSource ds, Class clazz, String sqlId, ResultSetHandler<T> rsh,
 			Object o) throws SQLException {
 		return queryByPK(ds, clazz, sqlId, o, 0, 1, rsh);
 	}

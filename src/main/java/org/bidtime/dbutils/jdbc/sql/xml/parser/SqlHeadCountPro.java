@@ -5,22 +5,15 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
+import javax.sql.DataSource;
+
 public class SqlHeadCountPro {
 	
 	private Map<String, ColProEx> mapCol;
+	
+	private String mapConvert;
 
 	private static class ColProEx {
-		
-//		@SuppressWarnings("unused")
-//		public static void main(String[] args) {
-//			ColProEx p = new ColProEx("id,code,name,get", "");
-//			for (int i=0; i<10; i++) {
-//				String sql = "select id,code,name,memo,licnum FROM a_carsrc";
-//				String s = p.replSql(sql);
-//				System.out.print(i + "\t");
-//				System.out.println(s);
-//			}
-//		}
 
 		public ColProEx(String cols, String prop) {
 			this.prop = prop;
@@ -153,7 +146,7 @@ public class SqlHeadCountPro {
 	}
 
 	private String id;
-	private String type; // "insert", "delete", "update", "select", "call"
+	private int sqlCmdType; // "insert", "delete", "update", "select", "call"
 
 	private String sql;
 
@@ -165,7 +158,15 @@ public class SqlHeadCountPro {
 		this.sql = sql;
 	}
 
-	public SqlHeadCountPro() {
+	public SqlHeadCountPro(String id, String sql) {
+		this.id = id;
+		this.sql = sql;
+	}
+
+	public SqlHeadCountPro(int sqlCmdType, String id, String sql) {
+		this.id = id;
+		this.sql = sql;
+		this.sqlCmdType = sqlCmdType;
 	}
 
 	public String getId() {
@@ -176,12 +177,12 @@ public class SqlHeadCountPro {
 		this.id = id;
 	}
 
-	public String getType() {
-		return type;
+	public int getSqlCmdType() {
+		return sqlCmdType;
 	}
 
-	public void setType(String type) {
-		this.type = type;
+	public void setSqlCmdType(int sqlCmdType) {
+		this.sqlCmdType = sqlCmdType;
 	}
 
 	public void setCol(String colId, String cols, String oper) {
@@ -278,5 +279,18 @@ public class SqlHeadCountPro {
 	    }  
 	      
 	    return false;  
-	} 
+	}
+
+	public Object execute(DataSource ds, Object[] args, Map<String, String> mapConvert) throws Exception {
+		return SqlExecute.execute(ds, this, args, mapConvert);
+	}
+
+	public String getMapConvert() {
+		return mapConvert;
+	}
+
+	public void setMapConvert(String mapConvert) {
+		this.mapConvert = mapConvert;
+	}
+	
 }

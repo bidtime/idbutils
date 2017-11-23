@@ -1,8 +1,7 @@
 package org.bidtime.dbutils.gson;
 
 import java.io.Serializable;
-import java.sql.SQLException;
-import java.util.List;
+import java.util.Collection;
 
 @SuppressWarnings("serial")
 public class ResultDTO<T> implements Serializable {
@@ -23,11 +22,8 @@ public class ResultDTO<T> implements Serializable {
     @SuppressWarnings({"rawtypes"})
     public void setData(T data) {
         if (data != null) {
-            //this.setType(data.getClass());
-            if (data instanceof List) {
-                this.len = ((List) data).size();
-            } else if (data instanceof ResultDTO) {
-                // ResultDTO resultDTO = (ResultDTO) data;
+            if (data instanceof Collection) {
+                this.len = ((Collection) data).size();
             }
         }
         this.data = data;
@@ -86,7 +82,7 @@ public class ResultDTO<T> implements Serializable {
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
-    public static ResultDTO success(Object data) {
+    public static <K> ResultDTO success(K data) {
         ResultDTO r = new ResultDTO();
         r.setData(data);
         return r;
@@ -142,7 +138,7 @@ public class ResultDTO<T> implements Serializable {
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
-    public static ResultDTO error(String msg, Object data) {
+    public static <K> ResultDTO error(String msg, K data) {
         ResultDTO r = new ResultDTO();
         r.setSuccess(false);
         r.setMsg(msg);
@@ -162,53 +158,31 @@ public class ResultDTO<T> implements Serializable {
     }
 
     //组装数据用回调接口
-    @SuppressWarnings({ "rawtypes" })
-	public static void doResult(ResultDTO dto, AssembDataCallBack cb) throws Exception {
-    	if (dto != null) {
-    		dto.assemb(cb);
-    	}
-    }
-    
-    //组装数据用回调接口
-    @Deprecated
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-	public void assemb(AssembDataCallBack cb) throws Exception {
-        if (isSuccess() && cb != null) {
-            Object o = this.getData();
-            if ( o != null ) {
-	            if (o instanceof List) {
-	                for (T t : (List<T>) o) {
-	                	cb.assemb(t);
-	                }
-	            } else {
-	           		cb.assemb((T)o);
-	            }
-            }
-        }
-    }
-
-    //组装数据用回调接口
-    @SuppressWarnings({ "rawtypes" })
-	public static void doResult(ResultDTO dto, ResultDataCallBack cb) throws SQLException {
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+	public static void doResult(ResultDTO<?> dto, ResultDataCallBack cb) throws Exception {
     	if (dto != null) {
     		dto.resultData(cb);
     	}
     }
 	    
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-	private void resultData(ResultDataCallBack cb) throws SQLException {
-        if (isSuccess() && cb != null) {
-            Object o = this.getData();
-            if ( o != null ) {
-	            if (o instanceof List) {
-	                for (T t : (List<T>) o) {
-	                	cb.callback(t);
-	                }
-	            } else {
-	           		cb.callback((T)o);
-	            }
+    //组装数据用回调接口
+	public void resultData(ResultDataCallBack<T> cb) throws Exception {
+        if (this.isSuccess() && cb != null) {
+            T o = this.getData();
+            if (o != null) {
+              if (o instanceof Collection) {
+                @SuppressWarnings({ "unchecked" })
+                Collection<T> c = (Collection<T>) o;
+                if ( !c.isEmpty() ) {
+                  for (T t : c) {
+                    cb.callback(t);
+                  }
+                }
+              } else {
+                cb.callback((T) o);
+              }
             }
-        }
+          }
     }
-
+    
 }

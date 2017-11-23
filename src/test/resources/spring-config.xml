@@ -10,21 +10,7 @@
     
     <context:property-placeholder location="classpath:appConfig.properties"
 		ignore-unresolvable="true"/>
-                                  
-    <bean id="globalParams" class="org.bidtime.utils.file.GlobalParams"
-          init-method="init" lazy-init="false">
-        <!-- 静态资源如图片等的url -->
-        <property name="webUrl" value="${webUrl}"/>
-        <property name="webRoot" value="${webRoot}"/>
-    </bean>
-    
-    <bean id="jsonFieldXmlsLoader" class="org.bidtime.dbutils.jdbc.sql.xml.JsonFieldXmlsLoader"
-          init-method="init" lazy-init="false">
-        <property name="packageRoot" value="org.bidtime.basicdata"/>
-        <property name="extName" value=".xml"/>
-        <property name="recursive" value="true"/>
-    </bean>
 
-	<context:component-scan base-package="org.bidtime.basicdata" />
+	<context:component-scan base-package="org.bidtime" />
 
 </beans>

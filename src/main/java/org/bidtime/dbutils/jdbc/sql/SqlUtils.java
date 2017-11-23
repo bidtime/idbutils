@@ -4,11 +4,12 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.bidtime.dbutils.jdbc.sql.xml.parser.ColumnPro;
 import org.bidtime.utils.basic.ObjectComm;
 
@@ -200,17 +201,6 @@ public class SqlUtils {
 		return sql.toString();
 	}
 
-	public static String getExistsOfTable(String tableName, String sWhereSql) {
-		StringBuilder sql = new StringBuilder();
-		sql.append("select 1 from ");
-		sql.append(tableName);
-		if (StringUtils.isNotEmpty(sWhereSql)) {
-			sql.append(" where ");
-			sql.append(sWhereSql);
-		}
-		return sql.toString();
-	}
-
 	public static String getCountSql(String sql) {
 		return "select count(*) from (" + sql + ")a";
 	}
@@ -267,7 +257,7 @@ public class SqlUtils {
 	/*
 	 * 获取可以执行的delete sql
 	 */
-	public static String getDeleteSql(String tableName, String... listPK) {
+	public static String getDeleteSql(String tableName, Object[] listPK) {
 		String sWhereSql = getWhereSqlOfListObject(listPK);
 		return getDeleteOfTable(tableName, sWhereSql);
 	}
@@ -276,7 +266,7 @@ public class SqlUtils {
 	 * 获取可以执行的delete sql
 	 */
 	public static String getDeleteSql(String tableName, Object[] listPK,
-			Object... pks) {
+			Object[] pks) {
 		StringBuilder sWhereSql = new StringBuilder();
 		for (int i = 0; i < pks.length; i++) {
 			if (i == 0) {
@@ -288,14 +278,11 @@ public class SqlUtils {
 		}
 		return getDeleteOfTable(tableName, sWhereSql.toString());
 	}
-
-	/*
-	 * 获取 select 1 from
-	 */
-	public static String getExistsSql(String tableName, Object[] listPK,
-			Object... pks) {
+	
+	public static String getDeleteSql(String tableName, Object[] listPK,
+			Collection<?> pks) {
 		StringBuilder sWhereSql = new StringBuilder();
-		for (int i = 0; i < pks.length; i++) {
+		for (int i = 0; i < pks.size(); i++) {
 			if (i == 0) {
 				sWhereSql.append(getWhereSqlOfListObject(listPK));
 			} else {
@@ -303,7 +290,7 @@ public class SqlUtils {
 				sWhereSql.append(getWhereSqlOfListObject(listPK));
 			}
 		}
-		return getExistsOfTable(tableName, sWhereSql.toString());
+		return getDeleteOfTable(tableName, sWhereSql.toString());
 	}
 
 	public static final int getObjectType(Object param) {
@@ -332,6 +319,9 @@ public class SqlUtils {
 
 	// decimal, numberic, datetime, BIGINT
 	public static final int getObjectType(String typeName) {
+		if (typeName == null) {
+			return Types.VARCHAR;
+		}
 		// int type = Types.VARCHAR;
 		if (typeName.equalsIgnoreCase("int")
 				|| typeName.equalsIgnoreCase("integer")) {

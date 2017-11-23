@@ -3,7 +3,7 @@ package org.bidtime.dbutils.jdbc.sql.xml.parser;
 import java.sql.Types;
 import java.util.Date;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.bidtime.dbutils.jdbc.sql.SqlUtils;
 import org.bidtime.utils.basic.DateTimeComm;
 

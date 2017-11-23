@@ -2,7 +2,7 @@ package org.bidtime.dbutils.jdbc.dialect;
 
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 public class OracleDialect implements Dialect {
 
@@ -34,6 +34,7 @@ public class OracleDialect implements Dialect {
 		return "insert ignore into";
 	}
 	
+  @Override
 	public String getReplace() {
 		return "replace into";
 	}

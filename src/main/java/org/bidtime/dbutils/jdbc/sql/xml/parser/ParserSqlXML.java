@@ -6,10 +6,11 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.StringTokenizer;
+import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.bidtime.dbutils.jdbc.sql.ArrayUtils;
+import org.bidtime.utils.comm.CaseInsensitiveHashMap;
 import org.dom4j.Attribute;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -28,88 +29,29 @@ public class ParserSqlXML {
 
 //	private static final Pattern REPLACE_PATN = Pattern
 //			.compile("\\{[\\sorder by\\s]*\\}");
-//	
-//	private static String replace(String inSql, Map<String, ?> params) {
-//		StringBuilder result = new StringBuilder(inSql.length());
-//		for (Matcher matcher = REPLACE_PATN.matcher(inSql); matcher.find(); matcher = REPLACE_PATN
-//				.matcher(inSql)) {
-//			int start = matcher.start();
-//			int end = matcher.end();
-//			result.append(inSql.substring(0, start));
-//			String group = matcher.group();
-//			String replace = (String) params.get(group
-//					.replaceAll("\\{|\\}", "").trim());
-//			replace = replace == null ? " " : " " + replace + " ";
-//			result.append(replace);
-//			inSql = inSql.substring(end);
-//		}
-//		result.append(inSql);
-//		return result.toString();
-//	}
-
-	/**
-	 * @param args
-	 * 
-	 */
-	// public static void main(String[] args) {
-	// try {
-	// //List<TTableProps> list =
-	// ParserSqlXML.parserTables(ParserSqlXML.class,"/com/eb/sql/db.xml");
-	// //visitListTable(list);
-	// ParserSqlXML.parserSql(ParserSqlXML.class,"/com/qmsk/sql/db.xml");
-	// } catch (DocumentException e) {
-	// } finally {
-	// }
-	// }
-
-	// private static <T> getAttributeValue(Element e, String name,Class<T>
-	// targetType) {
-	// if (e.attribute(name)!=null) {
-	// return (T) e.attribute(name);
-	// } else return null;
-	// }
 
 	private static void elementToColumnPro(Element e, ColumnPro p) {
-		if (e.attribute("name") != null) {
-			p.setName(e.attribute("name").getValue().trim().toLowerCase());
-		}
-		if (e.attribute("column") != null) {
-			p.setColumn(e.attribute("column").getValue().trim().toLowerCase());
-		}
-		if (e.attribute("type") != null) {
-			p.setType(e.attribute("type").getValue().trim().toLowerCase());
-		}
-		if (e.attribute("length") != null) {
-			p.setLength(Integer
-					.valueOf(e.attribute("length").getValue().trim()));
-		}
-		if (e.attribute("generator") != null) {
-			p.setGenerator(e.attribute("generator").getValue().trim());
-		}
-		if (e.attribute("not-null") != null) {
-			Boolean b = Boolean.valueOf(e.attribute("not-null").getValue()
-					.trim());
-			p.setNotNull(b);
-		}
+		p.setName(getAttrValue(e, "name"));
+		p.setColumn(getAttrValue(e, "column"));
+		p.setType(getAttrValue(e, "type"));
+		p.setLength(Integer.valueOf(getAttrValue(e, "length")));
+		p.setGenerator(getAttrValue(e, "generator"));
+		p.setNotNull( Boolean.valueOf(getAttrValue(e, "not-null")) );
 		if (p.getNotNull()) {
-			if (e.attribute("default") != null) {
-				p.setDefaultValue(e.attribute("default").getValue());
-			}
+			p.setDefaultValue(getAttrValue(e, "default"));
 		}
 	}
 
-	@SuppressWarnings("rawtypes")
 	private static void visitClassElementChild(Element pElement, TTableProps tp) {
 		List<String> listPkField = new ArrayList<String>();
-		for (Iterator iter1 = pElement.elementIterator(); iter1.hasNext();) {
-			Element e = (Element) iter1.next();
-			// logger.info(e.getName() + ": " + e.getText());
-			if (e.getName().trim().equalsIgnoreCase("id")) {
+		for (Iterator<?> iter = pElement.elementIterator(); iter.hasNext();) {
+			Element e = (Element) iter.next();
+			if (e.getName().equals("id")) {
 				ColumnPro p = new ColumnPro(true);
 				elementToColumnPro(e, p);
 				listPkField.add(p.getColumn());
 				tp.addColsPkPro(p.getName(), p);
-			} else if (e.getName().trim().equalsIgnoreCase("property")) {
+			} else if (e.getName().equals("property")) {
 				ColumnPro p = new ColumnPro(false);
 				elementToColumnPro(e, p);
 				tp.addColsCommonPro(p.getName(), p);
@@ -117,46 +59,35 @@ public class ParserSqlXML {
 		}
 		tp.setFieldPK(ArrayUtils.listToStringArray(listPkField));
 	}
-
-//	private static String trimAll(String str) {
-//		StringBuilder sb = new StringBuilder();
-//		char c = ' ';
-//		for (int i = 0; i < str.length(); i++) {
-//			char s = str.charAt(i);
-//			if (s != c) {
-//				sb.append(s);
-//			}
-//		}
-//		return sb.toString();
+	
+//	private static void attrValueToMap(Element e, String attrName, Map<String, String> map) {
+//		String value = getAttrValue(e, attrName);
+//		String key = attrName;
+//		map.put(key, value);
 //	}
 
-//	private static String removeDoubleSpace(String str) {
-//		StringBuilder sb = new StringBuilder();
-//		char c = ' ';
-//		int nSpaceCounts = 0;
-//		for (int i = 0; i < str.length(); i++) {
-//			char s = str.charAt(i);
-//			if (s != c) {
-//				if (nSpaceCounts > 0) {
-//					sb.append(c);
-//				}
-//				sb.append(s);
-//				nSpaceCounts = 0;
-//			} else {
-//				nSpaceCounts++;
-//			}
-//		}
-//		return sb.toString();
-//	}
-
-	public static String removeSpaces(String s) {
-		StringTokenizer st = new StringTokenizer(s, " ", false);
-		String t = "";
-		while (st.hasMoreElements()) {
-			t += st.nextElement();
+	private static Map<String, String> getElementToMapConvert(Element pElement) {
+		Map<String, String> map = new CaseInsensitiveHashMap<String>();
+		for (Iterator<?> iter = pElement.elementIterator(); iter.hasNext();) {
+			Element e = (Element) iter.next();
+			if (e.getName().equals("id") || e.getName().equals("property")) {
+				//p.setType(getAttrValue(e, "type"));
+				String key = getAttrValue(e, "column");
+				String value = getAttrValue(e, "name");
+				map.put(key, value);
+			}
 		}
-		return t;
+		return map;
 	}
+
+//	public static String removeSpaces(String s) {
+//		StringTokenizer st = new StringTokenizer(s, " ", false);
+//		String t = "";
+//		while (st.hasMoreElements()) {
+//			t += st.nextElement();
+//		}
+//		return t;
+//	}
 	
 //	private static final Pattern SQL_STANDARD_PATN = Pattern.compile(
 //			"^*(insert|delete|update|if exists|select|call)\\s", Pattern.CASE_INSENSITIVE);
@@ -187,10 +118,10 @@ public class ParserSqlXML {
 	private static void visitSqlIdCol(Element pele, SqlHeadCountPro p) {
 		for (Iterator it1 = pele.elementIterator(); it1.hasNext();) {
 			Element pe = (Element) it1.next();
-			if (pe.getName().equalsIgnoreCase("cols")) {
+			if (pe.getName().equals("cols")) {
 				for (Iterator iter1 = pe.elementIterator(); iter1.hasNext();) {
 					Element e = (Element) iter1.next();
-					if (e.getName().equalsIgnoreCase("col")) {
+					if (e.getName().equals("col")) {
 						Attribute atName = e.attribute("name");
 						if (atName != null) {
 							Attribute atProp = e.attribute("prop");
@@ -205,33 +136,37 @@ public class ParserSqlXML {
 			}
 		}
 	}
+	
+	private static String getAttrValue(Element e, String attrName) {
+		Attribute eleAttr = e.attribute(attrName);
+		if (eleAttr != null) {
+			return eleAttr.getValue();
+		} else {
+			return null;
+		}
+	}
 
 	@SuppressWarnings("rawtypes")
 	private static void visitSqlElementChild_tp(Element pElement, TTableProps tp)
 			throws DocumentException {
 		for (Iterator iter1 = pElement.elementIterator(); iter1.hasNext();) {
 			Element e = (Element) iter1.next();
-			if (StringUtils.equalsIgnoreCase(e.getName(), "id")) {
+			if (StringUtils.equals(e.getName(), "id")) {
 				// attribute name
-				Attribute attrClassName = e.attribute("name");
-				if (attrClassName == null
-						|| StringUtils.isEmpty(attrClassName.getValue())) {
+				String id = getAttrValue(e, "name");
+				if (StringUtils.isEmpty(id)) {
 					throw new DocumentException("sql id is null");
 				}
-				if (StringUtils.isEmpty(e.getText())) {
+				String sql = e.getText();
+				if (StringUtils.isEmpty(sql)) {
 					throw new DocumentException("sql context is null");
 				}
-				String id = attrClassName.getValue();
-				String sql = e.getText();
-				SqlHeadCountPro p = new SqlHeadCountPro();
-				p.setId(id);
-				p.setSql(sql);
+				SqlHeadCountPro p = new SqlHeadCountPro(id, sql);
 				// attribute type
-				Attribute attrTypeName = e.attribute("type");
-				if (attrTypeName != null) {
-					p.setType(attrTypeName.getValue());
-				}
-				// sSql = removeDoubleSpace(sSql);
+				int sqlCmdType = SQLCmdType.getSqlCmdType(sql);
+				p.setSqlCmdType(sqlCmdType);
+				// mapConvert
+				p.setMapConvert(getAttrValue(e, "mapConvert"));
 //				Attribute attrCountIdSql = e.attribute("countSqlId");
 //				if (attrCountIdSql != null) {
 //					p.setCountSqlId(attrCountIdSql.getValue());
@@ -246,20 +181,13 @@ public class ParserSqlXML {
 //				}
 				visitSqlIdCol(e, p);
 				tp.addSqlHeadPro(p);
-				// String sSqlLower = sSql.toLowerCase();
-				// if (sSqlLower.indexOf("select ") == 0
-				// || sSqlLower.indexOf("delete ") == 0
-				// || sSqlLower.indexOf("update ") == 0
-				// || sSqlLower.indexOf("insert into ") == 0
-				// || sSqlLower.indexOf("if exists") == 0
-				// || sSqlLower.indexOf("call ") >= 0
-				// || sSqlLower.indexOf(" call") >= 0) {
-				// sSql = removeDoubleSpace(sSql);
-				// } else {
-				// sSql = trimAll(sSql);
-				// }
-				// hashMap.put(attrClassName.getValue(), sSql);
-				//logger.info(attrClassName.getValue() + ": " + sSql);
+			} else if (StringUtils.equalsIgnoreCase(e.getName(), "mapConvert")) {
+				String id = getAttrValue(e, "id");
+				if (StringUtils.isEmpty(id)) {
+					throw new DocumentException("mapConvert id is null");
+				}
+				Map<String, String> map = getElementToMapConvert(e);
+				tp.addToMapBeanConvert(id, map);
 			}
 		}
 	}
@@ -285,26 +213,28 @@ public class ParserSqlXML {
 			Element root = document.getRootElement();
 			tp = new TTableProps();
 			//class
-			Element elementClass = root.element("class");
-			if (elementClass != null) {
-				Attribute attrClassName = elementClass.attribute("name");
-				Attribute attrTableName = elementClass.attribute("table");
-				if (attrClassName == null || attrClassName.getValue() == null
-						|| attrClassName.getValue().trim().equalsIgnoreCase("")) {
+			Element eleClass = root.element("class");
+			if (eleClass != null) {
+				//String packageName = getAttrValue(eleClass, "package");
+				String beanName = getAttrValue(eleClass, "name");
+				if (beanName == null) {
 					throw new DocumentException("class name is null");
 				}
-				if (attrTableName == null || attrTableName.getValue() == null
-						|| attrTableName.getValue().trim().equalsIgnoreCase("")) {
+				String tableName = getAttrValue(eleClass, "table");
+				if (StringUtils.isEmpty(tableName)) {
 					throw new DocumentException("table name is null");
 				}
-				tp.setTableName(attrTableName.getValue());
-				tp.setClassName(attrClassName.getValue());
-				visitClassElementChild(elementClass, tp);
+				tp.setTableName(tableName);
+				tp.setClassName(beanName);
+				//
+				visitClassElementChild(eleClass, tp);
 			}
 			//sql
 			Element elementSql = root.element("sql");
 			if (elementSql != null) {
 				visitSqlElementChild_tp(elementSql, tp);
+			} else {	//
+				
 			}
 		} finally {
 			try {

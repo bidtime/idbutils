@@ -2,45 +2,61 @@ package org.bidtime.dbutils.jdbc.rs.handle.ext;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Map;
 
 import org.bidtime.dbutils.gson.ResultDTO;
+import org.bidtime.dbutils.jdbc.rs.BeanProcessorEx;
 
 /**
  * @author jss
  * 
- *         提供对从ResultSet进行预处理的功能,继承自dbutils的ResultSetExHandler类
+ *         提供对从ResultSet进行预处理的功能,继承自dbutils的ResultSetHandler类
  *
  */
 @SuppressWarnings("serial")
 public class ResultSetDTOHandler<T> extends ResultSetExHandler<ResultDTO<T>> {
 
-	protected Map<String, String> mapBeanPropColumns = null;
+	protected boolean countSql = false;
 
 	@Override
 	public ResultDTO<T> handle(ResultSet rs) throws SQLException {
 		ResultDTO<T> t = new ResultDTO<T>();
-		t.setData(doDTO(rs));
+		t.setData(convertToBean(rs));
 		return t;
 	}
 
 	@SuppressWarnings("unchecked")
-	public T doDTO(ResultSet rs) throws SQLException {
-		return rs.next() ? (T)this.convert.toBean(rs, type, mapBeanPropColumns) : null;
+	public T convertToBean(ResultSet rs) throws SQLException {
+		return rs.next() ? (T) this.convert.toBean(rs, this.type, mapBeanPropColumns) : null;
 	}
 
-//  protected String[] getResultSetCols(ResultSetMetaData rsmd) throws SQLException {
-//      int cols = rsmd.getColumnCount();
-//      String[] columnToProperty = new String[cols];
-//      Arrays.fill(columnToProperty, null);
-//      for (int col = 1; col <= cols; col++) {
-//          String columnName = rsmd.getColumnLabel(col);
-//          if (null == columnName || 0 == columnName.length()) {
-//            columnName = rsmd.getColumnName(col);
-//          }
-//          columnToProperty[col - 1] = columnName;
-//      }
-//      return columnToProperty;
-//  }
+	@SuppressWarnings({ "rawtypes" })
+	@Override
+	public void setProp(Class type) {
+		this.setProp(type, false);
+	}
+
+	@SuppressWarnings({ "rawtypes" })
+	public void setProp(Class type, boolean countSql) {
+		super.setProp(type);
+		this.countSql = countSql;
+	}
+
+	@SuppressWarnings({ "rawtypes" })
+	public void setProp(Class type, BeanProcessorEx convert, boolean countSql) {
+		super.setProp(type, convert);
+		this.countSql = countSql;
+	}
+
+//	public void setMapBeanConvert(Map<String, String> mapConvert) {
+//		this.mapBeanPropColumns = mapConvert;
+//	}
+
+	public boolean isCountSql() {
+		return countSql;
+	}
+
+	public void setCountSql(boolean countSql) {
+		this.countSql = countSql;
+	}
 
 }

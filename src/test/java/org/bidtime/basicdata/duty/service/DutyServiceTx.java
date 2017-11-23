@@ -8,7 +8,6 @@ import org.bidtime.basicdata.duty.bean.Duty;
 import org.bidtime.basicdata.duty.dao.DutyDAO;
 import org.bidtime.basicdata.duty.dao.DutyDAO_;
 import org.bidtime.dbutils.jdbc.dao.PKCallback;
-import org.bidtime.utils.exception.TipMsgException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -60,7 +59,7 @@ public class DutyServiceTx {
 		int n = dao.delete(u);
 		if (n>0) {
 			if (dao_.delete(u)>0) {
-				throw new TipMsgException("err");				
+				throw new Exception("err");				
 			}
 		}
 		return n;

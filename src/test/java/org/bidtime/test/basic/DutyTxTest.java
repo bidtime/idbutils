@@ -7,8 +7,6 @@ import java.util.List;
 import org.apache.commons.dbutils.handlers.BeanHandler;
 import org.bidtime.basicdata.duty.bean.Duty;
 import org.bidtime.basicdata.duty.service.DutyServiceTx;
-import org.bidtime.dbutils.gson.ResultDTO;
-import org.bidtime.dbutils.jdbc.rs.handle.BeanDTOHandler;
 import org.bidtime.test.BasicTest;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -122,27 +120,27 @@ public class DutyTxTest extends BasicTest {
 		System.out.println("update: " + n);
 	}
 
-	@Test
-	public void test_getBeanDTOHandler() throws SQLException {
-		BeanDTOHandler<Duty> h = new BeanDTOHandler<Duty>(Duty.class);
-		ResultDTO<Duty> dto = service.list(h);
-		if (dto != null) {
-			System.out.println(dto);
-		} else {
-			System.out.println("null");
-		}
-	}
-
-	@Test
-	public void test_info() throws SQLException {
-		BeanDTOHandler<Duty> h = new BeanDTOHandler<Duty>(Duty.class);
-		ResultDTO<Duty> dto = service.info(h, 0);
-		if (dto != null) {
-			System.out.println(dto);
-		} else {
-			System.out.println("null");
-		}
-	}
+//	@Test
+//	public void test_getBeanDTOHandler() throws SQLException {
+//		BeanDTOHandler<Duty> h = new BeanDTOHandler<Duty>(Duty.class);
+//		ResultDTO<Duty> dto = service.list(h);
+//		if (dto != null) {
+//			System.out.println(dto);
+//		} else {
+//			System.out.println("null");
+//		}
+//	}
+//
+//	@Test
+//	public void test_info() throws SQLException {
+//		BeanDTOHandler<Duty> h = new BeanDTOHandler<Duty>(Duty.class);
+//		ResultDTO<Duty> dto = service.info(h, 0);
+//		if (dto != null) {
+//			System.out.println(dto);
+//		} else {
+//			System.out.println("null");
+//		}
+//	}
 
 	@Test
 	public void test_info_() throws SQLException {
