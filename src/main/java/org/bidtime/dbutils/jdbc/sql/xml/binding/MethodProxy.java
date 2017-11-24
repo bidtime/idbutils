@@ -30,7 +30,6 @@ public class MethodProxy<T> implements InvocationHandler {
 		this.jsonFieldXmlsLoader = jsonFieldXmlsLoader;
 	}
 
-	@SuppressWarnings({ "static-access" })
 	@Override
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 		System.out.println("=========================");
@@ -52,7 +51,7 @@ public class MethodProxy<T> implements InvocationHandler {
 			// 针对不同的方法进行不同的操作
 			//return invokeMethod(MethodInterfaceImpl.class, method.getName(), args);
 			//getCurrentDataSource(), this.getClass(), sqlId, rsh, params
-		    TTableProps tp = jsonFieldXmlsLoader.getTableProps(methodInterface);
+		    TTableProps tp = jsonFieldXmlsLoader.getTableProp(methodInterface);
 		    if (tp == null) {
 		    	throw new Exception("invoke:" + proxy.getClass() + "no xml file");
 		    }
@@ -177,5 +176,6 @@ public class MethodProxy<T> implements InvocationHandler {
     return ((method.getModifiers()
         & (Modifier.ABSTRACT | Modifier.PUBLIC | Modifier.STATIC)) == Modifier.PUBLIC)
         && method.getDeclaringClass().isInterface();
-  }	
+  }
+  
 }

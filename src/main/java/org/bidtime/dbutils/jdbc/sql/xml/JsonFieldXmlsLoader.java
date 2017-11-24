@@ -95,6 +95,11 @@ public class JsonFieldXmlsLoader extends TableFieldXmlsParser {
 		return getInstance().get(cls);
 	}
 	
+	@SuppressWarnings("rawtypes")
+	public TTableProps getTableProp(Class cls) throws SQLException {
+		return get(cls);
+	}
+	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	protected TTableProps load(String sKey, String path) throws Exception {
