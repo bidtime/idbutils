@@ -84,6 +84,21 @@ public class GsonRows extends GsonData {
 		}
 	}
 
+	public void addList(List<List<Object>> list) {
+		if (list != null && list.size() > 0 && data != null) {
+			int nLen = data.length + list.size();
+			Object[][] objReturn = new Object[nLen][head.length];
+			for (int i = 0; i < data.length; i++) {
+				objReturn[i] = data[i];
+			}
+			for (int i = data.length, j = 0; j < list.size(); i++, j++) {
+				List<Object> ll = list.get(j);
+				objReturn[i] = ll.toArray(new Object[0]);
+			}
+			data = objReturn;
+		}
+	}
+
 	// 一维转二维
 	private static Object[][] oneDegreeToTwoDegree(Object[] objects, int row,
 			int col) {

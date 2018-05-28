@@ -5,8 +5,6 @@ import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import com.alibaba.fastjson.JSON;
-
 /**
  * Created by bidtime on 2015/11/6. Basic Test
  */
@@ -40,7 +38,8 @@ public class BasicTest {
 	public void print(Object dto) {
 		System.out.println("---- Result ------------------");
 		if (dto != null) {
-			System.out.println(JSON.toJSON(dto));
+      //System.out.println(JSON.toJSON(dto));
+      System.out.println(dto.toString());
 		} else {
 			System.out.println("null");
 		}
