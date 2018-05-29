@@ -1,7 +1,6 @@
 package org.bidtime.test.basic;
 
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.Date;
 
 import org.bidtime.dbutils.gson.dataset.GsonRows;
@@ -14,6 +13,12 @@ public class GsonUtils {
   
   private static final String FROM_KEY = " from ";
   
+  public static void main(String[] args) throws Exception {
+    String sql = "select * from ap_duty where duty_id=10";
+    String tableName = GsonUtils.getTableName(sql);
+    System.out.println(tableName);
+  }
+  
   public static String getTableName(String sql) throws SQLException {
     String tableName = "";
     int pos = sql.indexOf(FROM_KEY);
@@ -21,8 +26,7 @@ public class GsonUtils {
       String tab = sql.substring(pos + FROM_KEY.length(), sql.length());
       int pp = tab.indexOf(' ');
       if (pp >=0 ) {
-        String ll = tab.substring(pos, pp);
-        tableName = ll;
+        tableName = tab.substring(0, pp);
       } else {
         tableName = tab;
       }
@@ -32,10 +36,12 @@ public class GsonUtils {
   
   public static String toInsertSql(GsonRows rows, String tableName, String insertSql, boolean batch) throws SQLException {
     StringBuilder sb = new StringBuilder();
+    // insert into table
     sb.append(insertSql);
     sb.append(" ");
     sb.append(tableName);
-    sb.append(" (");
+    sb.append(" ( ");
+    // column begin...
     int n = 0;
     for (String head : rows.getHead()) {
       if (n > 0) {
@@ -44,7 +50,8 @@ public class GsonUtils {
       sb.append(head);
       n ++;
     }
-    sb.append(")");    
+    sb.append(")");
+    // column end.    
     if (batch) {
       sb.append(" values ");
       sb.append("\n");
