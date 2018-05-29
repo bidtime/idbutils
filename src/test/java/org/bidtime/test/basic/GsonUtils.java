@@ -35,6 +35,9 @@ public class GsonUtils {
   }
   
   public static String toInsertSql(GsonRows rows, String tableName, String insertSql, boolean batch) throws SQLException {
+    if (rows == null) {
+      return "";
+    }
     StringBuilder sb = new StringBuilder();
     // insert into table
     sb.append(insertSql);
@@ -82,9 +85,10 @@ public class GsonUtils {
   public static String objectToString(Object o) {
     if (o != null) {
       if (o instanceof String) {
-        return "'" + (String) o + ",";
+        return "'" + (String) o + "'";
       } else if (o instanceof Date) {
-        return DateTimeComm.dateToString((Date)o, "yyyy-MM-dd HH:mm:ss zzz");
+        String dt = DateTimeComm.dateToString((Date)o, "yyyy-MM-dd HH:mm:ss SSS");
+        return dt;
       } else {
         return String.valueOf(o);
       }

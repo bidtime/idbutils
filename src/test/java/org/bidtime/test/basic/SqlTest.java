@@ -25,7 +25,7 @@ public class SqlTest extends BasicTest {
    */
   @Test
   public void openSql() throws SQLException {
-    String sql = "select * from ap_duty where duty_id=10";
+    String sql = "select * from ap_duty";
     String tableName = GsonUtils.getTableName(sql);
     GsonRows rows = openSql(sql);
     String ss = GsonUtils.toInsertSql(rows, tableName, "insert into", true);
