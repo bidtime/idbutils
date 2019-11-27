@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.bidtime.basicdata.duty.bean.Duty;
+import org.bidtime.basicdata.duty.bean.DutyCamel;
 import org.bidtime.dbutils.gson.ResultDTO;
 import org.bidtime.dbutils.jdbc.rs.handle.BeanDTOHandler;
 import org.bidtime.dbutils.jdbc.rs.handle.BeanHandler;
@@ -24,14 +25,22 @@ public class DutyDAO2Test extends BasicTest {
 	@Autowired
 	protected Duty2DAO dao;
 
-	@Test
-	public void test_beanList() throws SQLException {
-		BeanListHandler<Duty> h = new BeanListHandler<Duty>(Duty.class);
-		Map<String, Object> params = new HashMap<>();
-		Collection<Duty> dto = dao.selectByQuery(h, params);
-		print(dto);
-	}
+  @Test
+  public void test_beanList() throws SQLException {
+    BeanListHandler<Duty> h = new BeanListHandler<Duty>(Duty.class);
+    Map<String, Object> params = new HashMap<>();
+    Collection<Duty> dto = dao.selectByQuery(h, params);
+    print(dto);
+  }
 
+  @Test
+  public void test_beanList_camel() throws SQLException {
+    BeanListHandler<DutyCamel> h = new BeanListHandler<>(DutyCamel.class);
+    Map<String, Object> params = new HashMap<>();
+    Collection<DutyCamel> dto = dao.selectByQueryCamel(h, params);
+    print(dto);
+  }
+	
 	@Test
 	public void test_beanList_DTO() throws SQLException {
 		BeanListDTOHandler<Duty> h = new BeanListDTOHandler<>(Duty.class, 20);

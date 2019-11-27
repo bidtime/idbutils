@@ -4,6 +4,9 @@
  */
 package org.bidtime.test.mapper.dao;
 
+import java.sql.SQLException;
+
+import org.apache.commons.dbutils.ResultSetHandler;
 import org.bidtime.dbutils.base.mapper.BaseMapper;
 
 /**
@@ -17,5 +20,6 @@ public interface DutyMapper extends BaseMapper {
 //  int insert(Object o);
 //
 //  int insert(Object o, BeanAdapt ba);
+  <K> K selectByQueryCamel(ResultSetHandler<K> h, Object params) throws SQLException;
 
 }

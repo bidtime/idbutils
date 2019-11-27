@@ -37,6 +37,7 @@ import java.util.Map;
 
 import org.bidtime.dbutils.gson.dataset.GsonRow;
 import org.bidtime.dbutils.gson.dataset.GsonRows;
+import org.bidtime.dbutils.jdbc.rs.utils.CamelMapWrapper;
 import org.bidtime.utils.comm.CaseInsensitiveHashMap;
 
 /**
@@ -143,7 +144,7 @@ public class BeanProcessorEx implements Serializable {
         return toBean(rs, type, columnToPropertyOverrides);
     }
 
-	public <T> T toBean(ResultSet rs, Class<T> type, Map<String, String> mapBeanProps) throws SQLException {
+	  public <T> T toBean(ResultSet rs, Class<T> type, Map<String, String> mapBeanProps) throws SQLException {
         PropertyDescriptor[] props = this.propertyDescriptors(type);
         ResultSetMetaData rsmd = rs.getMetaData();
         int[] columnToProperty = this.mapColumnsToProperties(rsmd, props, mapBeanProps);
@@ -262,7 +263,8 @@ public class BeanProcessorEx implements Serializable {
      * @param value The value to pass into the setter.
      * @throws SQLException if an error occurs setting the property.
      */
-	private void callSetter(Object target, PropertyDescriptor prop, Object value)
+	@SuppressWarnings("unchecked")
+  private void callSetter(Object target, PropertyDescriptor prop, Object value)
             throws SQLException {
         Method setter = prop.getWriteMethod();
         if (setter == null) {
@@ -418,8 +420,8 @@ public class BeanProcessorEx implements Serializable {
        return mapColumnsToProperties(rsmd, props, 
     		   this.columnToPropertyOverrides);
     }
-   
-	protected int[] mapColumnsToProperties(ResultSetMetaData rsmd,
+    
+    protected int[] mapColumnsToProperties(ResultSetMetaData rsmd,
             PropertyDescriptor[] props, Map<String,String> mapBeanReflactColumn) throws SQLException {
         int cols = rsmd.getColumnCount();
         int[] columnToProperty = new int[cols + 1];
@@ -427,36 +429,43 @@ public class BeanProcessorEx implements Serializable {
         
         Map<String, Integer> mapBeanPropsIdx = new CaseInsensitiveHashMap<Integer>();
         try {
-	        for (int i = 0; i < props.length; i++) {
-	        	mapBeanPropsIdx.put(props[i].getName(), i);
-	        }
-	        
-	        for (int col = 1; col <= cols; col++) {
-	            String columnName = rsmd.getColumnLabel(col);
-	            if (null == columnName || 0 == columnName.length()) {
-	              columnName = rsmd.getColumnName(col);
-	            }
-	            // try get pro from map
-	            String propertyName = null;
-	            if (mapBeanReflactColumn != null && !mapBeanReflactColumn.isEmpty()) {
-	            	propertyName = mapBeanReflactColumn.get(columnName);
-	                if (propertyName == null) {
-	                    propertyName = columnName;
-	                }
-	            } else {
-	                propertyName = columnName;            	
-	            }
-	            Integer nColumnIdx = mapBeanPropsIdx.get(propertyName);
-	            if (nColumnIdx != null) {
-	            	columnToProperty[col] = nColumnIdx;
-	            }
-	        }
+          for (int i = 0; i < props.length; i++) {
+            mapBeanPropsIdx.put(props[i].getName(), i);
+          }
+          
+          for (int col = 1; col <= cols; col++) {
+              String columnName = rsmd.getColumnLabel(col);
+              if (null == columnName || 0 == columnName.length()) {
+                columnName = rsmd.getColumnName(col);
+              }
+              // try get pro from map
+              String propertyName = null;
+              if (mapBeanReflactColumn != null && !mapBeanReflactColumn.isEmpty()) {
+                propertyName = mapBeanReflactColumn.get(columnName);
+                  if (propertyName == null) {
+                      propertyName = columnName;
+                  }
+              } else {
+                if (useCamelCaseMapping) {
+                  propertyName = w.findProperty(columnName, useCamelCaseMapping);
+                } else {
+                  propertyName = columnName;                  
+                }
+              }
+              Integer nColumnIdx = mapBeanPropsIdx.get(propertyName);
+              if (nColumnIdx != null) {
+                columnToProperty[col] = nColumnIdx;
+              }
+          }
         } finally {
-        	mapBeanPropsIdx.clear();
-			mapBeanPropsIdx = null;
+          mapBeanPropsIdx.clear();
+          mapBeanPropsIdx = null;
         }
         return columnToProperty;
     }
+    
+    private static boolean useCamelCaseMapping = true;
+    private static CamelMapWrapper w = new CamelMapWrapper();
 
     /**
      * Convert a <code>ResultSet</code> column into an object.  Simple

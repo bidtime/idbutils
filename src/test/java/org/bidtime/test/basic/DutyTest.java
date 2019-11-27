@@ -9,6 +9,7 @@ import java.util.Map;
 import org.apache.commons.dbutils.handlers.BeanHandler;
 import org.apache.commons.dbutils.handlers.BeanListHandler;
 import org.bidtime.basicdata.duty.bean.Duty;
+import org.bidtime.basicdata.duty.bean.DutyCamel;
 import org.bidtime.basicdata.duty.service.DutyService;
 import org.bidtime.test.BasicTest;
 import org.junit.Test;
@@ -234,12 +235,19 @@ public class DutyTest extends BasicTest {
 		print(dto);
 	}
 
-	@Test
-	public void test_info_list() throws SQLException {
-		BeanListHandler<Duty> h = new BeanListHandler<Duty>(Duty.class);
-		List<Duty> dto = service.list(h);
-		print(dto);
-	}
+  @Test
+  public void test_info_list() throws SQLException {
+    BeanListHandler<Duty> h = new BeanListHandler<Duty>(Duty.class);
+    List<Duty> dto = service.list(h);
+    print(dto);
+  }
+
+  @Test
+  public void test_info_list_camel() throws SQLException {
+    BeanListHandler<DutyCamel> h = new BeanListHandler<>(DutyCamel.class);
+    List<DutyCamel> dto = service.list(h);
+    print(dto);
+  }
   
   @Test
   public void findIdByCode() throws SQLException {

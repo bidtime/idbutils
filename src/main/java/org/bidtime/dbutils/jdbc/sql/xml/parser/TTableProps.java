@@ -96,7 +96,7 @@ public class TTableProps {
 	
 	public Map<String, String> getMapConvertId(SqlHeadCountPro p) {
 		String mapCC = p.getMapConvert();
-		if (mapCC == null) {
+		if (mapCC == null || mapCC.length() == 0) {
 			return null;
 		} else if (mapCC.equals("default")) {
 			return this.mapDefaultBeanColumn;
