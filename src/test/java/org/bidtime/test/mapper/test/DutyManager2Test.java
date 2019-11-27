@@ -13,17 +13,17 @@ import org.bidtime.dbutils.jdbc.rs.handle.BeanHandler;
 import org.bidtime.dbutils.jdbc.rs.handle.BeanListDTOHandler;
 import org.bidtime.dbutils.jdbc.rs.handle.BeanListHandler;
 import org.bidtime.test.BasicTest;
-import org.bidtime.test.mapper.dao.Duty2DAO;
+import org.bidtime.test.mapper.dao.Duty2Manager;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Created by bidtim on 2015/9/23.
  */
-public class DutyDAO2Test extends BasicTest {
+public class DutyManager2Test extends BasicTest {
 
 	@Autowired
-	protected Duty2DAO dao;
+	protected Duty2Manager dao;
 
   @Test
   public void test_beanList() throws SQLException {

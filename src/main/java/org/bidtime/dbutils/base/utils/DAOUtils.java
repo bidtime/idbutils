@@ -74,37 +74,6 @@ public class DAOUtils {
     return listResult;
   }
 
-//  @SuppressWarnings("rawtypes")
-//  public static <T> PageBO<T> clonePage(Class<T> type, PageBO bo) throws Exception {
-//    List<T> listResult = null;
-//    if (bo.getContent() != null) {
-//      listResult = new ArrayList<>();
-//      for (Object u : bo.getContent()) {
-//        T modelBO = type.newInstance();
-//        BeanUtils.copyProperties(modelBO, u);
-//        listResult.add(modelBO);
-//      }
-//    }
-//    return new PageBO<T>(listResult, bo.getTotal());
-//  }
-//
-//  @SuppressWarnings("rawtypes")
-//  public static <T> PageBO<T> clonePage(Class<T> type, PageBO bo, IObjectCallBack<T> cb) throws Exception {
-//    List<T> listResult = null;
-//    if (bo.getContent() != null) {
-//      listResult = new ArrayList<>();
-//      for (Object u : bo.getContent()) {
-//        T modelBO = type.newInstance();
-//        BeanUtils.copyProperties(modelBO, u);
-//        if (cb != null) {
-//          cb.callback(modelBO);
-//        }
-//        listResult.add(modelBO);
-//      }
-//    }
-//    return new PageBO<T>(listResult, bo.getTotal());
-//  }
-
   public static <T> T cloneBean(Class<T> type, Object bo) throws Exception {
     T result = null;
     if (bo != null) {
@@ -125,65 +94,5 @@ public class DAOUtils {
     }
     return result;
   }
-
-//  public static Map<String, Object> bean2map(Object obj) throws Exception {
-//    if (obj == null) {
-//      return null;
-//    }    
-//    Map<String, Object> map = new HashMap<String, Object>();
-//    try {
-//      BeanInfo beanInfo = Introspector.getBeanInfo(obj.getClass());
-//      PropertyDescriptor[] propertyDescriptors = beanInfo.getPropertyDescriptors();
-//      for (PropertyDescriptor property : propertyDescriptors) {
-//        String key = property.getName();
-//        // 过滤class属性  
-//        if (!key.equals("class")) {
-//          // 得到property对应的getter方法  
-//          Method getter = property.getReadMethod();
-//          Object value = getter.invoke(obj);
-//          //if ( value != null ) {
-//            map.put(key, value);
-//          //}
-//        }
-//      }
-//    } catch (Exception e) {
-//      //System.out.println("transBean2Map Error " + e);
-//      throw new Exception(e);
-//    }
-//    return map;
-//  }
-
-//  public static <T> T map2bean(Class<T> type, Map<String, Object> map) throws Exception {
-//    T result = null;
-//    if (map != null) {
-//      result = type.newInstance();
-//      BeanUtils.populate(result, map);
-//      //BeanUtils.populate(result, map);
-//      //map2bean(result, map);
-//    }
-//    return result;
-//  }
-  
-//  // Map --> Bean 1: 利用Introspector,PropertyDescriptor实现 Map --> Bean  
-//  public static void map2bean(Object obj, Map<String, Object> map) throws Exception {
-//    try {
-//      BeanInfo beanInfo = Introspector.getBeanInfo(obj.getClass());
-//      PropertyDescriptor[] propertyDescriptors = beanInfo.getPropertyDescriptors();
-//      for (PropertyDescriptor property : propertyDescriptors) {
-//        String key = property.getName();
-//        if (map.containsKey(key)) {
-//          Object value = map.get(key);
-//          if ( value != null ) {
-//            // 得到property对应的setter方法  
-//            Method setter = property.getWriteMethod();
-//            setter.invoke(obj, value);
-//          }
-//        }
-//      }
-//    } catch (Exception e) {
-//      //System.out.println("transMap2Bean Error " + e);
-//      throw new Exception(e);
-//    }
-//  }
 
 }
