@@ -4,7 +4,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 
 import org.bidtime.basicdata.duty.service.DutyService;
-import org.bidtime.dbutils.gson.dataset.GsonRows;
+import org.bidtime.dbutils.data.dataset.GsonRows;
 import org.bidtime.dbutils.jdbc.rs.handle.GsonRowsHandler;
 import org.bidtime.test.BasicTest;
 import org.junit.Test;

@@ -11,7 +11,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.bidtime.dbutils.jdbc.sql.xml.parser.ColumnPro;
-import org.bidtime.utils.basic.ObjectComm;
+import org.bidtime.dbutils.utils.basic.ObjectComm;
 
 /*
  * author: jss

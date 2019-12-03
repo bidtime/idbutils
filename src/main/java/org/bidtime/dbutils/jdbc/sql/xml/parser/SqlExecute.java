@@ -11,9 +11,8 @@ import javax.sql.DataSource;
 
 import org.apache.commons.dbutils.ResultSetHandler;
 import org.apache.commons.dbutils.handlers.ScalarHandler;
-import org.bidtime.dbutils.base.utils.BeanMapUtils;
-import org.bidtime.dbutils.gson.PropAdapt;
-import org.bidtime.dbutils.gson.dataset.GsonRow;
+import org.bidtime.dbutils.data.PropAdapt;
+import org.bidtime.dbutils.data.dataset.GsonRow;
 import org.bidtime.dbutils.jdbc.connection.DbConnection;
 import org.bidtime.dbutils.jdbc.rs.BeanAdapt;
 import org.bidtime.dbutils.jdbc.rs.DeleteAdapt;
@@ -21,6 +20,7 @@ import org.bidtime.dbutils.jdbc.rs.InsertAdapt;
 import org.bidtime.dbutils.jdbc.rs.handle.ext.ResultSetExHandler;
 import org.bidtime.dbutils.jdbc.sql.SqlParser;
 import org.bidtime.dbutils.jdbc.sql.SqlUtils;
+import org.bidtime.dbutils.utils.comm.BeanMapUtils;
 
 public class SqlExecute {
 

@@ -1,7 +1,7 @@
 package org.bidtime.test.java;
 
-import org.bidtime.utils.proxy.OperDataParam;
-import org.bidtime.utils.proxy.OperExistsParam;
+import org.bidtime.dbutils.utils.proxy.OperDataParam;
+import org.bidtime.dbutils.utils.proxy.OperExistsParam;
 
 public interface MethodInterface {
 

@@ -7,15 +7,8 @@
            http://www.springframework.org/schema/context/spring-context-3.2.xsd
            http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.2.xsd">
 
-	<!-- 引入jdbc配置文件 -->
-	<context:property-placeholder location="classpath:data.properties" ignore-unresolvable="true"/>
-		
-    <bean id="jsonFieldXmlsLoader" class="org.bidtime.dbutils.jdbc.sql.xml.JsonFieldXmlsLoader"
-          init-method="init" lazy-init="false">
-        <property name="packageRoot" value="org.bidtime"/>
-        <property name="extName" value=".xml"/>
-        <property name="dataSource" ref="dataSource"/>
-    </bean>
+    <!-- 引入jdbc配置文件 -->
+    <context:property-placeholder location="classpath:data.properties" ignore-unresolvable="true"/>
 
   <!-- carvin数据源 -->
   <bean name="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init"
@@ -56,6 +49,13 @@
     
 	<!-- 注解事务管理器 -->
 	<tx:annotation-driven transaction-manager="txManager"  />
+		
+    <bean id="jsonFieldXmlsLoader" class="org.bidtime.dbutils.jdbc.sql.xml.JsonFieldXmlsLoader"
+          init-method="init" lazy-init="false">
+        <property name="packageRoot" value="org.bidtime"/>
+        <property name="extName" value=".xml"/>
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
     
 	<bean class="org.bidtime.dbutils.jdbc.sql.xml.mapper.MaperXMLScanner">
 	    <property name="basePackage" value="org.bidtime" />

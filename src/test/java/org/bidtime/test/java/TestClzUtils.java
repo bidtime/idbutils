@@ -1,7 +1,7 @@
 package org.bidtime.test.java;
 
-import org.bidtime.utils.proxy.ClzUtils;
-import org.bidtime.utils.proxy.OperExistsParam;
+import org.bidtime.dbutils.utils.proxy.ClzUtils;
+import org.bidtime.dbutils.utils.proxy.OperExistsParam;
 import org.junit.Test;
 
 public class TestClzUtils {

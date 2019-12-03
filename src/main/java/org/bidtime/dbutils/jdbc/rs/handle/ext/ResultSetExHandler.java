@@ -5,6 +5,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
 
+import org.apache.commons.dbutils.BasicRowProcessor;
 import org.apache.commons.dbutils.ResultSetHandler;
 import org.bidtime.dbutils.jdbc.rs.BeanProcessorEx;
 
@@ -22,15 +23,17 @@ public class ResultSetExHandler<T> implements ResultSetHandler<T>, Serializable 
 	@SuppressWarnings("rawtypes")
 	protected Class type;
 
-	static final protected BeanProcessorEx default_convert = new BeanProcessorEx();
+	protected static final BeanProcessorEx default_convert = new BeanProcessorEx();
+
+	protected static final BasicRowProcessor row_convert = new BasicRowProcessor();
 	
 	protected BeanProcessorEx convert;
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public T handle(ResultSet rs) throws SQLException {
-		return rs.next() ? (T) this.convert.toBean(rs, this.type, mapBeanPropColumns) : null;
-	}
+  @SuppressWarnings("unchecked")
+  @Override
+  public T handle(ResultSet rs) throws SQLException {
+    return rs.next() ? (T) this.convert.toBean(rs, this.type, mapBeanPropColumns) : null;
+  }
 
 	@SuppressWarnings({ "rawtypes" })
 	public void setProp(Class type) {

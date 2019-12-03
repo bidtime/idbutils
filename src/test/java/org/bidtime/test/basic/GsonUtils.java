@@ -3,8 +3,8 @@ package org.bidtime.test.basic;
 import java.sql.SQLException;
 import java.util.Date;
 
-import org.bidtime.dbutils.gson.dataset.GsonRows;
-import org.bidtime.utils.basic.DateTimeComm;
+import org.bidtime.dbutils.data.dataset.GsonRows;
+import org.bidtime.dbutils.utils.basic.DateTimeComm;
 
 /**
  * Created by bidtim on 2015/9/23.

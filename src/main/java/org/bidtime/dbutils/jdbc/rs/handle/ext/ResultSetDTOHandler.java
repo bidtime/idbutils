@@ -3,7 +3,7 @@ package org.bidtime.dbutils.jdbc.rs.handle.ext;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.bidtime.dbutils.gson.ResultDTO;
+import org.bidtime.dbutils.data.ResultDTO;
 import org.bidtime.dbutils.jdbc.rs.BeanProcessorEx;
 
 /**
@@ -19,15 +19,25 @@ public class ResultSetDTOHandler<T> extends ResultSetExHandler<ResultDTO<T>> {
 
 	@Override
 	public ResultDTO<T> handle(ResultSet rs) throws SQLException {
-		ResultDTO<T> t = new ResultDTO<T>();
-		t.setData(convertToBean(rs));
-		return t;
+		return new ResultDTO<T>(convertToBean(rs));
 	}
 
 	@SuppressWarnings("unchecked")
-	public T convertToBean(ResultSet rs) throws SQLException {
+	protected T convertToBean(ResultSet rs) throws SQLException {
 		return rs.next() ? (T) this.convert.toBean(rs, this.type, mapBeanPropColumns) : null;
 	}
+
+//  @SuppressWarnings("unchecked")
+//  public List<T> toList(ResultSet rs) throws SQLException {
+//    List<T> list = new ArrayList<T>();
+//    Object[] ar = rs.next() ? row_convert.toArray(rs) : null;
+//    if (ar != null) {
+//      for (Object o : ar) {
+//        list.add((T)o);
+//      }
+//    }
+//    return list;
+//  }
 
 	@SuppressWarnings({ "rawtypes" })
 	@Override

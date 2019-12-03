@@ -11,7 +11,7 @@ import java.util.Map;
 
 import org.bidtime.dbutils.jdbc.sql.xml.parser.ParserSqlXML;
 import org.bidtime.dbutils.jdbc.sql.xml.parser.TTableProps;
-import org.bidtime.utils.basic.PackageUtils;
+import org.bidtime.dbutils.utils.basic.PackageUtils;
 import org.dom4j.DocumentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

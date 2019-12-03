@@ -378,9 +378,9 @@ public class QueryRunnerEx extends AbstractQueryRunner {
                     close(conn);
                 }
             }
-    		if (LogSelectSql.logInfoOrDebug()) {
-    			LogSelectSql.logFormatTimeNow(startTime, sql, params);
-    		}
+      		if (LogSelectSql.logInfoOrDebug()) {
+      			LogSelectSql.logFormatTimeNow(startTime, sql, params);
+      		}
         }
 
         return result;

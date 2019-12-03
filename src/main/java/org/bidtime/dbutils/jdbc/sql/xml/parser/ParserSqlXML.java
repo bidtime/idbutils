@@ -10,7 +10,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.bidtime.dbutils.jdbc.sql.ArrayUtils;
-import org.bidtime.utils.comm.CaseInsensitiveHashMap;
+import org.bidtime.dbutils.utils.comm.CaseInsensitiveHashMap;
 import org.dom4j.Attribute;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -29,12 +29,21 @@ public class ParserSqlXML {
 
 //	private static final Pattern REPLACE_PATN = Pattern
 //			.compile("\\{[\\sorder by\\s]*\\}");
+	
+  private static Integer str2int(String s) {
+    if (s == null) {
+      return null;
+    } else {
+      return Integer.valueOf(s);
+    }
+  }
+
 
 	private static void elementToColumnPro(Element e, ColumnPro p) {
 		p.setName(getAttrValue(e, "name"));
 		p.setColumn(getAttrValue(e, "column"));
 		p.setType(getAttrValue(e, "type"));
-		p.setLength(Integer.valueOf(getAttrValue(e, "length")));
+		p.setLength(str2int(getAttrValue(e, "length")));
 		p.setGenerator(getAttrValue(e, "generator"));
 		p.setNotNull( Boolean.valueOf(getAttrValue(e, "not-null")) );
 		if (p.getNotNull()) {

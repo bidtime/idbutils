@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.bidtime.dbutils.base.utils.BeanMapUtils;
+import org.bidtime.dbutils.utils.comm.BeanMapUtils;
 import org.bidtime.test.BasicTest;
 import org.junit.Test;
 

@@ -3,7 +3,7 @@ package org.bidtime.dbutils.jdbc.rs.handle;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.bidtime.dbutils.gson.dataset.GsonRows;
+import org.bidtime.dbutils.data.dataset.GsonRows;
 import org.bidtime.dbutils.jdbc.rs.handle.ext.ResultSetExHandler;
 
 /**

@@ -1,6 +1,6 @@
 package org.bidtime.dbutils.params;
 
-import org.bidtime.utils.comm.PropEx;
+import org.bidtime.dbutils.utils.comm.PropEx;
 
 public class StmtParams {
 	

@@ -9,9 +9,9 @@ import javax.sql.DataSource;
 import org.apache.commons.dbutils.ResultSetHandler;
 import org.apache.commons.dbutils.handlers.ScalarHandler;
 import org.bidtime.dbutils.QueryRunnerEx;
-import org.bidtime.dbutils.gson.ResultDTO;
-import org.bidtime.dbutils.gson.dataset.GsonRow;
-import org.bidtime.dbutils.gson.dataset.GsonRows;
+import org.bidtime.dbutils.data.ResultDTO;
+import org.bidtime.dbutils.data.dataset.GsonRow;
+import org.bidtime.dbutils.data.dataset.GsonRows;
 import org.bidtime.dbutils.jdbc.connection.ds.DataSourceTransactionHolder;
 import org.bidtime.dbutils.jdbc.connection.log.LogSpSql;
 import org.bidtime.dbutils.jdbc.dao.SQLCallback;
@@ -21,8 +21,10 @@ import org.bidtime.dbutils.jdbc.rs.handle.AbstractListHandler;
 import org.bidtime.dbutils.jdbc.rs.handle.ext.ResultSetDTOHandler;
 import org.bidtime.dbutils.jdbc.sql.SqlUtils;
 import org.bidtime.dbutils.jdbc.sql.xml.parser.TTableProps;
-import org.bidtime.utils.basic.ArrayComm;
-import org.bidtime.utils.basic.ObjectComm;
+import org.bidtime.dbutils.utils.basic.ArrayComm;
+import org.bidtime.dbutils.utils.basic.ObjectComm;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.datasource.ConnectionHolder;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
@@ -33,6 +35,9 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
  *
  */
 public class DbConnection {
+  
+  private static final Logger log = LoggerFactory
+      .getLogger(DbConnection.class);
 
 	// 使用 ThreadLocal 保存 DataSourceTransactionHolder 变量
 	private volatile static ThreadLocal<DataSourceTransactionHolder> dataSourceTransThreadLocal = new ThreadLocal<DataSourceTransactionHolder>();
@@ -399,7 +404,12 @@ public class DbConnection {
 					((AbstractListHandler)rsh).setInitialSize(nPageSize);					
 				}
 			}
-			t = qr.query(conn, sql, rsh, paramAll);
+			try {
+			  t = qr.query(conn, sql, rsh, paramAll);
+			} catch (Exception e) {
+			  log.error("query: {}, {}, {}", sql, paramAll, e.getMessage());
+			  throw e;
+			}
 			if (sqlCount!=null && sqlCount.length()>0) { // total rows
 				bCountSql = true;
 				nTotalRows = ObjectComm.objectToLong(qr.query(conn,

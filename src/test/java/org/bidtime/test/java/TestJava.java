@@ -2,10 +2,10 @@ package org.bidtime.test.java;
 
 import java.sql.SQLException;
 
+import org.bidtime.dbutils.utils.proxy.ClzUtils;
+import org.bidtime.dbutils.utils.proxy.OperDataParam;
+import org.bidtime.dbutils.utils.proxy.OperExistsParam;
 import org.bidtime.test.BasicTest;
-import org.bidtime.utils.proxy.ClzUtils;
-import org.bidtime.utils.proxy.OperDataParam;
-import org.bidtime.utils.proxy.OperExistsParam;
 import org.junit.Test;
 
 /**

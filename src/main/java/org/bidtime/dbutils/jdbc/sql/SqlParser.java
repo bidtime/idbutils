@@ -155,9 +155,9 @@ public class SqlParser {
 		//String cfgSql2 = cfgSql.replace('\r', ' ').replace('\n', ' ')
 		//		.replaceAll(" {2,}", " ");
 		if (compareKey && !containsAllParams(cfgSql, inParams)) {
-			SQLException e = new SQLException("sql params is not match.");
-			logger.error("parse", e);
-			throw e;
+			//SQLException e = new SQLException("sql params is not match.");
+			logger.debug("parse: {}, {}, {}", cfgSql, inParams, "sql params is not match.");
+			//throw e;
 		}
 
 		// 替换 order by

@@ -4,7 +4,6 @@
  */
 package org.bidtime.dbutils.base.mapper;
 
-import java.sql.SQLException;
 import java.util.Map;
 
 import org.apache.commons.dbutils.ResultSetHandler;
@@ -18,48 +17,48 @@ import org.bidtime.dbutils.jdbc.rs.InsertAdapt;
  */
 public interface BaseMapper {
 
-	<K> K selectByQuery(ResultSetHandler<K> h, Map<String, Object> params) throws SQLException;
+	<K> K selectByQuery(ResultSetHandler<K> h, Map<String, Object> params);
 
-	<K> K selectByQuery(ResultSetHandler<K> h, Object params) throws SQLException;
+	<K> K selectByQuery(ResultSetHandler<K> h, Object params);
 
-	<K> K selectByQuery(ResultSetHandler<K> h) throws SQLException;
+	<K> K selectByQuery(ResultSetHandler<K> h);
 
-	<K> K selectByQuery(ResultSetHandler<K> h, Map<String, Object> params, Integer pageIdx, Integer pageSize) throws SQLException;
+	<K> K selectByQuery(ResultSetHandler<K> h, Map<String, Object> params, Integer pageIdx, Integer pageSize);
 
-	<K> K selectByQuery(ResultSetHandler<K> h, Object params, Integer pageIdx, Integer pageSize) throws SQLException;
+	<K> K selectByQuery(ResultSetHandler<K> h, Object params, Integer pageIdx, Integer pageSize);
 
-	<K> K selectByQuery(ResultSetHandler<K> h, Integer pageIdx, Integer pageSize) throws SQLException;
+	<K> K selectByQuery(ResultSetHandler<K> h, Integer pageIdx, Integer pageSize);
 
-//	<K> ResultDTO<K> selectByQuery(ResultDTO<ResultSetHandler<K>> h, Map<String, Object> params) throws SQLException;
+//	<K> ResultDTO<K> selectByQuery(ResultDTO<ResultSetHandler<K>> h, Map<String, Object> params);
 
-	<K> K selectById(ResultSetHandler<K> h, Number id) throws SQLException;
+	<K> K selectById(ResultSetHandler<K> h, Number id);
 
-	<K> K selectById(ResultSetHandler<K> h, String id) throws SQLException;
+	<K> K selectById(ResultSetHandler<K> h, String id);
 	
 	// insert
 	
-	<K> int insert(K k) throws SQLException;
+	<K> int insert(K k);
 	
-	<K, M> M insert(K k, InsertAdapt ia) throws SQLException;
+	<K, M> M insert(K k, InsertAdapt ia);
 
-	<K> int insert(K k, BeanAdapt ba) throws SQLException;
+	<K> int insert(K k, BeanAdapt ba);
 
-	//<K, M> M insert(K k, InsertAdapt ia, BeanAdapt ba) throws SQLException;
+	//<K, M> M insert(K k, InsertAdapt ia, BeanAdapt ba);
 	
 	// update
 
-	<K> int update(K k) throws SQLException;
+	<K> int update(K k);
 
-	<K> int update(K k, BeanAdapt ba) throws SQLException;
+	<K> int update(K k, BeanAdapt ba);
 	
 	// delete
 
-	<K> int delete(K k) throws SQLException;
+	<K> int delete(K k);
 
-	<K> int delete(K k, DeleteAdapt adapt) throws SQLException;
+	<K> int delete(K k, DeleteAdapt adapt);
 
-	int deleteById(Number id) throws SQLException;
+	int deleteById(Number id);
 
-	int deleteById(String id) throws SQLException;
+	int deleteById(String id);
 	
 }

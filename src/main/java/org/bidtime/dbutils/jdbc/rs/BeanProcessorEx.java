@@ -35,10 +35,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.bidtime.dbutils.gson.dataset.GsonRow;
-import org.bidtime.dbutils.gson.dataset.GsonRows;
+import org.bidtime.dbutils.data.dataset.GsonRow;
+import org.bidtime.dbutils.data.dataset.GsonRows;
 import org.bidtime.dbutils.jdbc.rs.utils.CamelMapWrapper;
-import org.bidtime.utils.comm.CaseInsensitiveHashMap;
+import org.bidtime.dbutils.utils.comm.CaseInsensitiveHashMap;
 
 /**
  * <p>
