@@ -11,16 +11,14 @@
     <context:property-placeholder location="classpath:data.properties" ignore-unresolvable="true"/>
 
   <!-- carvin数据源 -->
-  <bean name="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init"
+  <!--
+  <bean name="dataSource1" class="com.alibaba.druid.pool.DruidDataSource" init-method="init"
     destroy-method="close">
     <property name="url" value="${ds.url}" />
     <property name="username" value="${ds.username}" />
     <property name="password" value="${ds.password}" />
     <property name="initialSize" value="${ds.initialSize}" />
     <property name="maxActive" value="${ds.maxActive}" />
-    <!--
-    <property name="maxIdle" value="20" />
-    -->
     <property name="minIdle" value="0" />
     <property name="maxWait" value="60000" />
     <property name="validationQuery" value="select 1" />
@@ -34,7 +32,17 @@
     <property name="logAbandoned" value="true" />
     <property name="filters" value="mergeStat" />
   </bean>
-
+  -->
+  
+  <bean name="dataSource" class="com.zaxxer.hikari.HikariDataSource" >
+    <!-- <property name="driverClassName" value="${ds.driverClassl}" /> -->
+    <property name="jdbcUrl" value="${ds.url}" />
+    <property name="username" value="${ds.username}" />
+    <property name="password" value="${ds.password}" />
+    <property name="minimumIdle" value="${ds.initialSize}" />
+    <property name="maximumPoolSize" value="${ds.maxActive}" />
+  </bean>
+  
 	<!-- 事务管理器 -->
 	<bean id="txManager"
 		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
