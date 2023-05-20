@@ -79,18 +79,31 @@ public class DutyManager2Test extends BasicTest {
 		Duty bean = new Duty();
 		bean.setId(id);
 		bean.setCode("code_" + id);
-		bean.setCode("name_" + id);
+		bean.setName("name_" + id);
 		int n = manager.insert(bean);
 		print(n);
 	}
 
 	@Test
+	public void test_insert_nums() throws SQLException {
+		for (int i=0; i<10; i++) {
+			Long id = Long.valueOf(getId(10));
+			Duty bean = new Duty();
+			bean.setId(id);
+			bean.setCode("code_" + id);
+			bean.setName("name_" + id);
+			int n = manager.insert(bean);
+			print(n);
+		}
+	}
+
+	@Test
 	public void test_update() throws SQLException {
 		Duty bean = new Duty();
-		bean.setId(19L);
-		Long id = Long.valueOf(getId(10));
-		bean.setCode("code_" + id);
-		bean.setCode("name_" + id);
+		bean.setId(4L);
+		Long new_id = Long.valueOf(getId(10));
+		bean.setCode("code_" + new_id);
+		bean.setName("name_" + new_id);
 		int n = manager.update(bean);
 		print(n);
 	}
@@ -98,14 +111,14 @@ public class DutyManager2Test extends BasicTest {
 	@Test
 	public void test_delete_bean() throws SQLException {
 		Duty bean = new Duty();
-		bean.setId(19L);
-		int n = manager.update(bean);
+		bean.setId(1L);
+		int n = manager.delete(bean);
 		print(n);
 	}
 
 	@Test
 	public void test_delete_id() throws SQLException {
-		Long id = 19L;
+		Long id = 3L;
 		int n = manager.delete(id);
 		print(n);
 	}
