@@ -263,10 +263,6 @@ public class TTableProps {
 	public TTableProps() {
 	}
 
-//	public void finished() {
-//		setSqlHeadPro_CountSql();
-//	}
-
 	private void setDefaultValue(GsonRow r) {
 		if (r == null || !r.isExistsData() || !this.existDefault) {
 			return;

@@ -75,7 +75,7 @@ public class SqlExecute {
 
 	// query
 
-	public static <T> T querySql(DataSource ds, String sqlPrepare, ResultSetHandler<T> rsh, Map<String, ?> params,
+	private static <T> T querySql(DataSource ds, String sqlPrepare, ResultSetHandler<T> rsh, Map<String, ?> params,
 			Integer pageIdx, Integer pageSize) throws Exception {
 		List<Object> paramList = new ArrayList<Object>();
 		String sql = SqlParser.parse(sqlPrepare, params, paramList);
@@ -104,7 +104,7 @@ public class SqlExecute {
 		}
 	}
 
-	public static int insert(DataSource ds, TTableProps tp, Object object, PropAdapt pa) throws SQLException {
+	private static int insert(DataSource ds, TTableProps tp, Object object, PropAdapt pa) throws SQLException {
 		return insert(ds, tp, object, pa, new ISqlCallBack<GsonRow>() {
 
 			@Override
@@ -177,19 +177,7 @@ public class SqlExecute {
 		}
 	}
 
-//	public static int insertForPK(DataSource ds, TTableProps tp, Object object, PropAdapt pa) throws SQLException {
-//		return insertForPK(ds, tp, object, pa, new ISqlCallBack<GsonRow>() {
-//
-//			@Override
-//			public String callback(GsonRow r) {
-//				return tp.getInsertSql(r, true);
-//			}
-//
-//		});
-//	}
-
-	//<K, M> M insertForPK(K k, Class<M> clz, InsertAdapt ia);
-	public static <M> M insertForPK(DataSource ds, TTableProps tp, Object object, ResultSetHandler<M> h) throws SQLException {
+	private static <M> M insertForPK(DataSource ds, TTableProps tp, Object object, ResultSetHandler<M> h) throws SQLException {
 		return insertForPK(ds, tp, object, h, new ISqlCallBack<GsonRow>() {
 
 			@Override
@@ -231,7 +219,7 @@ public class SqlExecute {
 	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public static <M> M insertForPK(DataSource ds, TTableProps tp, Object object, ResultSetHandler<M> h, ISqlCallBack cb) throws SQLException {
+	private static <M> M insertForPK(DataSource ds, TTableProps tp, Object object, ResultSetHandler<M> h, ISqlCallBack cb) throws SQLException {
 		if (object == null) {
 			return (M)null;
 		}

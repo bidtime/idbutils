@@ -67,12 +67,6 @@ public class ParserSqlXML {
 		}
 		tp.setFieldPK(ArrayUtils.listToStringArray(listPkField));
 	}
-	
-//	private static void attrValueToMap(Element e, String attrName, Map<String, String> map) {
-//		String value = getAttrValue(e, attrName);
-//		String key = attrName;
-//		map.put(key, value);
-//	}
 
 	private static Map<String, String> getElementToMapConvert(Element pElement) {
 		Map<String, String> map = new CaseInsensitiveHashMap<String>();
