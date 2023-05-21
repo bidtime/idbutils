@@ -12,6 +12,7 @@ import org.bidtime.dbutils.jdbc.rs.handle.BeanDTOHandler;
 import org.bidtime.dbutils.jdbc.rs.handle.BeanHandler;
 import org.bidtime.dbutils.jdbc.rs.handle.BeanListDTOHandler;
 import org.bidtime.dbutils.jdbc.rs.handle.BeanListHandler;
+import org.bidtime.dbutils.jdbc.rs.handle.MaxIdHandler;
 import org.bidtime.test.BasicTest;
 import org.bidtime.test.mapper.duty.service.Duty2Manager;
 import org.junit.Test;
@@ -81,6 +82,31 @@ public class DutyManager2Test extends BasicTest {
 		bean.setCode("code_" + id);
 		bean.setName("name_" + id);
 		int n = manager.insert(bean);
+		print(n);
+	}
+
+	@Test
+	public void test_insertForPK() throws SQLException {
+		Long id = Long.valueOf(getId(10));
+		Duty bean = new Duty();
+		//bean.setId(id);
+		bean.setCode("code_" + id);
+		bean.setName("name_" + id);
+		MaxIdHandler<Long> h = new MaxIdHandler<Long>(Long.class);
+		Long n = manager.insertForPK(bean, h);
+		print(n);
+	}
+
+	@Test
+	public void test_insertForPK2() throws SQLException {
+		Long id = Long.valueOf(getId(10));
+		Duty bean = new Duty();
+		//bean.setId(id);
+		bean.setCode("code_" + id);
+		bean.setName("name_" + id);
+		//MaxIdHandler<Long> h = new MaxIdHandler<Long>(Long.class);
+		Long n = manager.insertForPK(bean, Long.class);
+		//Long n = manager.insertForPK(bean, Long);
 		print(n);
 	}
 

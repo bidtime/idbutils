@@ -6,6 +6,7 @@ import org.apache.commons.dbutils.ResultSetHandler;
 import org.bidtime.dbutils.base.mapper.BaseMapper;
 import org.bidtime.dbutils.jdbc.rs.BeanAdapt;
 import org.bidtime.dbutils.jdbc.rs.DeleteAdapt;
+import org.bidtime.dbutils.jdbc.rs.InsertAdapt;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class BaseManager<M extends BaseMapper> {
@@ -45,9 +46,37 @@ public class BaseManager<M extends BaseMapper> {
 		return mapper.insert(k);
 	}
 	
-	public <K> int insert(K k, BeanAdapt ba) {
-		return mapper.insert(k, ba);
+	public <K> int insert(K k, InsertAdapt ia) {
+		return mapper.insert(k, ia);
 	}
+	
+//	public <K> int insert(K k, BeanAdapt ba) {
+//		return mapper.insert(k, ba);
+//	}
+	
+	@SuppressWarnings({ "hiding" })
+	public <K, M> M insertForPK(K k, ResultSetHandler<M> h) {
+		return (M)mapper.insertForPK(k, h);
+	}
+	
+//	@SuppressWarnings("hiding")
+//	public <K, M> M insertForPK(K k, M m) {
+//		return (M)mapper.insertForPK(k, m);
+//	}
+	
+	@SuppressWarnings({ "hiding", "unchecked" })
+	public <K, M> M insertForPK(K k, Class<M> clz) {
+		return (M)mapper.insertForPK(k, clz);
+	}
+	
+//	@SuppressWarnings({ "hiding" })
+//	public <K, M> M insertForPK(K k, Class<M> clz, InsertAdapt ia) {
+//		return (M)mapper.insertForPK(k, clz, ia);
+//	}
+	
+//	public <K, M> M insertForPK(K k, BeanAdapt ba) {
+//		return mapper.insert(k, ba);
+//	}
 	
 	// update
 	

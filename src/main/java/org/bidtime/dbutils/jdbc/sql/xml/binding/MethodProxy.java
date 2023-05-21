@@ -13,7 +13,6 @@ import org.apache.commons.dbutils.ResultSetHandler;
 import org.bidtime.dbutils.jdbc.connection.SqlLoadUtils;
 import org.bidtime.dbutils.jdbc.sql.xml.JsonFieldXmlsLoader;
 import org.bidtime.dbutils.jdbc.sql.xml.parser.TTableProps;
-import org.springframework.lang.UsesJava7;
 
 public class MethodProxy<T> implements InvocationHandler {
 	
@@ -133,6 +132,7 @@ public class MethodProxy<T> implements InvocationHandler {
 		}
 	}
 	
+	@SuppressWarnings("deprecation")
 	public static <R> Object invokeMethod(Class<R> clz, String methodName, Object[] args) throws Exception {
 		Object owner = clz.newInstance();
 		Class<?>[] args_class = new Class[args.length];
@@ -153,20 +153,20 @@ public class MethodProxy<T> implements InvocationHandler {
 		return method.invoke(null, args);
 	}
 
-  @UsesJava7
+  @SuppressWarnings("deprecation")
   private Object invokeDefaultMethod(Object proxy, Method method, Object[] args)
       throws Throwable {
-    final Constructor<MethodHandles.Lookup> constructor = MethodHandles.Lookup.class
-        .getDeclaredConstructor(Class.class, int.class);
-    if (!constructor.isAccessible()) {
-      constructor.setAccessible(true);
-    }
-    final Class<?> declaringClass = method.getDeclaringClass();
-    return constructor
-        .newInstance(declaringClass,
-            MethodHandles.Lookup.PRIVATE | MethodHandles.Lookup.PROTECTED
-                | MethodHandles.Lookup.PACKAGE | MethodHandles.Lookup.PUBLIC)
-        .unreflectSpecial(method, declaringClass).bindTo(proxy).invokeWithArguments(args);
+		final Constructor<MethodHandles.Lookup> constructor = MethodHandles.Lookup.class
+		    .getDeclaredConstructor(Class.class, int.class);
+		if (!constructor.isAccessible()) {
+		  constructor.setAccessible(true);
+		}
+		final Class<?> declaringClass = method.getDeclaringClass();
+		return constructor
+		    .newInstance(declaringClass,
+		        MethodHandles.Lookup.PRIVATE | MethodHandles.Lookup.PROTECTED
+		            | MethodHandles.Lookup.PACKAGE | MethodHandles.Lookup.PUBLIC)
+		    .unreflectSpecial(method, declaringClass).bindTo(proxy).invokeWithArguments(args);
   }
 
   /**

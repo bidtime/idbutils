@@ -30,14 +30,13 @@ public class ParserSqlXML {
 //	private static final Pattern REPLACE_PATN = Pattern
 //			.compile("\\{[\\sorder by\\s]*\\}");
 	
-  private static Integer str2int(String s) {
-    if (s == null) {
-      return null;
-    } else {
-      return Integer.valueOf(s);
-    }
-  }
-
+	private static Integer str2int(String s) {
+		if (s == null) {
+			return null;
+		} else {
+			return Integer.valueOf(s);
+		}
+	}
 
 	private static void elementToColumnPro(Element e, ColumnPro p) {
 		p.setName(getAttrValue(e, "name"));

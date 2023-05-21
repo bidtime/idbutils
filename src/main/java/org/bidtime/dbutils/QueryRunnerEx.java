@@ -625,8 +625,8 @@ public class QueryRunnerEx extends AbstractQueryRunner {
             stmt.setQueryTimeout(StmtParams.getInstance().getStmtUpdateTimeOut());
             this.fillStatement(stmt, params);
             stmt.executeUpdate();
-            ResultSet resultSet = stmt.getGeneratedKeys();
-            generatedKeys = rsh.handle(resultSet);
+            ResultSet rs = stmt.getGeneratedKeys();
+            generatedKeys = rsh.handle(rs);
         } catch (SQLException e) {
             this.rethrow(e, sql, params);
         } finally {

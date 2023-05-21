@@ -12,7 +12,7 @@ import org.bidtime.dbutils.jdbc.rs.DeleteAdapt;
 import org.bidtime.dbutils.jdbc.rs.InsertAdapt;
 
 /**
- * @author maguangzu
+ * @author riverbo
  * @since 2017年8月29日
  */
 public interface BaseMapper {
@@ -39,11 +39,19 @@ public interface BaseMapper {
 	
 	<K> int insert(K k);
 	
-	<K, M> M insert(K k, InsertAdapt ia);
+	<K> int insert(K k, InsertAdapt ia);
 
-	<K> int insert(K k, BeanAdapt ba);
+	//<K> int insert(K k, BeanAdapt ba);
+	
+	<K, M> M insertForPK(K k, ResultSetHandler<M> h);
+	
+//	<K, M> M insertForPK(K k, M m);
 
-	//<K, M> M insert(K k, InsertAdapt ia, BeanAdapt ba);
+	<K, M> M insertForPK(K k, Class<M> clz);
+
+//	<K, M> M insertForPK(K k, Class<M> clz, InsertAdapt ia);
+	
+	//<K, M> M insertForPK(K k, BeanAdapt ba);
 	
 	// update
 

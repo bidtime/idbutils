@@ -14,10 +14,8 @@
 
 	<properties>
 	    <commons-beanutils.version>1.9.3</commons-beanutils.version>
-		<commons-dbutils.version>1.6</commons-dbutils.version>
-		<idbutils.version>1.0.16</idbutils.version>
-
-		<spring.version>4.3.16.RELEASE</spring.version>
+		<commons-dbutils.version>1.7</commons-dbutils.version>
+		<spring.version>5.3.25</spring.version>
 		<fastjson.version>1.2.17</fastjson.version>
 		<commons-lang3.version>3.5</commons-lang3.version>
 
@@ -117,11 +115,12 @@
 			<version>${spring.version}</version>
 		</dependency>
 
+        <!--
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-webmvc-portlet</artifactId>
 			<version>${spring.version}</version>
-		</dependency>
+		</dependency> -->
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-oxm</artifactId>
@@ -142,11 +141,13 @@
 			<artifactId>spring-instrument</artifactId>
 			<version>${spring.version}</version>
 		</dependency>
+		<!--
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-instrument-tomcat</artifactId>
 			<version>${spring.version}</version>
 		</dependency>
+		-->
 
 		<dependency>
 			<groupId>org.springframework</groupId>

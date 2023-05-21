@@ -88,6 +88,8 @@ public class TTableProps {
 				return SqlExecute.update(ds, this, args_old);
 			} else if ("delete".equals(sqlId)) {
 				return SqlExecute.delete(ds, this, args_old);
+			} else if ("insertForPK".equals(sqlId)) {
+				return SqlExecute.insertForPK(ds, this, args_old);
 			} 
 	    	throw new Exception("invoke:" + this.getClass() + ", " + sqlId + " method not exists");
 	    }

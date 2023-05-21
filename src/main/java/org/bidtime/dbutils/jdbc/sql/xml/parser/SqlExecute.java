@@ -1,5 +1,6 @@
 package org.bidtime.dbutils.jdbc.sql.xml.parser;
 
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -10,13 +11,13 @@ import java.util.Map;
 import javax.sql.DataSource;
 
 import org.apache.commons.dbutils.ResultSetHandler;
-import org.apache.commons.dbutils.handlers.ScalarHandler;
 import org.bidtime.dbutils.data.PropAdapt;
 import org.bidtime.dbutils.data.dataset.GsonRow;
 import org.bidtime.dbutils.jdbc.connection.DbConnection;
 import org.bidtime.dbutils.jdbc.rs.BeanAdapt;
 import org.bidtime.dbutils.jdbc.rs.DeleteAdapt;
 import org.bidtime.dbutils.jdbc.rs.InsertAdapt;
+import org.bidtime.dbutils.jdbc.rs.handle.MaxIdHandler;
 import org.bidtime.dbutils.jdbc.rs.handle.ext.ResultSetExHandler;
 import org.bidtime.dbutils.jdbc.sql.SqlParser;
 import org.bidtime.dbutils.jdbc.sql.SqlUtils;
@@ -89,13 +90,14 @@ public class SqlExecute {
 		} else if (args_old.length == 1) {
 			return insert(ds, tp, args_old[0], (PropAdapt) null);
 		} else {
-			Object o2 = args_old[1];
-		    if (o2 == null) {
-		    	return insert(ds, tp, args_old[0], (PropAdapt) null);
-			} if (o2 instanceof InsertAdapt) {
-				return insertForPK(ds, tp, args_old[0], (PropAdapt) null);
-			} else if (o2 instanceof BeanAdapt) {				
-				return insert(ds, tp, args_old[0], (PropAdapt) args_old[1]);
+			Object par1 = args_old[0];
+			Object par2 = args_old[1];
+		    if (par2 == null) {
+		    	return insert(ds, tp, par1, (PropAdapt) null);
+			} if (par2 instanceof InsertAdapt) {
+				return insert(ds, tp, par1, (PropAdapt)par2);
+			} else if (par2 instanceof BeanAdapt) {				
+				return insert(ds, tp, par1, (PropAdapt)par2);
 			} else {
 				throw new SQLException("insert the second param must be InsertAdapt or BeanAdapt");
 			}
@@ -104,6 +106,91 @@ public class SqlExecute {
 
 	public static int insert(DataSource ds, TTableProps tp, Object object, PropAdapt pa) throws SQLException {
 		return insert(ds, tp, object, pa, new ISqlCallBack<GsonRow>() {
+
+			@Override
+			public String callback(GsonRow r) {
+				return tp.getInsertSql(r, true);
+			}
+
+		});
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public static Object insertForPK(DataSource ds, TTableProps tp, Object[] args_old) throws SQLException {
+		if (args_old.length == 0) {
+			throw new SQLException("insert par could not be null");
+		} else if (args_old.length == 1) {
+			throw new SQLException("insert par could not be one");
+		} else if (args_old.length == 2) {
+			Object par1 = args_old[0];
+			Object par2 = args_old[1];
+		    if (par2 == null) {
+				throw new SQLException("insert par2 could not be null");
+			} if (par2 instanceof ResultSetHandler) {
+				return insertForPK(ds, tp, par1, (ResultSetHandler)par2);
+			} else if (par2 instanceof Class) {
+				Class clz = (Class)par2;
+				if (clz.isAssignableFrom(Long.class)) {
+					MaxIdHandler<Long> h = new MaxIdHandler<Long>(Long.class);
+					return insertForPK(ds, tp, par1, h);
+		          } else if (clz.isAssignableFrom(BigDecimal.class)) {
+					MaxIdHandler<Long> h = new MaxIdHandler<Long>(Long.class);
+					return insertForPK(ds, tp, par1, h);
+		          } else if (clz.isAssignableFrom(Short.class)) {
+					MaxIdHandler<Short> h = new MaxIdHandler<Short>(Short.class);
+					return insertForPK(ds, tp, par1, h);
+		          } else if (clz.isAssignableFrom(Byte.class)) {
+					MaxIdHandler<Byte> h = new MaxIdHandler<Byte>(Byte.class);
+					return insertForPK(ds, tp, par1, h);
+		          } else {
+					MaxIdHandler<Integer> h = new MaxIdHandler<Integer>(Integer.class);
+					return insertForPK(ds, tp, par1, h);
+		          }
+//				ProcessMaxIdHandler<M> h = null;
+//				if (clz.equals(Long.class)) {
+//					h = new ProcessMaxIdHandler<Long>();
+//				} else if (clz.equals(BigDecimal.class)) {
+//					h = new ProcessMaxIdHandler<BigDecimal>();
+//				} else if (clz.equals(Integer.class)) {
+//					h = new ProcessMaxIdHandler<Integer>();
+//				} else if (clz.equals(Short.class)) {
+//					h = new ProcessMaxIdHandler<Short>();
+//				} else {
+//					h = new ProcessMaxIdHandler<Integer>();
+//				}
+			} else {
+				throw new SQLException("insert the second param must be InsertAdapt or BeanAdapt");
+			}
+		} else {
+//			Object par1 = args_old[0];
+//			Object par2 = args_old[1];
+//			Object par3 = args_old[2];
+//		    if (par2 == null) {
+//		    	return insertForPK(ds, tp, par1, (PropAdapt)null);
+//			} if (par2 instanceof InsertAdapt) {
+//				return insertForPK(ds, tp, par1, (PropAdapt)par2);
+//			} else if (par2 instanceof BeanAdapt) {				
+//				return insertForPK(ds, tp, par1, (PropAdapt)null);
+//			} else {
+				throw new SQLException("insert the second param must be InsertAdapt or BeanAdapt");
+			//}
+		}
+	}
+
+//	public static int insertForPK(DataSource ds, TTableProps tp, Object object, PropAdapt pa) throws SQLException {
+//		return insertForPK(ds, tp, object, pa, new ISqlCallBack<GsonRow>() {
+//
+//			@Override
+//			public String callback(GsonRow r) {
+//				return tp.getInsertSql(r, true);
+//			}
+//
+//		});
+//	}
+
+	//<K, M> M insertForPK(K k, Class<M> clz, InsertAdapt ia);
+	public static <M> M insertForPK(DataSource ds, TTableProps tp, Object object, ResultSetHandler<M> h) throws SQLException {
+		return insertForPK(ds, tp, object, h, new ISqlCallBack<GsonRow>() {
 
 			@Override
 			public String callback(GsonRow r) {
@@ -144,20 +231,19 @@ public class SqlExecute {
 	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public static <M> M insertForPK(DataSource ds, TTableProps tp, Object o, PropAdapt pa) throws SQLException {
-		if (o == null) {
-			return null;
+	public static <M> M insertForPK(DataSource ds, TTableProps tp, Object object, ResultSetHandler<M> h, ISqlCallBack cb) throws SQLException {
+		if (object == null) {
+			return (M)null;
 		}
 		GsonRow g = null;
 		try {
-			if (o instanceof Map) {
-				g = tp.mapToRow((Map)o, true);
+			if (object instanceof Map) {
+				g = tp.mapToRow((Map) object, true);
 			} else {
-				g = tp.clazzToRow(o, true, pa);
+				g = tp.clazzToRow(object, true, null);
 			}
-			String sql = tp.getInsertSql(g, true);
-			return (M) DbConnection.insert(ds, sql, new ScalarHandler<M>()
-					, g.getData());
+			String sql = cb.callback(g);
+			return DbConnection.insert(ds, sql, h, g.getData());
 		} finally {
 			g = null;
 		}
