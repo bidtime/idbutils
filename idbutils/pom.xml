@@ -36,11 +36,13 @@
  	    <HikariCP.version>4.0.3</HikariCP.version>
 
 	</properties>
-      <modules>
-         <module>idbutils-data</module>
-         <module>idbutils</module>
-      </modules>  
+
 	<dependencies>
+	   <dependency>
+            <groupId>org.bidtime.utils</groupId>
+            <artifactId>idbutils-data</artifactId>
+            <version>1.0.17</version>
+        </dependency>
 	
 		<!-- https://mvnrepository.com/artifact/commons-beanutils/commons-beanutils -->
 		<dependency>
